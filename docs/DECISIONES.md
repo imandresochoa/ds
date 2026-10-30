@@ -176,3 +176,14 @@ Un agente que solo necesitaba saber qué usa un bloque tenía que bajarse `regis
 - **Solo lectura.** No es compatible con `npx shadcn add`, como ya se decidió con la interfaz de shadcn/ui: nada del sistema escribe en producción.
 
 **Directorio.** La lista de sistemas sale de un repo de directorio aparte, con un `directorio.json` que apunta a las carpetas de los sistemas y los sirve juntos. Así el kit no nombra ningún producto y la cobertura se lee en local, sin peticiones de red. Se descartó una clave `directorio` en el `system.json` de cada sistema: la lista se repetiría en cada uno y habría que pedir la cobertura por red a cada sitio publicado. Hoy `ds dev` y `ds build` sirven un solo sistema, así que juntarlos es parte de esa tarea.
+
+## 2026-10-30 · Directorio
+
+Un repo de directorio sirve juntos los sistemas que lista su `directorio.json`. El núcleo ya leía varios sistemas (`DS_SISTEMAS`), pero el CLI siempre servía uno: ahora `ds dev`, `ds build` y `ds doctor` reconocen `directorio.json` y `ds init --directorio` lo crea.
+
+- **Un sitio con todos.** La portada (`/`) es el Directorio y cada sistema conserva sus rutas (`/<sistema>/…`, su registry y su `design.md`). `llms.txt` los enumera todos y `/directorio.json` da a un agente la misma tarjeta que ve una persona. Se descartó generar solo un índice que enlazara al sitio publicado de cada sistema: obligaba a declarar la URL pública de cada uno, y un agente tendría que ir a varios dominios para comparar.
+- **Qué lleva la tarjeta.** Las fichas por estado, el sync de las que tienen fuentes (cuántas coinciden con producción) y la cobertura de cada superficie según el último sync: clases, componentes o tokens documentados de los que hay en el código. Son los datos que ya calcula `ds sync`; el directorio no lee producción.
+- **Sin aceptación aparte.** Un sistema sale en el Directorio porque está en `directorio.json`, que se escribe a mano. No hace falta una clave en `system.json`: la lista explícita ya es el consentimiento.
+- **Una versión del kit.** Todos los sistemas del directorio se sirven con el kit del directorio. Si uno necesita otra versión, se publica por su cuenta.
+- **Sin terceros.** Solo nuestros sistemas, como se acordó: nada de registries ajenos.
+

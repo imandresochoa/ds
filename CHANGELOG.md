@@ -9,6 +9,7 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
   - Cada pieza tiene su JSON en `/<sistema>/r/<sección>/<slug>.json`: estado por plataforma, `usa` y `usadoPor`, fuentes, sync, reglas y antipatrones.
   - `llms.txt` y la página «Para agentes» lo explican.
 - **`usa`**, clave nueva y opcional de la ficha: las piezas que compone. Los `tokens` entran solos en el grafo. La ficha la enseña en el apartado «Usa». Un id que no existe se avisa al generar.
+- **Directorio.** `ds init --directorio` crea un repo con `directorio.json`, que lista las carpetas de varios sistemas. `ds dev`, `ds build` y `ds doctor` los sirven juntos: la portada es el Directorio (una tarjeta por sistema con sus fichas, su sync y su cobertura de producción) y se publica `/directorio.json` para agentes. La ruta de publicación es la del directorio.
 - Workflow «Comprobar» en cada PR y en `main`: `npm ci`, typecheck, build y un `ds init` de prueba con Node 24, como «Publicar en npm».
 - **`ds ver <pieza>`** imprime el JSON de una pieza (por id o por slug). **`ds search --json`** devuelve piezas con la forma del índice, más `archivo`.
 - Migración:

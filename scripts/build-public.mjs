@@ -7,6 +7,7 @@
 //   /<sistema>/registry.json      índice del registry: lo justo de cada pieza para elegirla
 //   /<sistema>/r/<sección>/<slug>.json  cada pieza: estado, grafo (usa), fuentes, sync, reglas y antipatrones
 //   /llms.txt                     índice para agentes de todos los sistemas
+//   /directorio.json              con varios sistemas (repo de directorio): una tarjeta por sistema con su cobertura
 //   /metodologia/<guía>.md        la metodología común
 //
 // Con --exportar (ds build), los enlaces absolutos de estos archivos llevan delante la ruta de publicación
@@ -15,7 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
 import { CONTENT_SECTIONS, FUNCIONES, KIT_PAGES, PLATFORM_SECTIONS, PLATFORMS, ROOT, STATUSES, SYNC_STATES, listSystems, loadDocs, loadPages, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
-import { categoria, loadRegistry } from '../lib/registry.mjs';
+import { categoria, loadDirectoryIndex, loadRegistry } from '../lib/registry.mjs';
 
 const PUBLIC = path.join(ROOT, 'public');
 const ROUTE = process.argv.includes('--exportar') ? publicationRoute() : '';
@@ -55,9 +56,14 @@ function llmsGroup(entry) {
   return null;
 }
 
+// Con varios sistemas, el Directorio: lo que ve la portada (/) y lo que lee un agente para elegir sistema.
+const directory = loadDirectoryIndex({ at });
+if (directory) write('directorio.json', JSON.stringify(directory, null, 2) + '\n');
+
 const llms = [
-  '# Sistemas de diseño',
+  `# ${directory?.nombre ?? 'Sistemas de diseño'}`,
   '',
+  ...(directory?.descripcion ? [`> ${directory.descripcion}`, ''] : []),
   '> Sistemas de diseño agentic-first. Cada página tiene su versión Markdown en la misma ruta terminada en `.md`.',
   '> Empieza por el design.md del sistema. Usa solo fichas «En producción» salvo que te pidan lo contrario; las que están en exploración o desarrollo aún no existen en producción. Si algo no está documentado, dilo en lugar de inventarlo.',
   '',
@@ -65,6 +71,7 @@ const llms = [
   '',
   ...Object.values(STATUSES).map((s) => `- ${s.label}: ${s.descripcion}`),
   '',
+  ...(directory ? ['## Directorio', '', `- [directorio.json](${at('/directorio.json')}): un sistema por tarjeta, con su cobertura y el enlace a su registry`, ''] : []),
 ];
 
 for (const system of listSystems()) {

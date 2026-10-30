@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 // CLI del kit. Salvo `instalar` e `init`, se ejecuta desde el repo de un sistema de diseño (la carpeta con system.json).
+// `dev`, `build` y `doctor` también funcionan en un repo de directorio (directorio.json), que sirve juntos varios sistemas.
 //
 //   ds instalar [--aqui] [--quitar]  instala la skill de montaje para Claude Code y Codex (en tu usuario; con --aqui, en esta carpeta)
 //   ds init "<Nombre>" [id]   crea el repo del sistema: plantilla, kit y skills (sin nombre, pregunta en la terminal)
 //        [--carpeta <ruta>] [--desde repo|web|figma|cero] [--produccion <ruta>] [--url <url>] [--kit <paquete>] [--json]
+//   ds init --directorio ["<Nombre>"] [--carpeta <ruta>] [--sistemas <ruta>,<ruta>]   crea un repo de directorio
 //   ds info [--json]          sistema, secciones, producción, último sync, skills y rutas del kit
 //   ds search <texto> [--seccion <id>] [--limite 10] [--json]   busca fichas antes de crear una (con --json, como en registry.json)
 //   ds ver <pieza>            el JSON de una pieza, igual que /<sistema>/r/<sección>/<slug>.json (id o slug)
@@ -43,11 +45,13 @@ const RENAMED_SKILLS = ['crear-sistema'];
 /** Dónde lee las skills cada agente: Claude Code y Codex. */
 const SKILL_DIRS = [['.claude', 'skills'], ['.agents', 'skills']];
 /** Lo que puede haber en la carpeta antes de `ds init` (lo que dejan git init y npm init). */
-const INIT_ALLOWED = new Set(['.git', '.gitignore', '.DS_Store', 'package.json', 'package-lock.json', 'node_modules', 'README.md', 'system.json']);
+const INIT_ALLOWED = new Set(['.git', '.gitignore', '.DS_Store', 'package.json', 'package-lock.json', 'node_modules', 'README.md', 'system.json', 'directorio.json']);
+/** Un repo de directorio: lista los sistemas que se sirven juntos, con el Directorio en la portada. */
+const DIRECTORY_FILE = 'directorio.json';
 const ORIGINS = ['repo', 'web', 'figma', 'cero'];
 
 // Opciones: `--clave valor` e interruptores (`--json`). El resto son argumentos posicionales.
-const VALUE_OPTIONS = new Set(['--carpeta', '--desde', '--produccion', '--url', '--kit', '--seccion', '--limite', '--port', '--accept', '--solo', '--archivo']);
+const VALUE_OPTIONS = new Set(['--sistemas', '--carpeta', '--desde', '--produccion', '--url', '--kit', '--seccion', '--limite', '--port', '--accept', '--solo', '--archivo']);
 const option = (name) => {
   const at = args.indexOf(name);
   return at >= 0 ? args[at + 1] : undefined;
@@ -74,6 +78,30 @@ const foreignFiles = (dir) => (fs.existsSync(dir) ? fs.readdirSync(dir).filter((
 
 function requireSystem() {
   if (!fs.existsSync(path.join(SITE, 'system.json'))) fail('no hay system.json en esta carpeta. Ejecuta «ds init "<Nombre>"» o entra en el repo del sistema.');
+}
+
+/** El directorio.json de esta carpeta con las rutas de sus sistemas ya resueltas, o null. */
+function readDirectory() {
+  const config = readJson(path.join(SITE, DIRECTORY_FILE));
+  if (!config) return null;
+  const sistemas = (config.sistemas ?? []).map((rel) => path.resolve(SITE, rel));
+  if (!sistemas.length) fail(`${DIRECTORY_FILE} no lista ningún sistema. Añade sus carpetas: "sistemas": ["../mi-design-system"].`);
+  const missing = sistemas.filter((dir) => !fs.existsSync(path.join(dir, 'system.json')));
+  if (missing.length) fail(`${DIRECTORY_FILE}: no hay system.json en ${missing.join(', ')}`);
+  return { ...config, sistemas };
+}
+
+/** dev, build y doctor: el repo de un sistema o el de un directorio. */
+function requireSite() {
+  if (fs.existsSync(path.join(SITE, 'system.json'))) return;
+  if (readDirectory()) return;
+  fail(`no hay system.json ni ${DIRECTORY_FILE} en esta carpeta. Entra en el repo de un sistema o de un directorio.`);
+}
+
+/** Qué sistemas lee el motor: el de esta carpeta o, en un directorio, todos los que lista. */
+function siteEnv() {
+  if (fs.existsSync(path.join(SITE, 'system.json')) || !fs.existsSync(path.join(SITE, DIRECTORY_FILE))) return { DS_SISTEMAS: SITE, DS_DIRECTORIO: '' };
+  return { DS_SISTEMAS: readDirectory().sistemas.join(path.delimiter), DS_DIRECTORIO: path.join(SITE, DIRECTORY_FILE) };
 }
 
 /**
@@ -111,7 +139,7 @@ function runtimeDir() {
 
 function run(cmd, cmdArgs, { cwd, env = {} } = {}) {
   return new Promise((resolve) => {
-    const child = spawn(cmd, cmdArgs, { cwd, stdio: 'inherit', env: { ...process.env, DS_SISTEMAS: SITE, ...env } });
+    const child = spawn(cmd, cmdArgs, { cwd, stdio: 'inherit', env: { ...process.env, ...siteEnv(), ...env } });
     child.on('exit', (code) => resolve(code ?? 1));
   });
 }
@@ -167,6 +195,18 @@ function installSkills(target = SITE) {
   log(`Skills del kit ${kitPkg.version} en .claude/skills/ y .agents/skills/: ${names.join(', ')}`);
 }
 
+/** Instala esta versión del kit en `target`, si no está ya, y devuelve cómo se fijó. */
+function installKit(target) {
+  const spec = kitSpec();
+  if (!fs.existsSync(path.join(target, 'node_modules', ...kitPkg.name.split('/'), 'package.json'))) {
+    log(`Instalando el kit (${spec})…`);
+    const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+    const result = spawnSync(npm, ['install', '--save', spec], { cwd: target, stdio: ['ignore', 2, 2] });
+    if (result.status !== 0) fail(`no se pudo instalar el kit. Prueba a mano: cd ${target} && npm install ${spec}`);
+  }
+  return spec;
+}
+
 /** Preguntas de `ds init` en una terminal, para quien no usa agente. Con agente, las hace la skill montar-sistema. */
 async function askInTerminal() {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -198,6 +238,30 @@ async function askInTerminal() {
   }
 }
 
+/** `ds init --directorio`: un repo que sirve juntos varios sistemas, con el Directorio en la portada. */
+function initDirectory() {
+  const nombre = positional[0] ?? 'Sistemas de diseño';
+  const target = path.resolve(SITE, option('--carpeta') ?? '.');
+  const extra = foreignFiles(target);
+  if (extra.length) fail(`${target} no está vacía (${extra.slice(0, 3).join(', ')}${extra.length > 3 ? '…' : ''}). El directorio necesita su propia carpeta: usa --carpeta <ruta>.`);
+  fs.mkdirSync(target, { recursive: true });
+  if (!fs.existsSync(path.join(target, '.git'))) spawnSync('git', ['init', '-q'], { cwd: target, stdio: 'ignore' });
+  const pkgFile = path.join(target, 'package.json');
+  const pkg = readJson(pkgFile) ?? { name: slugify(nombre) || 'directorio', private: true };
+  pkg.scripts = { dev: 'ds dev', build: 'ds build', doctor: 'ds doctor', ...pkg.scripts };
+  fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + '\n');
+  const spec = installKit(target);
+  const file = path.join(target, DIRECTORY_FILE);
+  // Las rutas a los sistemas son relativas a este repo, como produccion.repo en system.json.
+  const sistemas = (option('--sistemas') ?? '').split(',').map((s) => s.trim()).filter(Boolean).map((s) => path.relative(target, path.resolve(SITE, s)).split(path.sep).join('/'));
+  if (!fs.existsSync(file)) fs.writeFileSync(file, JSON.stringify({ nombre, descripcion: '', sistemas }, null, 2) + '\n');
+  if (!fs.existsSync(path.join(target, '.gitignore'))) fs.writeFileSync(path.join(target, '.gitignore'), 'node_modules/\n.ds/\nout/\n');
+  const result = { directorio: { nombre, carpeta: target, sistemas }, kit: spec };
+  if (JSON_OUT) return console.log(JSON.stringify(result, null, 2));
+  console.log(`\nDirectorio «${nombre}» en ${target}.`);
+  console.log(sistemas.length ? `Sistemas: ${sistemas.join(', ')}. Siguiente paso: npx ds dev.` : `Siguiente paso: añade las carpetas de los sistemas a "sistemas" en ${DIRECTORY_FILE} y ejecuta npx ds dev.`);
+}
+
 const commands = {
   async instalar() {
     const base = flag('--aqui') ? SITE : os.homedir();
@@ -216,6 +280,7 @@ const commands = {
     console.log(`Para quitarla: npx ${kitSpec()} instalar${flag('--aqui') ? ' --aqui' : ''} --quitar`);
   },
   async init() {
+    if (flag('--directorio')) return initDirectory();
     const answers = positional[0] || JSON_OUT || !process.stdin.isTTY ? null : await askInTerminal();
     const nombre = positional[0] ?? answers?.nombre;
     if (!nombre) fail('uso: ds init "<Nombre>" [id] [--carpeta <ruta>] [--desde repo|web|figma|cero] [--produccion <ruta>] [--url <url>] [--json]');
@@ -241,13 +306,7 @@ const commands = {
     pkg.scripts = { dev: 'ds dev', build: 'ds build', sync: 'ds sync', 'check:sync': 'ds check', ...pkg.scripts };
     fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + '\n');
 
-    const spec = kitSpec();
-    if (!fs.existsSync(path.join(target, 'node_modules', ...kitPkg.name.split('/'), 'package.json'))) {
-      log(`Instalando el kit (${spec})…`);
-      const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-      const result = spawnSync(npm, ['install', '--save', spec], { cwd: target, stdio: ['ignore', 2, 2] });
-      if (result.status !== 0) fail(`no se pudo instalar el kit. Prueba a mano: cd ${target} && npm install ${spec}`);
-    }
+    const spec = installKit(target);
 
     const sysFile = path.join(target, 'system.json');
     const isNew = !fs.existsSync(sysFile);
@@ -361,7 +420,7 @@ const commands = {
     console.log(JSON.stringify(piece(entry), null, 2));
   },
   async dev() {
-    requireSystem();
+    requireSite();
     const dir = runtimeDir();
     const portAt = args.indexOf('--port');
     const port = portAt >= 0 ? args[portAt + 1] : '4100';
@@ -369,7 +428,7 @@ const commands = {
     process.exit(await run(process.execPath, [nextBin(dir), 'dev', '--port', port], { cwd: dir }));
   },
   async build() {
-    requireSystem();
+    requireSite();
     const dir = runtimeDir();
     // --exportar: los enlaces de los .md, design.md y llms.txt llevan la ruta de publicación, si la hay.
     if ((await node(dir, 'scripts/build-public.mjs', ['--exportar'])) !== 0) process.exit(1);
@@ -521,7 +580,7 @@ const commands = {
     installSkills();
   },
   async doctor() {
-    requireSystem();
+    requireSite();
     process.exit(await node(runtimeDir(), 'scripts/doctor.mjs'));
   },
   async enlazar() {
