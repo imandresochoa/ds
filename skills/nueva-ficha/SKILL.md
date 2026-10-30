@@ -5,7 +5,9 @@ description: Crea o completa una ficha del sistema de diseño (componente, bloqu
 
 # Crear una ficha
 
-Lee primero la metodología del kit (ruta en `npx ds info --json` → `kit.metodologia`): `05-ficha.md` (anatomía) y `03-estados.md` (estados). Antes de crear una ficha, comprueba con `npx ds search <nombre>` que no existe ya.
+Lee primero la metodología del kit (ruta en `npx ds info --json` → `kit.metodologia`): `05-ficha.md` (anatomía) y `03-estados.md` (estados). Antes de crear una ficha, comprueba con `npx ds search <nombre>` que no existe ya. `npx ds ver <pieza>` te da lo que usa una pieza y quién la usa.
+
+`usa` es lo que la pieza compone (el grafo del registry); `relacionados`, «ver también». No los mezcles.
 
 ## 1. Decide sección y forma
 
@@ -13,8 +15,8 @@ Lee primero la metodología del kit (ruta en `npx ds info --json` → `kit.metod
 | --- | --- | --- |
 | Criterio (cómo y cuándo) | `fundamentos` | `relacionados` a sus tokens |
 | Valores con nombre | `tokens` | `grupo`, `tokens: [{nombre, rol}]` |
-| Pieza reutilizable | `componentes` | `funcion` (acciones, navegacion, formularios, feedback, contenido, superposiciones), `nivel` (atomo, molecula, organismo) |
-| Composición | `bloques` | `categoria` (seccion, pantalla, flujo), `relacionados` |
+| Pieza reutilizable | `componentes` | `funcion` (acciones, navegacion, formularios, feedback, contenido, superposiciones), `nivel` (atomo, molecula, organismo), `usa` si compone otros |
+| Composición | `bloques` | `categoria` (seccion, pantalla, flujo), `usa` con los componentes que compone |
 | Presentación de datos | `graficos` | `categoria` (area, barras, lineas, circular, radar, radial, tooltip), `tokens` de color |
 | Página de documentación | `content/docs/` | `titulo`, `resumen`; orden en `content/docs/meta.json` |
 | Trabajo en curso | `iniciativas` | secciones fijas: Resumen, Referencias, Exploración, Flujos, Handoff, Playground |

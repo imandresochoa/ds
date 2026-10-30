@@ -2,6 +2,20 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+- **Registry por piezas**, de solo lectura:
+  - `/<sistema>/registry.json` pasa a ser el índice: `piezas` con lo justo para elegir una y el enlace a su JSON.
+  - Cada pieza tiene su JSON en `/<sistema>/r/<sección>/<slug>.json`: estado por plataforma, `usa` y `usadoPor`, fuentes, sync, reglas y antipatrones.
+  - `llms.txt` y la página «Para agentes» lo explican.
+- **`usa`**, clave nueva y opcional de la ficha: las piezas que compone. Los `tokens` entran solos en el grafo. La ficha la enseña en el apartado «Usa». Un id que no existe se avisa al generar.
+- **`ds ver <pieza>`** imprime el JSON de una pieza (por id o por slug). **`ds search --json`** devuelve piezas con la forma del índice, más `archivo`.
+- Migración:
+  - Si algo lee `registry.json`: `fichas` pasa a `piezas`. `seccion`, `funcion`, `categoria` y `nivel` pasan a `tipo` y `categorias`. `plataformas`, `sync` y `tokens` de cada ficha están en su JSON (el enlace `json` de cada pieza).
+  - Si algo lee `ds search --json`: `seccion` pasa a `tipo`.
+  - En los bloques, pasa a `usa` los componentes que tenías en `relacionados`. Lo que no cambies sigue saliendo en «Relacionados».
+  - `npx ds skills` para tener la skill `nueva-ficha` al día.
+
 ## 0.10.1 · 2026-10-30
 
 - Mismo contenido que la 0.10.0, que no llegó a npm. El workflow de publicación falló en `npm ci`: a `package-lock.json` le faltaban `@emnapi/core` y `@emnapi/runtime`, que piden los paquetes wasm opcionales de Tailwind y de sharp, y npm 11.19 (el de Node 24 en GitHub Actions) no lo acepta. El lockfile está regenerado con esa versión de npm.

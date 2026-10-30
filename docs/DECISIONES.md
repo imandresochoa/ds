@@ -163,3 +163,16 @@ Un sistema que parte de una web, de Figma o de nada ajusta sus primitivos en el 
 - **Por qué.** Una etiqueta pública puede estar ya fijada en un sistema (`github:imandresochoa/ds#vX.Y.Z`) o citada en un informe. Si se mueve, el mismo nombre deja de señalar el mismo código.
 - **Descartado.** Borrar `v0.10.0` y crearla en el commit arreglado. npm quedaría sin huecos, pero se reescribiría una etiqueta pública.
 - **Pendiente.** Un workflow en cada PR con `npm ci` (ver `TAREAS.md`), para que esto se vea antes de publicar.
+
+## 2026-10-30 · Registry por piezas
+
+Un agente que solo necesitaba saber qué usa un bloque tenía que bajarse `registry.json` entero, con todas las fichas. Ahora el registry tiene la forma del de shadcn/ui: un índice y un JSON por pieza.
+
+- **El índice es `registry.json`.** Se queda en la misma ruta, pero `fichas` pasa a `piezas`, con lo justo para elegir una: `id`, `tipo`, `titulo`, `resumen`, `estado`, `categorias`, `destacado`, `iniciativa` y los enlaces `json`, `md` y `url`. Siguen `sistema`, `estados`, `tokens` y `modos`, y se añade `tipos`. Se descartó dejar `registry.json` igual y añadir un `r/index.json`: serían dos índices que mantener, y la 0.x es el momento de cambiarlo.
+- **Una pieza por archivo**, en `/<sistema>/r/<sección>/<slug>.json`. La sección va en la ruta porque dos secciones pueden tener el mismo slug. Lleva el índice más `nivel`, fechas, `usa` y `usadoPor`, `relacionados`, `tokens` (con su rol y su valor de producción en las fichas de tokens), `plataformas` con sus superficies, `sync` con sus fuentes y huellas, `reglas` y `antipatrones`.
+- **Reglas y antipatrones en Markdown.** Son el texto de esas secciones de la ficha (`## Reglas`, `## Antipatrones` o `## Rechaza estos reflejos`). La metodología fija el orden de las secciones, no su formato, y convertir las tablas en datos fallaría sin avisar.
+- **`usa` es explícito.** Es una clave nueva de la ficha con las piezas que compone. Los `tokens` de la ficha entran solos, a través de la ficha de tokens que los documenta, y `usadoPor` se calcula al revés. Un id que no existe se avisa al generar. Se descartó sacarlo de `relacionados`, porque mezcla «usa» con «ver también», y deducirlo de las clases de los ejemplos, porque falla en superficies Tailwind y con clases compartidas.
+- **El CLI da la misma forma sin build.** `ds search --json` devuelve piezas como las del índice, más `archivo`. `ds ver <pieza>` imprime el JSON de una pieza. Los dos leen las fichas con `lib/registry.mjs`, igual que `ds build`, así que no hace falta exportar el sitio para consultarlos.
+- **Solo lectura.** No es compatible con `npx shadcn add`, como ya se decidió con la interfaz de shadcn/ui: nada del sistema escribe en producción.
+
+**Directorio.** La lista de sistemas sale de un repo de directorio aparte, con un `directorio.json` que apunta a las carpetas de los sistemas y los sirve juntos. Así el kit no nombra ningún producto y la cobertura se lee en local, sin peticiones de red. Se descartó una clave `directorio` en el `system.json` de cada sistema: la lista se repetiría en cada uno y habría que pedir la cobertura por red a cada sitio publicado. Hoy `ds dev` y `ds build` sirven un solo sistema, así que juntarlos es parte de esa tarea.

@@ -21,7 +21,8 @@ creado: 2026-10-11
 actualizado: 2026-10-11
 iniciativa: sistema-agentic-first   # opcional
 tokens: [ink, paper]          # tokens que usa (en fichas de tokens: lista con nombre y rol)
-relacionados: [componentes/enlace-de-texto]
+usa: [componentes/icono]      # piezas que compone: el grafo del registry (los tokens entran solos)
+relacionados: [componentes/enlace-de-texto]   # ver también: no es una dependencia
 plataformas:
   web:
     estado: produccion
@@ -57,6 +58,12 @@ Las páginas que no son fichas (introducción, instalación, guías) van en `con
 - **El fundamento** explica cómo y cuándo se usa algo (reglas, antipatrones) y enlaza a sus tokens.
 - **La ficha de tokens** solo tiene la tabla: nombre, rol y valor de producción. Si un token está también en `experimental/` (por ejemplo, porque salió del Lab de primitivos), la tabla enseña ese valor en la columna «Experimental». Las reglas de uso no van ahí.
 - Se enlazan entre sí con `relacionados`.
+
+## `usa` y `relacionados`
+
+- **`usa`** dice qué piezas compone esta: los componentes de un bloque, o el icono dentro de un botón. Con ella, el registry arma el grafo (`usa` y `usadoPor`) y un agente sabe qué se ve afectado si cambia una pieza. Los `tokens` de la ficha entran solos en el grafo, a través de la ficha de tokens que los documenta.
+- **`relacionados`** es «ver también»: el fundamento de una ficha de tokens, o el sustituto de una pieza obsoleta. No es una dependencia.
+- Un id de `usa` que no existe se avisa en `ds build` y `ds dev`.
 
 ## Escribir para agentes
 

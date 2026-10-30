@@ -4,7 +4,8 @@
 //   /<sistema>/<sección>/<ficha>.md  cada ficha en Markdown (misma ruta que su página)
 //   /<sistema>/docs.md, /<sistema>/docs/<página>.md  las páginas de Docs del sistema (content/docs/)
 //   /<sistema>/design.md          guía para agentes: DESIGN.md escrito a mano + apéndice generado
-//   /<sistema>/registry.json      datos estructurados de todas las fichas
+//   /<sistema>/registry.json      índice del registry: lo justo de cada pieza para elegirla
+//   /<sistema>/r/<sección>/<slug>.json  cada pieza: estado, grafo (usa), fuentes, sync, reglas y antipatrones
 //   /llms.txt                     índice para agentes de todos los sistemas
 //   /metodologia/<guía>.md        la metodología común
 //
@@ -13,7 +14,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
-import { CONTENT_SECTIONS, FUNCIONES, KIT_PAGES, PLATFORM_SECTIONS, PLATFORMS, ROOT, STATUSES, SYNC_STATES, listSystems, loadDocs, loadEntries, loadPages, loadProductionTokens, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
+import { CONTENT_SECTIONS, FUNCIONES, KIT_PAGES, PLATFORM_SECTIONS, PLATFORMS, ROOT, STATUSES, SYNC_STATES, listSystems, loadDocs, loadPages, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
+import { categoria, loadRegistry } from '../lib/registry.mjs';
 
 const PUBLIC = path.join(ROOT, 'public');
 const ROUTE = process.argv.includes('--exportar') ? publicationRoute() : '';
@@ -45,9 +47,6 @@ function entryMarkdown(system, entry, report) {
   return parts.filter(Boolean).join('\n\n') + '\n';
 }
 
-/** Categoría de una ficha en las secciones que agrupan por categoría (`nivel` es su nombre anterior en los bloques). */
-const categoria = (entry) => (CONTENT_SECTIONS.find((s) => s.id === entry.section)?.agrupar === 'categoria' ? entry.data.categoria ?? entry.data.nivel ?? null : null);
-
 /** Subgrupo de una ficha en llms.txt: los componentes, por función; bloques y gráficos, por categoría. */
 function llmsGroup(entry) {
   const section = CONTENT_SECTIONS.find((s) => s.id === entry.section);
@@ -69,9 +68,9 @@ const llms = [
 ];
 
 for (const system of listSystems()) {
-  const entries = loadEntries(system);
+  const { entries, index, piece, avisos } = loadRegistry(system, { at });
   const report = loadSyncReport(system);
-  const tokens = loadProductionTokens(system);
+  const tokens = index.tokens;
 
   copyDir(path.join(system.dir, 'produccion'), `_ds/${system.id}/produccion`);
   copyDir(path.join(system.dir, 'experimental'), `_ds/${system.id}/experimental`);
@@ -81,32 +80,10 @@ for (const system of listSystems()) {
   const pages = loadPages(system).filter((p) => !KIT_PAGES.some((k) => k.slug === p.slug));
   for (const page of pages) write(page.slug ? `${system.id}/docs/${page.slug}.md` : `${system.id}/docs.md`, `# ${page.titulo}\n\n${page.resumen}\n\n${md(page.body.trim())}\n`);
 
-  // registry.json: lo que un agente necesita para decidir sin leer cada ficha.
-  const registry = {
-    sistema: { id: system.id, nombre: system.nombre, descripcion: system.descripcion, extiende: system.extiende, produccion: system.produccion ? { web: system.produccion.web, codigo: system.produccion.codigo, commit: report?.commit ?? null } : null },
-    estados: STATUSES,
-    fichas: entries.map((e) => ({
-      id: e.id,
-      titulo: e.titulo,
-      resumen: e.resumen,
-      seccion: e.section,
-      funcion: e.data.funcion ?? null,
-      categoria: categoria(e),
-      nivel: categoria(e) === null ? e.data.nivel ?? null : null,
-      destacado: e.data.destacado === true,
-      estado: e.estado,
-      iniciativa: e.data.iniciativa ?? null,
-      md: at(`${e.href}.md`),
-      url: at(e.href),
-      tokens: (e.data.tokens ?? []).map((t) => (typeof t === 'string' ? t : t.nombre)),
-      plataformas: Object.fromEntries(Object.entries(e.platforms).map(([p, info]) => [p, { estado: info.estado, superficies: info.superficies }])),
-      sync: report?.entradas?.[e.id] ? { estado: report.entradas[e.id].estado, avisos: report.entradas[e.id].avisos } : null,
-    })),
-    tokens,
-    // Modos de cada superficie y los selectores que los activan (claro en :root, oscuro en .dark…).
-    modos: Object.fromEntries(Object.entries(report?.tokens ?? {}).map(([surface, info]) => [surface, info.modos])),
-  };
-  write(`${system.id}/registry.json`, JSON.stringify(registry, null, 2) + '\n');
+  // registry.json es el índice; cada pieza tiene su JSON en r/. Un agente elige en el índice y lee solo lo que usa.
+  write(`${system.id}/registry.json`, JSON.stringify(index, null, 2) + '\n');
+  for (const entry of entries) write(`${system.id}/r/${entry.section}/${entry.slug}.json`, JSON.stringify(piece(entry), null, 2) + '\n');
+  for (const aviso of avisos) console.warn(`aviso ${system.id}: ${aviso}`);
 
   // design.md: criterio escrito a mano + mecánica generada (nunca se desincroniza).
   const handwritten = fs.existsSync(path.join(system.dir, 'DESIGN.md')) ? md(fs.readFileSync(path.join(system.dir, 'DESIGN.md'), 'utf8').trim()) : `# ${system.nombre}`;
@@ -155,7 +132,7 @@ for (const system of listSystems()) {
   write(`${system.id}/design.md`, `${handwritten}\n\n${generated}`);
   write(`${system.id}/llms-full.txt`, entries.map((e) => entryMarkdown(system, e, report)).join('\n\n---\n\n'));
 
-  llms.push(`## ${system.nombre}`, '', `- [design.md](${at(`/${system.id}/design.md`)}): reglas, API de clases, tokens y estados`, `- [registry.json](${at(`/${system.id}/registry.json`)}): datos estructurados`, `- [llms-full.txt](${at(`/${system.id}/llms-full.txt`)}): todas las fichas en un archivo`, '');
+  llms.push(`## ${system.nombre}`, '', `- [design.md](${at(`/${system.id}/design.md`)}): reglas, API de clases, tokens y estados`, `- [registry.json](${at(`/${system.id}/registry.json`)}): índice de piezas; cada una en \`${at(`/${system.id}/r/<sección>/<slug>.json`)}\` con su estado, lo que usa, sus fuentes y su sync`, `- [llms-full.txt](${at(`/${system.id}/llms-full.txt`)}): todas las fichas en un archivo`, '');
   llms.push('### Docs', '', ...pages.map((p) => `- [${p.titulo}](${at(`/${system.id}/${p.slug ? `docs/${p.slug}` : 'docs'}.md`)})${p.resumen ? `: ${p.resumen}` : ''}`), '');
   const line = (e) => `- [${e.titulo}](${at(e.href)}.md): ${statusLabel(e.estado)}. ${e.resumen}`;
   for (const section of CONTENT_SECTIONS) {

@@ -85,7 +85,7 @@ Rama + PR ──▶ CI: tests + ds check ──▶ merge: main → staging ─�
 
 ## Publicar el sistema
 
-`npx ds build` exporta el sitio a `out/`: las páginas en HTML, su versión `.md`, `design.md`, `llms.txt`, `registry.json` y la instantánea de producción que cargan los ejemplos en vivo (`/_ds/`). Es un sitio estático: lo sirve cualquier hosting de archivos que resuelva `/x` a `x.html`.
+`npx ds build` exporta el sitio a `out/`: las páginas en HTML, su versión `.md`, `design.md`, `llms.txt`, `registry.json` con una pieza por archivo en `r/`, y la instantánea de producción que cargan los ejemplos en vivo (`/_ds/`). Es un sitio estático: lo sirve cualquier hosting de archivos que resuelva `/x` a `x.html`.
 
 ### En la raíz o bajo una ruta
 
@@ -95,7 +95,7 @@ Por defecto, el sitio va en la raíz de un dominio (`https://ds.producto.com/<id
 "publicacion": { "ruta": "/ds" }
 ```
 
-Con ella, `ds build` pone `/ds` delante de todo lo que el sitio escribe: las páginas, `/_next`, los enlaces de la interfaz y de las fichas, los `.md`, los enlaces de `llms.txt`, `design.md` y `registry.json`, y las hojas de los ejemplos en vivo. `out/` no cambia de forma (no lleva una carpeta `ds/` dentro): quien lo sirve quita la ruta antes de buscar el archivo, de modo que `https://dominio/ds/x` responde con `out/x`.
+Con ella, `ds build` pone `/ds` delante de todo lo que el sitio escribe: las páginas, `/_next`, los enlaces de la interfaz y de las fichas, los `.md`, los enlaces de `llms.txt`, `design.md`, `registry.json` y las piezas de `r/`, y las hojas de los ejemplos en vivo. `out/` no cambia de forma (no lleva una carpeta `ds/` dentro): quien lo sirve quita la ruta antes de buscar el archivo, de modo que `https://dominio/ds/x` responde con `out/x`.
 
 - `DS_RUTA` gana a `system.json` en un build concreto: `DS_RUTA=/otra npx ds build`, o `DS_RUTA= npx ds build` para exportar en la raíz.
 - `ds dev` sirve siempre en la raíz, con o sin ruta.
