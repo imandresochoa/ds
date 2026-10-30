@@ -21,9 +21,9 @@ La interfaz copia la estructura y el estilo de ui.shadcn.com: neutra, sin decora
   - Iniciativas muestra tarjetas «En curso» y «Publicadas».
   - Una sección vacía explica qué va en ella y da el prompt para pedírselo al agente.
 - **Lab de primitivos** (`/<sistema>/lab`). Es el equivalente al Create de shadcn, pero solo con primitivos. Tiene dos pestañas:
-  - **Generar** crea los tokens, con los nombres de shadcn, desde unos pocos primitivos: neutro, marca y error; familias, tamaño base, escala e interlineado; unidad de espaciado; radio base; y opacidad y difuminado de las sombras.
+  - **Generar** crea los tokens, con los nombres de shadcn, desde unos pocos primitivos: neutro, marca y error; familias, tamaño base, escala e interlineado; unidad de espaciado; radio base; opacidad y difuminado de las sombras; y duración base, escala y curvas del movimiento.
   - **Ajustar tokens** cambia los que el sistema ya tiene, de cada superficie de producción o de `experimental/`.
-  - Enseña claro y oscuro uno al lado del otro, sin componentes: pares de color con su contraste, escala de neutros, escala tipográfica, espacios, radios y sombras.
+  - Enseña claro y oscuro uno al lado del otro, sin componentes: pares de color con su contraste, escala de neutros, escala tipográfica, espacios, radios, sombras y movimiento (cada duración y cada curva, animadas; se paran con «reducir movimiento»).
   - Cada par por debajo de AA sale arriba con «Ajustar», que lo lleva al valor más cercano que llega.
   - No escribe nada. El estado va en la URL (`?preset=`), y «Copiar para tu agente» la pasa con el prompt para aplicarla (`npx ds preset aplicar`, ver «Crear un sistema nuevo»).
   - No descarga fuentes ni hace peticiones: las muestras usan las fuentes instaladas en el equipo.

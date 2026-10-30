@@ -2,7 +2,7 @@
 
 import { XIcon } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
-import { ESCALAS, isSafeValue, parseColor, toHex, type Ajustes, type Preset } from '@/lib/lab.mjs';
+import { CURVAS, DEFAULT_PRESET, ESCALAS, isSafeValue, parseColor, toHex, type Ajustes, type Preset } from '@/lib/lab.mjs';
 import { modeLabel } from '@/lib/tokens.mjs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -96,6 +96,8 @@ function SliderField({ label, value, min, max, step, format, onChange }: { label
 export function GenerateControls({ preset, onChange, onRemoveAdjustment }: { preset: Preset; onChange: (next: Preset) => void; onRemoveAdjustment: (mode: string, name: string) => void }) {
   const set = <K extends keyof Preset>(key: K, value: Preset[K]) => onChange({ ...preset, [key]: value });
   const { color, texto, sombra } = preset;
+  // Un preset anterior al movimiento no lo trae: los controles parten de los valores por defecto.
+  const movimiento = preset.movimiento ?? DEFAULT_PRESET.movimiento!;
   const adjustments = Object.entries(preset.ajustes as Ajustes).flatMap(([mode, values]) => Object.entries(values).map(([name, value]) => ({ mode, name, value })));
   return (
     <div className="flex flex-col gap-6">
@@ -130,6 +132,22 @@ export function GenerateControls({ preset, onChange, onRemoveAdjustment }: { pre
       <Group title="Sombras">
         <SliderField label="Opacidad" value={sombra.opacidad} min={0} max={0.4} step={0.01} format={(n) => `${Math.round(n * 100)} %`} onChange={(n) => set('sombra', { ...sombra, opacidad: n })} />
         <SliderField label="Difuminado" value={sombra.difuminado} min={0.25} max={3} step={0.05} format={(n) => `× ${decimal(n)}`} onChange={(n) => set('sombra', { ...sombra, difuminado: n })} />
+      </Group>
+      <Group title="Movimiento">
+        <SliderField label="Duración base" value={movimiento.duracion} min={80} max={500} step={10} format={(n) => `${n} ms`} onChange={(n) => set('movimiento', { ...movimiento, duracion: n })} />
+        <SliderField label="Escala" value={movimiento.escala} min={1.2} max={2} step={0.1} format={(n) => `× ${decimal(n)}`} onChange={(n) => set('movimiento', { ...movimiento, escala: n })} />
+        <p className="text-xs text-muted-foreground">
+          --duration-fast, -normal y -slow: la base dividida y multiplicada por la escala ({Math.round(movimiento.duracion / movimiento.escala)}, {movimiento.duracion} y {Math.round(movimiento.duracion * movimiento.escala)} ms).
+        </p>
+        <div className="flex flex-col gap-3">
+          <Label>Curvas</Label>
+          <ToggleGroup type="single" variant="outline" size="sm" value={movimiento.curva} onValueChange={(v) => v && set('movimiento', { ...movimiento, curva: v })} className="w-full">
+            {Object.entries(CURVAS).map(([id, c]) => (
+              <ToggleGroupItem key={id} value={id} className="flex-1 text-xs">{c.label}</ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+          <p className="text-xs text-muted-foreground">--ease-in, --ease-out y --ease-in-out, con los nombres de Tailwind 4.</p>
+        </div>
       </Group>
       {adjustments.length > 0 && (
         <Group title="Ajustes a mano">

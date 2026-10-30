@@ -2,7 +2,7 @@ import { Lab, type LabBase } from '@/components/lab/Lab';
 import { PageHeader, PageHeaderDescription, PageHeaderHeading } from '@/components/site/PageHeader';
 import { loadExperimentalTokens, loadProductionTokens, loadSyncReport, loadSystem, tokenModes } from '@/lib/core.mjs';
 
-export const metadata = { title: 'Lab de primitivos', description: 'Color, texto, espaciado, radios y sombras del sistema, en claro y oscuro, con el contraste a la vista.' };
+export const metadata = { title: 'Lab de primitivos', description: 'Color, texto, espaciado, radios, sombras y movimiento del sistema, en claro y oscuro, con el contraste a la vista.' };
 
 type Values = Record<string, string | Record<string, string>>;
 
@@ -28,7 +28,7 @@ export default async function LabPage({ params }: { params: Promise<{ system: st
     <div className="flex flex-1 flex-col">
       <PageHeader>
         <PageHeaderHeading>Lab de primitivos</PageHeaderHeading>
-        <PageHeaderDescription>Color, texto, espaciado, radios y sombras, en claro y oscuro y con el contraste a la vista. Cuando te guste, pásale el preset a tu agente.</PageHeaderDescription>
+        <PageHeaderDescription>Color, texto, espaciado, radios, sombras y movimiento, en claro y oscuro y con el contraste a la vista. Cuando te guste, pásale el preset a tu agente.</PageHeaderDescription>
       </PageHeader>
       <Lab systemId={system.id} bases={bases} saved={experimental?.preset ?? null} production={Boolean(system.produccion)} />
     </div>

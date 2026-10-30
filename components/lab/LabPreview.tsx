@@ -148,6 +148,29 @@ export function ModePanel({ mode, values, comunes, neutral, results }: { mode: s
         </div>
       </Specimen>
 
+      {comunes['duration-normal'] && (
+        <Specimen title="Movimiento">
+          <div className="flex flex-col gap-3">
+            {[
+              ...['fast', 'normal', 'slow'].map((d) => ({ label: `duration-${d}`, duration: `var(--lab-duration-${d})`, ease: 'var(--lab-ease-out)' })),
+              ...['in', 'out', 'in-out'].map((e) => ({ label: `ease-${e}`, duration: 'var(--lab-duration-slow)', ease: `var(--lab-ease-${e})` })),
+            ].map((m) => (
+              <div key={m.label} className="flex items-center gap-3">
+                <span className="w-28 shrink-0 font-mono text-[11px]" style={{ color: 'var(--lab-muted-foreground)' }}>{m.label}</span>
+                {/* La pista mide el ancho menos el punto: el punto recorre su propio ancho al 100 %. */}
+                <span className="relative h-3 min-w-0 flex-1 rounded-full" style={{ background: 'var(--lab-muted)' }}>
+                  <span className="absolute inset-y-0 left-0 right-3">
+                    <span className="lab-move block h-full w-full" style={{ animationDuration: m.duration, animationTimingFunction: m.ease }}>
+                      <span className="block size-3 rounded-full" style={{ background: 'var(--lab-primary)' }} />
+                    </span>
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </Specimen>
+      )}
+
       <Specimen title="Sombras">
         <div className="flex flex-wrap gap-6 pb-2">
           {['sm', 'md', 'lg'].map((s) => (

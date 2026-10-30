@@ -55,7 +55,7 @@ Decidido (ver «Lab de primitivos» en `DECISIONES.md`):
 Tareas:
 - [x] Propuesta y preguntas.
 - [x] Lab, preset (`ds preset`) y skill que lo aplica.
-- [ ] Movimiento (duraciones y curvas) en el Lab.
+- [x] Movimiento (duraciones y curvas) en el Lab.
 - [x] Publicar la 0.10.1 en npm: etiqueta `v0.10.1` en `main` y workflow «Publicar en npm».
 
 ### Fase 4 · Registry propio y Directorio

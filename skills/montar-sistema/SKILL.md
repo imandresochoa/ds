@@ -89,13 +89,13 @@ npx ESPEC_DEL_KIT init "<Nombre>" --carpeta <carpeta> --desde <repo|web|figma|ce
 
 1. Escribe `DESIGN.md` con lo que te contaron: contexto, para quién, tono y prioridades.
 2. **Primitivos de partida, con el Lab.** Pregunta (cabecera «Primitivos»):
-   1. **Los ajusto en el Lab** (recomendada): arranca `npx ds dev` y pásale `http://localhost:4100/<id>/lab`. Ajusta color, texto, espaciado, radios y sombras, y copia el enlace o «Copiar para tu agente».
+   1. **Los ajusto en el Lab** (recomendada): arranca `npx ds dev` y pásale `http://localhost:4100/<id>/lab`. Ajusta color, texto, espaciado, radios, sombras y movimiento, y copia el enlace o «Copiar para tu agente».
    2. **Propónmelos tú**: escribe un preset en JSON con lo que te contaron (solo lo que cambia; el resto toma los valores por defecto), por ejemplo `{"color":{"marca":"#…","neutro":"#…"},"radio":6}`. Enséñalo con `npx ds preset ver '<json>'`, que también da el enlace para abrirlo en el Lab, y espera su visto bueno.
 3. En los dos casos, sigue «Aplicar un preset del Lab». Los tokens llevan los nombres de shadcn.
 
 ## Aplicar un preset del Lab
 
-El Lab de primitivos (`/<id>/lab` con `npx ds dev`, o «Nuevo» → «Lab de primitivos») ajusta color, texto, espaciado, radios y sombras, y los enseña en claro y oscuro con el contraste de cada par. No escribe nada. El estado va en el enlace (`?preset=`), y «Copiar para tu agente» te lo pasa con un prompt. «Generar» crea los tokens desde unos pocos primitivos. «Ajustar tokens» cambia los que el sistema ya tiene, de producción o de `experimental/`.
+El Lab de primitivos (`/<id>/lab` con `npx ds dev`, o «Nuevo» → «Lab de primitivos») ajusta color, texto, espaciado, radios, sombras y movimiento, y los enseña en claro y oscuro con el contraste de cada par. No escribe nada. El estado va en el enlace (`?preset=`), y «Copiar para tu agente» te lo pasa con un prompt. «Generar» crea los tokens desde unos pocos primitivos. «Ajustar tokens» cambia los que el sistema ya tiene, de producción o de `experimental/`.
 
 1. **Léelo antes de escribir.** Ejecuta `npx ds preset ver "<enlace>"` y resume a la persona los valores, los ajustes a mano y el contraste. Si avisa de valores descartados, díselo: venían en el enlace y no eran válidos.
 2. **Contraste.** El mínimo es 4,5:1 en los pares de texto y 3:1 en `--ring` sobre `--background`. Si un par que cambia el preset no llega:
@@ -109,8 +109,8 @@ El Lab de primitivos (`/<id>/lab` con `npx ds dev`, o «Nuevo» → «Lab de pri
    - `--solo color,radios` aplica solo esos grupos sobre el preset que ya hay en el archivo.
    - No pisa un archivo que no generó el Lab. Pregunta antes de usar `--sobrescribir` o `--archivo <otro>.css`. `--archivo` siempre apunta dentro de `experimental/`.
 4. **Fichas de tokens**, según el sistema:
-   - **Sin producción** (desde una web, Figma o nada): una ficha por grupo en `content/tokens/` (color, tipografía, espaciado, radios, sombras), con estado `exploracion`, y `nombre` y `rol` de cada token.
-     - Un preset de «Generar» usa los nombres de shadcn: `background`, `foreground`, `primary`, `primary-foreground`, `muted`, `muted-foreground`, `border`, `ring`, `radius`, `spacing`, `text-base`, `shadow-md`…
+   - **Sin producción** (desde una web, Figma o nada): una ficha por grupo en `content/tokens/` (color, tipografía, espaciado, radios, sombras, movimiento), con estado `exploracion`, y `nombre` y `rol` de cada token.
+     - Un preset de «Generar» usa los nombres de shadcn: `background`, `foreground`, `primary`, `primary-foreground`, `muted`, `muted-foreground`, `border`, `ring`, `radius`, `spacing`, `text-base`, `shadow-md`, `duration-normal`, `ease-out`…
      - Los valores no se copian a la ficha: la ficha los lee de `experimental/` y los enseña en la columna «Experimental».
    - **Con producción**: el cambio es una **iniciativa**. Créala (o usa la que ya hay) con la skill `nueva-ficha`, añade `iniciativa: <slug>` a las fichas de tokens que cambian y anota en su «Exploración» qué cambia y por qué.
      - Los nombres son los del producto, nunca los de shadcn.
