@@ -10,9 +10,10 @@ El kit contiene la interfaz (con la estructura de ui.shadcn.com), el CLI `ds`, l
 
 | Ruta | Qué hay |
 | --- | --- |
-| `bin/ds.mjs` | CLI: `instalar`, `init`, `info`, `search`, `dev`, `build`, `sync`, `check`, `skills`, `doctor`. |
+| `bin/ds.mjs` | CLI: `instalar`, `init`, `info`, `search`, `ver`, `dev`, `build`, `sync`, `check`, `skills`, `doctor`. |
 | `lib/core.mjs` | Lee sistemas y fichas. `DS_SISTEMAS` apunta a repos externos; sin ella, `systems/`. |
 | `lib/meta.mjs` | Secciones, estados, grupos y prompts de acción. |
+| `lib/registry.mjs` | El registry: índice (`registry.json`) y un JSON por pieza (`r/`). Lo comparten `ds build` y el CLI. |
 | `app/`, `components/` | Interfaz. `app/globals.css` tiene los tokens; `components/ui/`, las primitivas de shadcn/ui (MIT), solo para la interfaz. |
 | `scripts/` | `sync-production.mjs`, `build-public.mjs`, `doctor.mjs`. |
 | `plantilla/` | Lo que `ds init` copia a un repo de sistema. Usa `NOMBRE_DEL_SISTEMA` e `ID_DEL_SISTEMA`. |

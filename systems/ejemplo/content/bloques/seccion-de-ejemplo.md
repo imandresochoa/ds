@@ -5,7 +5,7 @@ estado: exploracion
 categoria: seccion
 creado: 2026-10-11
 actualizado: 2026-10-11
-relacionados: [componentes/boton]
+usa: [componentes/boton]
 ---
 
 Pendiente: sustituye este bloque por una sección, pantalla o flujo real del producto.

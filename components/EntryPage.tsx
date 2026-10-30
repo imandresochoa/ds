@@ -1,5 +1,6 @@
 import { ArrowUpRightIcon } from 'lucide-react';
 import Link from 'next/link';
+import { Fragment } from 'react';
 import { loadEntries, loadExperimentalTokens, loadProductionTokens, loadSyncReport, modeLabel, PLATFORM_SECTIONS, PLATFORMS, resolvedTokenValue, SECTIONS, STATUSES, SYNC_STATES, tokenModes, tokenValue } from '@/lib/core.mjs';
 import { createSlugger, prepareMarkdown, type TocItem } from '@/lib/markdown';
 import type { Entry, Nav, System } from '@/lib/nav';
@@ -68,7 +69,10 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   const available = Object.entries(PLATFORMS).filter(([id]) => entry.platforms[id as keyof typeof entry.platforms].estado !== 'sin-iniciar' || id === platform);
   const current = entry.platforms[platform as keyof typeof entry.platforms];
   const all = loadEntries(system);
-  const related = ((entry.data.relacionados ?? []) as string[]).map((id) => all.find((e) => e.id === id)).filter(Boolean) as Entry[];
+  const byIds = (ids: string[] = []) => ids.map((id) => all.find((e) => e.id === id)).filter(Boolean) as Entry[];
+  // `usa`: las piezas que compone (el grafo del registry). `relacionados`: ver también.
+  const uses = byIds(entry.data.usa as string[]);
+  const related = byIds(entry.data.relacionados as string[]).filter((r) => !uses.includes(r));
   const item = nav.items.find((i) => i.href === entry.href)!;
   const sources = ((sync?.fuentes ?? []) as Source[]).filter((f) => f.superficie !== 'tokens');
   const startPrompt = `Implementa «${entry.titulo}» para ${PLATFORMS[platform as keyof typeof PLATFORMS]} en el sistema ${system.id}. Lee ${sitePath(entry.href)}.md y docs/metodologia/06-plataformas.md. Crea ${entry.file.replace(/index\.md$|\.md$/, '')}/${platform}.md con estado exploracion y no toques producción.`;
@@ -82,8 +86,10 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   const extra = (title: string): TocItem => ({ id: slug(title), title, depth: 2 });
   const tokensHeading = entry.section !== 'tokens' && tokenRows.length > 0 ? extra('Tokens que usa') : null;
   const productionHeading = sources.length > 0 ? extra('Enlace con producción') : null;
+  const usesHeading = uses.length > 0 ? extra('Usa') : null;
   const relatedHeading = related.length > 0 ? extra('Relacionados') : null;
-  const toc = [...(platformMd?.toc ?? []), ...(commonMd?.toc ?? []), ...[tokensHeading, productionHeading, relatedHeading].filter((t): t is TocItem => t !== null)];
+  const pieceLists = [{ heading: usesHeading, list: uses }, { heading: relatedHeading, list: related }].filter((g): g is { heading: TocItem; list: Entry[] } => g.heading !== null);
+  const toc = [...(platformMd?.toc ?? []), ...(commonMd?.toc ?? []), ...[tokensHeading, productionHeading, usesHeading, relatedHeading].filter((t): t is TocItem => t !== null)];
 
   const badges = (
     <>
@@ -230,11 +236,11 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
           </>
         )}
 
-        {relatedHeading && (
-          <>
-            <Heading id={relatedHeading.id}>{relatedHeading.title}</Heading>
+        {pieceLists.map(({ heading, list }) => (
+          <Fragment key={heading.id}>
+            <Heading id={heading.id}>{heading.title}</Heading>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {related.map((r) => (
+              {list.map((r) => (
                 <Link key={r.id} href={r.href} data-slot="card" className="flex flex-col gap-1 rounded-xl border p-4 text-sm transition-colors hover:bg-accent/50">
                   <span className="text-xs text-muted-foreground">{SECTIONS.find((x) => x.id === r.section)?.label}</span>
                   <span className="flex items-center gap-2 font-medium">
@@ -245,8 +251,8 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
                 </Link>
               ))}
             </div>
-          </>
-        )}
+          </Fragment>
+        ))}
 
         <p className="mt-16 text-xs text-muted-foreground">
           <code>{entry.id}</code>

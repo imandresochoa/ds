@@ -5,7 +5,8 @@
 //   ds init "<Nombre>" [id]   crea el repo del sistema: plantilla, kit y skills (sin nombre, pregunta en la terminal)
 //        [--carpeta <ruta>] [--desde repo|web|figma|cero] [--produccion <ruta>] [--url <url>] [--kit <paquete>] [--json]
 //   ds info [--json]          sistema, secciones, producción, último sync, skills y rutas del kit
-//   ds search <texto> [--seccion <id>] [--limite 10] [--json]   busca fichas antes de crear una
+//   ds search <texto> [--seccion <id>] [--limite 10] [--json]   busca fichas antes de crear una (con --json, como en registry.json)
+//   ds ver <pieza>            el JSON de una pieza, igual que /<sistema>/r/<sección>/<slug>.json (id o slug)
 //   ds dev [--port 4100]      servidor de desarrollo con el contenido de este repo
 //   ds build                  exporta el sitio estático a ./out (bajo publicacion.ruta o DS_RUTA, si la hay)
 //   ds preset ver <preset>    lee un preset del Lab (código, enlace o JSON): valores y contraste
@@ -125,10 +126,10 @@ const nextBin = (dir) => {
   }
 };
 
-/** El núcleo del kit leyendo el sistema de esta carpeta (para info y search, sin arrancar Next). */
+/** El núcleo del kit leyendo el sistema de esta carpeta (para info, search y ver, sin arrancar Next). */
 async function loadCore() {
   process.env.DS_SISTEMAS = SITE;
-  return import('../lib/core.mjs');
+  return { ...(await import('../lib/core.mjs')), ...(await import('../lib/registry.mjs')) };
 }
 
 function copyTemplate(from, to, replace) {
@@ -321,12 +322,13 @@ const commands = {
     if (!query) fail('uso: ds search <texto> [--seccion <id>] [--limite 10] [--json]');
     const core = await loadCore();
     const [system] = core.listSystems();
+    const { entries, indexEntry } = core.loadRegistry(system);
     const norm = (text = '') => String(text).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
     const words = norm(query).split(/\s+/).filter(Boolean);
     const section = option('--seccion');
     const limit = Number(option('--limite') ?? 10);
     // Cada palabra tiene que aparecer en algún campo; pesa más en el id y el título que en el cuerpo.
-    const results = core.loadEntries(system)
+    const results = entries
       .filter((e) => !section || e.section === section)
       .map((e) => {
         const fields = [[norm(e.id), 5], [norm(e.titulo), 4], [norm(e.resumen), 2], [norm([e.body, ...Object.values(e.platforms).map((p) => p.body)].join('\n')), 1]];
@@ -341,10 +343,22 @@ const commands = {
       .filter((r) => r !== null)
       .sort((a, b) => b.score - a.score || a.entry.titulo.localeCompare(b.entry.titulo, 'es'))
       .slice(0, limit)
-      .map(({ entry: e }) => ({ id: e.id, titulo: e.titulo, seccion: e.section, estado: e.estado, resumen: e.resumen, archivo: e.file, md: `${e.href}.md` }));
+      // La misma forma que las piezas de registry.json, más el archivo de la ficha en este repo.
+      .map(({ entry: e }) => ({ ...indexEntry(e), archivo: e.file }));
     if (JSON_OUT) return console.log(JSON.stringify(results, null, 2));
     if (!results.length) return console.log(`Ninguna ficha coincide con «${query}».`);
     for (const r of results) console.log(`${r.id} · ${r.estado}\n  ${r.titulo}: ${r.resumen}\n  ${r.archivo}`);
+  },
+  async ver() {
+    requireSystem();
+    const query = positional[0];
+    if (!query) fail('uso: ds ver <pieza> (id, como componentes/boton, o slug)');
+    const core = await loadCore();
+    const [system] = core.listSystems();
+    const { entries, piece } = core.loadRegistry(system);
+    const { entry, candidatos } = core.findEntry(entries, query);
+    if (!entry) fail(candidatos?.length ? `«${query}» es ambiguo: ${candidatos.join(', ')}` : `no hay ninguna pieza «${query}». Búscala con ds search.`);
+    console.log(JSON.stringify(piece(entry), null, 2));
   },
   async dev() {
     requireSystem();

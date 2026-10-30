@@ -7,7 +7,7 @@ export function AgentsPage({ system }: { system: System }) {
   const resources = [
     { href: sitePath(`/${system.id}/design.md`), title: 'design.md', text: 'Reglas, API de clases, tokens y estados en un solo archivo. Es el punto de entrada.' },
     { href: sitePath('/llms.txt'), title: 'llms.txt', text: 'Índice de todas las fichas en Markdown, de todos los sistemas.' },
-    { href: sitePath(`/${system.id}/registry.json`), title: 'registry.json', text: 'Datos estructurados: estado, plataformas, fuentes y huellas de cada ficha.' },
+    { href: sitePath(`/${system.id}/registry.json`), title: 'registry.json', text: 'Índice de piezas. Cada una tiene su JSON en r/ con lo que usa, sus fuentes y su sync.' },
     { href: sitePath(`/${system.id}/llms-full.txt`), title: 'llms-full.txt', text: 'Todas las fichas del sistema en un solo archivo.' },
   ];
   return (

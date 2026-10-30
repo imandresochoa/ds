@@ -56,7 +56,7 @@ Tareas:
 - [x] Propuesta y preguntas.
 - [x] Lab, preset (`ds preset`) y skill que lo aplica.
 - [ ] Movimiento (duraciones y curvas) en el Lab.
-- [ ] Publicar la 0.10.1 en npm: etiqueta `v0.10.1` en `main` y workflow «Publicar en npm» (ver «Publicar una versión» en `AGENTS.md`).
+- [x] Publicar la 0.10.1 en npm: etiqueta `v0.10.1` en `main` y workflow «Publicar en npm».
 
 ### Fase 4 · Registry propio y Directorio
 
@@ -67,14 +67,20 @@ Acordado:
 - **No es compatible con `npx shadcn add`**, a propósito: nada escribe en el repo de producción. Si algún día hace falta, que se abra un PR en producción en vez de escribir en él.
 - **Directorio con solo nuestros sistemas:** una tarjeta por sistema con su descripción, su cobertura y el enlace a su registry. Sin registries de terceros, porque un agente podría meter en producción código que nadie ha revisado.
 
-Por decidir:
-- De dónde sale la lista del Directorio sin nombrar productos en el kit: `directorio` en el `system.json` de cada sistema, o los sistemas que se sirven juntos.
-- Qué pasa con el `registry.json` actual (todas las fichas en un archivo): se queda como índice o convive con él.
-- Si `ds info` y `ds search` pasan a leer el registry nuevo.
+Decidido (ver «Registry por piezas» en `DECISIONES.md`):
+- `registry.json` pasa a ser el índice y cada pieza va en `/<sistema>/r/<sección>/<slug>.json`.
+- `usa` es una clave nueva y explícita de la ficha. Los `tokens` entran solos en el grafo. `relacionados` sigue siendo «ver también».
+- `ds info` y `ds search` siguen leyendo las fichas, sin build. `ds search --json` devuelve piezas con la forma del índice y `ds ver <pieza>`, el JSON de una pieza.
+- La lista del Directorio sale de un repo de directorio aparte: un `directorio.json` con las carpetas de los sistemas, que se sirven juntos. Así el kit no nombra ningún producto y no hace falta pedir nada por red.
+
+Por decidir (Directorio):
+- Cómo se crea y se sirve el repo de directorio (`ds init --directorio`, `ds dev` y `ds build` cuando hay `directorio.json`).
+- Qué es la cobertura en la tarjeta: fichas en producción, estado del sync o las dos.
+- Si cada sistema tiene que aceptar salir en el Directorio desde su `system.json`.
 
 Tareas:
-- [ ] Propuesta y preguntas.
-- [ ] `/r/<pieza>.json` e índice en `ds build`.
+- [x] Propuesta y preguntas.
+- [x] `/r/<pieza>.json` e índice en `ds build`, `ds search` con la misma forma y `ds ver`.
 - [ ] Directorio.
 
 ### Fase 5 · Metodología, plantilla y 1.0.0

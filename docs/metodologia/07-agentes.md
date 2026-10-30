@@ -9,18 +9,23 @@ resumen: Qué lee un agente, en qué orden, y cómo se mejora la guía con evalu
 | --- | --- |
 | `/llms.txt` | Índice de todos los sistemas y fichas, con enlaces a su Markdown. |
 | `/<sistema>/design.md` | Punto de entrada. Criterio escrito a mano (`DESIGN.md`) y un apéndice generado: estados, API pública de clases, fichas y tokens de producción. |
-| `/<sistema>/registry.json` | Datos estructurados: estado, plataformas, fuentes, huellas y avisos de cada ficha. |
+| `/<sistema>/registry.json` | Índice del registry: cada pieza con su tipo, estado, categorías y el enlace a su JSON. También los tokens de producción y sus modos. |
+| `/<sistema>/r/<sección>/<slug>.json` | Una pieza: estado por plataforma, lo que usa y quién la usa, fuentes, sync, reglas y antipatrones. |
 | `/<sistema>/llms-full.txt` | Todas las fichas en un solo archivo. |
 | `<ruta de la ficha>.md` | Cada página en Markdown, en la misma ruta. |
 
-En la interfaz, «Copiar página» copia cada página en Markdown y la tarjeta «¿Trabajas con un agente?» copia un contexto listo para pegar. Desde la terminal, `npx ds info --json` y `npx ds search <texto>` dan lo mismo a un agente sin abrir la web. El Lab de primitivos pasa sus cambios con un enlace: `npx ds preset ver` lo lee y `npx ds preset aplicar` lo escribe en `experimental/`.
+En la interfaz, «Copiar página» copia cada página en Markdown y la tarjeta «¿Trabajas con un agente?» copia un contexto listo para pegar. Desde la terminal, `npx ds info --json`, `npx ds search <texto> --json` y `npx ds ver <pieza>` dan lo mismo a un agente sin abrir la web ni hacer build: `search` devuelve piezas con la forma del índice y `ver`, el JSON de una pieza. El Lab de primitivos pasa sus cambios con un enlace: `npx ds preset ver` lo lee y `npx ds preset aplicar` lo escribe en `experimental/`.
 
 ## Orden de lectura para un agente
 
 1. `design.md` del sistema.
-2. La ficha concreta (`.md`).
+2. La ficha concreta (`.md`), o su JSON en `r/` si necesita datos: qué usa, quién la usa y su sync.
 3. Si va a escribir texto, la guía de voz enlazada desde Fundamentos.
 4. Si va a crear algo nuevo, esta metodología.
+
+## El registry es de solo lectura
+
+De shadcn/ui se toma la forma: un índice y un JSON por pieza, con su tipo, sus dependencias (`usa`) y sus categorías. No es compatible con `npx shadcn add`, a propósito: nada del sistema escribe en el repo de producción. Una pieza entra en producción por un PR que aprueba una persona.
 
 ## Prompts del botón «Nuevo»
 
