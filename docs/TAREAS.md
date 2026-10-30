@@ -19,11 +19,9 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 - [ ] Visor de bloques redimensionable arrastrando, como en shadcn.
 - [x] Inicio con un solo sistema: redirige al sistema.
 
-## Siguientes fases
+## Instalación y publicación
 
 - [x] Skill de montaje con preguntas nativas (`ds instalar`, `montar-sistema`), `ds init` con parámetros, `ds info` y `ds search`.
-- [ ] Lab de primitivos: colores con pares AA, estilos de texto, espaciado, radios y sombras; sale un preset.
-- [ ] Registry propio de solo lectura (`/r/<pieza>.json`) y Directorio con solo nuestros sistemas.
 - [x] Paquete preparado: `@imandresochoa/ds`, `files` en lista blanca y workflow manual con trusted publishing.
 - [x] Repo público nuevo sin historial (`imandresochoa/ds`); el antiguo, privado, como `design-system-agentic-first-kit-legacy`.
 - [x] Licencia MIT.
@@ -31,6 +29,62 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 - [x] Primera publicación en npm: `@imandresochoa/ds@0.9.0`, a mano y con 2FA (2026-10-30).
 - [x] Trusted publisher configurado con `npm trust` (`imandresochoa/ds`, `publicar.yml`). Las versiones siguientes salen con el workflow.
 - [ ] En npmjs.com, «Publishing access» → «Require two-factor authentication and disallow tokens».
+
+## Fases pendientes
+
+El rediseño al modelo de shadcn/ui se acordó en cinco fases. La 1 (interfaz) y la 2 (instalación y `montar-sistema`) están hechas y salieron en la 0.9.0; lo decidido está en `DECISIONES.md`, entradas del 2026-10-30. Cada fase empieza con una propuesta y preguntas, no con código (ver «Cómo trabajamos» en `AGENTS.md`). Lo que pone «Por decidir» no está decidido: se pregunta.
+
+### Fase 3 · Lab de primitivos
+
+Ajustar los primitivos de un sistema que parte de una web, de Figma o de nada, sin escribir los tokens a mano. Es el equivalente del Create de shadcn, pero solo con primitivos, porque el kit no lleva componentes.
+
+Acordado:
+- **Qué ajusta:** color (neutro y marca, que dan pares semánticos `x` / `x-foreground` con comprobación de contraste AA), estilos de texto (familias, tamaño base y escala), espaciado, radios (una base y su escala, como shadcn) y sombras. El movimiento, más adelante.
+- **Qué enseña:** muestras de esos primitivos en claro y oscuro: escala tipográfica, paleta, regla de espacios y radios. Ningún componente.
+- **Qué produce:** un preset en la URL. Una skill lo aplica: escribe los tokens en `experimental/` y sus fichas en estado exploración.
+- **Con un producto que ya existe**, el Lab se abre con los primitivos de producción cargados y lo que se cambie pasa a ser una iniciativa. Nunca toca producción.
+- «Nuevo», en la cabecera, llevará al Lab.
+
+Por decidir:
+- Dónde vive: una página del sitio de cada sistema o una herramienta aparte.
+- El formato del preset.
+- Qué skill aplica el preset (`montar-sistema` u otra) y si `ds` necesita un comando para ello.
+- Qué hace el Lab cuando un par no llega a AA.
+
+Tareas:
+- [ ] Propuesta y preguntas.
+- [ ] Lab, preset y skill que lo aplica.
+
+### Fase 4 · Registry propio y Directorio
+
+Que un agente lea el sistema pieza a pieza y que haya un índice de nuestros sistemas.
+
+Acordado:
+- **Registry de solo lectura:** un JSON por pieza (`/r/<pieza>.json`) y un índice. De shadcn se toma solo la forma: un campo `tipo` (fundamento, token, componente, bloque, gráfico o iniciativa), las dependencias internas como grafo (`usa`) y las categorías como dato. Dentro va lo nuestro: estado, sync, fuentes, reglas y antipatrones.
+- **No es compatible con `npx shadcn add`**, a propósito: nada escribe en el repo de producción. Si algún día hace falta, que se abra un PR en producción en vez de escribir en él.
+- **Directorio con solo nuestros sistemas:** una tarjeta por sistema con su descripción, su cobertura y el enlace a su registry. Sin registries de terceros, porque un agente podría meter en producción código que nadie ha revisado.
+
+Por decidir:
+- De dónde sale la lista del Directorio sin nombrar productos en el kit: `directorio` en el `system.json` de cada sistema, o los sistemas que se sirven juntos.
+- Qué pasa con el `registry.json` actual (todas las fichas en un archivo): se queda como índice o convive con él.
+- Si `ds info` y `ds search` pasan a leer el registry nuevo.
+
+Tareas:
+- [ ] Propuesta y preguntas.
+- [ ] `/r/<pieza>.json` e índice en `ds build`.
+- [ ] Directorio.
+
+### Fase 5 · Metodología, plantilla y 1.0.0
+
+Cerrar el rediseño con la documentación al día y una versión estable.
+
+Por decidir: qué tiene que cumplirse para llamarla 1.0.0.
+
+Tareas:
+- [ ] Revisar `docs/metodologia/` entera con lo de las fases 1 a 4.
+- [ ] Revisar la plantilla y las skills contra la metodología (regla 5 de `AGENTS.md`).
+- [ ] Entradas en `DECISIONES.md` y `CHANGELOG.md`, con la migración.
+- [ ] Publicar la 1.0.0 (ver «Publicar una versión» en `AGENTS.md`).
 
 ## Método y herramientas
 
