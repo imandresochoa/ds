@@ -2,6 +2,7 @@
 // Genera public/ a partir de los sistemas (DS_SISTEMAS o systems/) y docs/ (se ejecuta antes de `dev` y `build`):
 //   /_ds/<sistema>/produccion/…   instantánea del CSS de producción para los ejemplos en vivo
 //   /<sistema>/<sección>/<ficha>.md  cada ficha en Markdown (misma ruta que su página)
+//   /<sistema>/docs.md, /<sistema>/docs/<página>.md  las páginas de Docs del sistema (content/docs/)
 //   /<sistema>/design.md          guía para agentes: DESIGN.md escrito a mano + apéndice generado
 //   /<sistema>/registry.json      datos estructurados de todas las fichas
 //   /llms.txt                     índice para agentes de todos los sistemas
@@ -12,7 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
-import { CONTENT_SECTIONS, PLATFORMS, ROOT, STATUSES, SYNC_STATES, listSystems, loadDocs, loadEntries, loadProductionTokens, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
+import { CONTENT_SECTIONS, FUNCIONES, KIT_PAGES, PLATFORM_SECTIONS, PLATFORMS, ROOT, STATUSES, SYNC_STATES, listSystems, loadDocs, loadEntries, loadPages, loadProductionTokens, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
 
 const PUBLIC = path.join(ROOT, 'public');
 const ROUTE = process.argv.includes('--exportar') ? publicationRoute() : '';
@@ -36,12 +37,23 @@ function entryMarkdown(system, entry, report) {
   const parts = [`---\n${YAML.stringify(front).trim()}\n---`, `# ${entry.titulo}`, entry.resumen, md(entry.body.trim())];
   for (const [platform, info] of Object.entries(entry.platforms)) {
     if (info.body.trim()) parts.push(`# ${PLATFORMS[platform]}\n\n${md(info.body.trim())}`);
-    else if (CONTENT_SECTIONS.find((s) => s.id === entry.section)?.agrupar === 'nivel') parts.push(`# ${PLATFORMS[platform]}\n\nEstado: ${statusLabel(info.estado)}. Sin implementación documentada.`);
+    else if (PLATFORM_SECTIONS.includes(entry.section)) parts.push(`# ${PLATFORMS[platform]}\n\nEstado: ${statusLabel(info.estado)}. Sin implementación documentada.`);
   }
   if (sync?.fuentes?.length) {
     parts.push('# Enlace con producción\n\n| Fuente | Estado | Huella |\n| --- | --- | --- |\n' + sync.fuentes.map((f) => `| \`${f.fuente}\` | ${SYNC_STATES[f.estado]?.label ?? f.estado} | ${f.huella ?? '—'} |`).join('\n'));
   }
   return parts.filter(Boolean).join('\n\n') + '\n';
+}
+
+/** Categoría de una ficha en las secciones que agrupan por categoría (`nivel` es su nombre anterior en los bloques). */
+const categoria = (entry) => (CONTENT_SECTIONS.find((s) => s.id === entry.section)?.agrupar === 'categoria' ? entry.data.categoria ?? entry.data.nivel ?? null : null);
+
+/** Subgrupo de una ficha en llms.txt: los componentes, por función; bloques y gráficos, por categoría. */
+function llmsGroup(entry) {
+  const section = CONTENT_SECTIONS.find((s) => s.id === entry.section);
+  if (entry.section === 'componentes') return FUNCIONES[entry.data.funcion] ?? 'Otros';
+  if (section?.agrupar === 'categoria') return section.categorias?.[categoria(entry)] ?? categoria(entry) ?? 'Otros';
+  return null;
 }
 
 const llms = [
@@ -65,6 +77,9 @@ for (const system of listSystems()) {
   copyDir(path.join(system.dir, 'experimental'), `_ds/${system.id}/experimental`);
 
   for (const entry of entries) write(`${system.id}/${entry.section}/${entry.slug}.md`, entryMarkdown(system, entry, report));
+  // Las páginas propias de Docs; las del kit (Producción, Para agentes) se generan en la interfaz.
+  const pages = loadPages(system).filter((p) => !KIT_PAGES.some((k) => k.slug === p.slug));
+  for (const page of pages) write(page.slug ? `${system.id}/docs/${page.slug}.md` : `${system.id}/docs.md`, `# ${page.titulo}\n\n${page.resumen}\n\n${md(page.body.trim())}\n`);
 
   // registry.json: lo que un agente necesita para decidir sin leer cada ficha.
   const registry = {
@@ -76,7 +91,9 @@ for (const system of listSystems()) {
       resumen: e.resumen,
       seccion: e.section,
       funcion: e.data.funcion ?? null,
-      nivel: e.data.nivel ?? null,
+      categoria: categoria(e),
+      nivel: categoria(e) === null ? e.data.nivel ?? null : null,
+      destacado: e.data.destacado === true,
       estado: e.estado,
       iniciativa: e.data.iniciativa ?? null,
       md: at(`${e.href}.md`),
@@ -139,10 +156,15 @@ for (const system of listSystems()) {
   write(`${system.id}/llms-full.txt`, entries.map((e) => entryMarkdown(system, e, report)).join('\n\n---\n\n'));
 
   llms.push(`## ${system.nombre}`, '', `- [design.md](${at(`/${system.id}/design.md`)}): reglas, API de clases, tokens y estados`, `- [registry.json](${at(`/${system.id}/registry.json`)}): datos estructurados`, `- [llms-full.txt](${at(`/${system.id}/llms-full.txt`)}): todas las fichas en un archivo`, '');
+  llms.push('### Docs', '', ...pages.map((p) => `- [${p.titulo}](${at(`/${system.id}/${p.slug ? `docs/${p.slug}` : 'docs'}.md`)})${p.resumen ? `: ${p.resumen}` : ''}`), '');
+  const line = (e) => `- [${e.titulo}](${at(e.href)}.md): ${statusLabel(e.estado)}. ${e.resumen}`;
   for (const section of CONTENT_SECTIONS) {
     const list = entries.filter((e) => e.section === section.id);
     if (!list.length) continue;
-    llms.push(`### ${section.label}`, '', ...list.map((e) => `- [${e.titulo}](${at(e.href)}.md): ${statusLabel(e.estado)}. ${e.resumen}`), '');
+    llms.push(`### ${section.label}`, '');
+    const groups = [...new Set(list.map(llmsGroup))];
+    if (groups.length === 1 && groups[0] === null) llms.push(...list.map(line), '');
+    else for (const group of groups) llms.push(`#### ${group}`, '', ...list.filter((e) => llmsGroup(e) === group).map(line), '');
   }
 }
 

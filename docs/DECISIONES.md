@@ -86,3 +86,17 @@ En una superficie 100 % Tailwind las clases son utilidades: contar clases sin do
 Un sistema se publicaba en la raíz de un dominio, o dentro de otro sitio con rewrites de cada ruta que usa (`/<id>`, `/_next`, `/_ds`, `/llms.txt`). Si el sitio que lo aloja también es Next, los dos `/_next` chocan y los rewrites no pueden separarlos. La salida es servir el sistema bajo una carpeta propia: `publicacion.ruta` en `system.json`, que `ds build` aplica como `basePath` de Next y pone delante de lo que Next no ve (los archivos para agentes, los enlaces escritos en las fichas, las hojas de los ejemplos en vivo). Se descartó `assetPrefix` solo: separa `/_next` pero no las páginas, los `.md` ni `/_ds`. También se descartó que las fichas y `llms.txt` usaran enlaces relativos para servir en cualquier ruta sin configurar nada: cambiaba lo publicado de todos los sistemas y muchos agentes no resuelven bien enlaces relativos.
 
 Es una opción de publicación, no del contenido: la ruta va en `system.json` porque es del sistema, `DS_RUTA` la cambia en un build concreto (otro entorno, o la raíz) y `ds dev` no la usa, para que el servidor de desarrollo siga en el mismo sitio en todos los sistemas. Sin ruta, el sitio exportado es el de antes.
+
+## 2026-10-30 · Interfaz y estructura de shadcn/ui
+
+La interfaz y la forma de pensar un sistema pasan a ser las de ui.shadcn.com. Ese modelo lo conocen las personas y los agentes, y separa bien la documentación que se lee de las piezas que se copian. Sustituye a la interfaz al estilo de Codex, a la portada con mosaico y al rail.
+
+- **Estructura**: una cabecera con Inicio, Docs, Componentes, Bloques, Gráficos e Iniciativas. Docs va a tres columnas: barra lateral, contenido y «En esta página». Bloques, Gráficos e Iniciativas son páginas anchas.
+- **Tecnología**: Tailwind 4 y primitivas de shadcn/ui copiadas en `components/ui/` (MIT), solo para la interfaz del kit. Los ejemplos de las fichas siguen en un iframe con el CSS de producción.
+- **Bloques sustituye a Patrones** (con categoría `seccion`, `pantalla` o `flujo`) y llega **Gráficos**. Las dos secciones son estructura: el kit no trae ningún componente, bloque ni gráfico. Cada sistema las llena con lo que existe en su producto o con lo que diseñe desde cero.
+- **Componentes en lista alfabética**, con «Nuevos» arriba, como shadcn. Esto revisa la entrada «Componentes agrupados por función»: la `funcion` sigue en la ficha y ordena `llms.txt` y el registry.
+- **Docs por sistema**: cada sistema escribe sus páginas en `content/docs/`. El kit añade «Producción» y «Para agentes» con los datos del sync, que antes estaban en Inicio.
+- **Abrir en Claude o ChatGPT** solo si el sistema pone `"abrirEnAgentes": true`, porque envía la URL de la página a un servicio externo. Por defecto, solo se copia.
+- **Compatibilidad**: `content/patrones/` se sigue leyendo como Bloques. `nivel: seccion` cuenta como `categoria: seccion`. Las huellas y los `relacionados` con `patrones/…` siguen funcionando.
+
+Se descartaron tres opciones: «Create», porque los sistemas ya tienen sus menús; «Typeset», porque la tipografía la define cada sistema; y un registry compatible con `npx shadcn add`, porque nada debe escribir en el repo de producción. El registry propio, de solo lectura, queda para una fase posterior.

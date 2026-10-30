@@ -1,55 +1,50 @@
 ---
 titulo: La interfaz
-resumen: Doble barra lateral al estilo de Codex, con sus medidas exactas y por qué está así.
+resumen: "La estructura de ui.shadcn.com: cabecera, Docs a tres columnas y páginas anchas para Bloques, Gráficos e Iniciativas."
 ---
 
-La interfaz replica la estructura y el estilo visual de la app de escritorio de Codex: neutra, densa y sin decoración. El contenido es lo que tiene color; la interfaz no compite con él. La excepción es la portada: es la puerta de entrada y lleva el color del sistema.
+La interfaz copia la estructura y el estilo de ui.shadcn.com: neutra, sin decoración, con el contenido como única fuente de color. También copia su forma de pensar un sistema: documentación que se lee de arriba abajo y piezas que se ven en vivo y se copian. La diferencia es que aquí cada pieza enlaza con su código en producción.
 
 ## Estructura
 
-- **Portada** (`/<sistema>`): lo primero que se ve, sin barras. Ver «Portada» más abajo.
-- **Barra de título** (44 px): a la izquierda, siempre el nombre del sistema (sin icono), que lleva a la portada, alineado con el título de la barra de sección, y a su lado atrás y adelante. A la derecha, las etiquetas de la ficha abierta y sus acciones: abrir el `.md`, ver en producción y el menú «…».
-- **Pastilla de estado**: una sola, con fondo. El texto es el estado («En producción») y el color resume el sync: verde, sincronizada; ámbar, hay que revisarla; rojo, declara algo que ya no existe. Al pasar el ratón muestra el detalle: estado, sync, plataformas y fuentes. El id y la fecha van al pie de la ficha.
-- **Pestañas de plataforma**: solo aparecen las plataformas que existen. Con una sola, no hay pestañas.
-- **Rail de iconos** (52 px): arriba, una entrada por capa (Inicio, Fundamentos, Tokens, Componentes, Patrones, Iniciativas). Abajo, de arriba a abajo: mostrar u ocultar la barra lateral; «…», con los recursos para agentes, la metodología (si el sistema la activa) y el enlace con producción; y el sistema actual. Los menús de abajo se abren hacia arriba.
-- **Barra de sección** (292 px): el nombre de la sección, contexto para agentes y buscar; una acción que copia un prompt para tu agente; y las fichas de la sección agrupadas.
-- **Contenido**: título, resumen y, si hay más de una plataforma, las pestañas para cambiar entre ellas.
+- **Cabecera** (fija). A la izquierda, la marca del sistema (un selector si hay varios) y la navegación: Inicio, Docs, Componentes, Bloques, Gráficos e Iniciativas. A la derecha, buscar, el repo de código (si `produccion.codigo` existe), modo claro u oscuro y **Nuevo**, con el prompt de cada sección y «Pedir un cambio».
+- **Home** (`/<sistema>`). Un aviso con la última ficha creada, el nombre y la descripción del sistema, «Empezar» y «Ver componentes». Debajo, un escaparate con los ejemplos en vivo de las fichas marcadas con `destacado: true`. Si no hay ninguna, usa las que tienen ejemplo, primero las de producción, hasta nueve. Sin ejemplos, muestra una tarjeta por sección.
+- **Docs.** Tres columnas, como en shadcn:
+  - **Barra lateral**: «Secciones» (Introducción y una entrada por sección), «Empezar» (las páginas propias de `content/docs/`, más Producción y Para agentes, que pone el kit), un grupo por sección con sus fichas y, si el sistema la activa, Metodología.
+  - **Contenido**: título, descripción, insignias (estado, código, iniciativa), «Copiar página» en Markdown y anterior y siguiente.
+  - **Derecha**: «En esta página» y la tarjeta «¿Trabajas con un agente?», que copia el contexto del sistema.
+- **Índice de sección** (`/<sistema>/componentes`, `/fundamentos`, `/tokens`). Como el índice de componentes de shadcn: «Nuevos» (creadas en los últimos 30 días, con punto azul) y «Todos», en rejilla alfabética. Fundamentos y Tokens se agrupan por `grupo`.
+- **Ficha.** Los ejemplos en vivo con su código debajo. Si el código pasa de ocho líneas, se pliega con «Ver código». Las pestañas Web, iOS y Android siguen el conmutador de base de shadcn y solo aparecen las plataformas que existen. Al final van «Tokens que usa», «Enlace con producción» y «Relacionados».
+- **Páginas anchas.** Bloques y Gráficos tienen la forma de Blocks y Charts: cabecera, navegación por categoría y galería.
+  - Cada bloque va en un visor con Vista y Código, anchos de escritorio, tablet y móvil, y un botón que copia el prompt para que un agente lo use. Es el equivalente a `npx shadcn add`.
+  - Los gráficos van en tarjetas, en rejilla.
+  - Iniciativas muestra tarjetas «En curso» y «Publicadas».
+  - Una sección vacía explica qué va en ella y da el prompt para pedírselo al agente.
+- **Pie**: enlaces a `design.md` y `llms.txt`. En Docs no aparece.
 
-Inicio vive en `/<sistema>/inicio`. Su barra de sección muestra **Recientes** (lo que has abierto en este navegador) y **Añadidos recientemente** (por fecha de creación).
+## Estado de una ficha
 
-## Portada
+Una insignia junto a la descripción. El texto es el estado y el punto resume el sync: verde, en producción y sincronizada; ámbar, hay que revisarla; rojo, declara algo que ya no existe; azul, en desarrollo; violeta, en exploración; gris, obsoleta. Al pasar el ratón muestra el estado, el sync, las plataformas y las fuentes. En las listas solo aparece el punto, y solo si la ficha no está en producción.
 
-`/<sistema>` es el mosaico de secciones a pantalla completa, sin barras, a partir de brand.dropbox.com. Las cajas giran en molinete alrededor de la casilla del sistema (sus iniciales sobre su `color`), que lleva a Inicio. Al cargar, el mosaico entra con un zoom corto hacia atrás y las cajas aparecen una tras otra.
+## Estructura, no componentes
 
-- **Una caja por sección**: Fundamentos, Tokens, Componentes, Patrones, Iniciativas y, si el sistema la activa, Metodología. Cada una muestra su número de fichas y una ilustración de su icono del rail, animada en bucle: una mano traza una línea a lo largo de la regla, el muestrario se abre en abanico, las piezas se separan, giran y encajan, un cursor arrastra las cajas de la plantilla, una mano mece el matraz mientras burbujea y el libro pasa página.
-- **Ilustraciones**: al estilo de las de Claude. Cada una es una lámina de color con grano, con figuras de papel recortado (blanco roto, bordes algo torcidos, sin contorno) y trazo de tinta a mano (casi negro, grueso, de puntas redondas) para manos, lápices y detalles. Lo que se sale de la lámina queda cortado por su borde. Rejilla de 200 en `components/LandingArt.tsx`.
-- **Al pasar el ratón**, la caja toma el color del sistema, enseña la descripción de la sección y la lámina se inclina un poco.
-- **Composición**: `lib/landing.ts` tiene varias plantillas en molinete por número de cajas (de 4 a 8): apaisadas, cuadradas y verticales, y también las prueba traspuestas y con distintos pesos por pista. Para cada proporción de pantalla elige la más armónica: la que deja la caja más alargada lo menos alargada posible, con la casilla del sistema cerca del centro y cajas de tamaño parecido. El resultado son media queries por proporción, calculadas en el servidor. Así no quedan barras estrechas a lo alto ni a lo ancho: en las pantallas habituales ninguna caja pasa de 1:1,8. Con más de 8 cajas, las que sobran van en filas bajo el molinete. Una sección nueva aparece sola; si no tiene ilustración en `components/LandingArt.tsx`, usa la genérica.
-- **Color**: las cajas son neutras; la lámina de las ilustraciones es el `color` del sistema, aclarado si es tan oscuro que la tinta no se vería (más si es casi neutro, para que no quede gris de periódico) u oscurecido si el papel no destacaría. Papel y tinta son fijos, también en modo oscuro, como una lámina impresa. El texto encima del color es blanco o casi negro, el que más contraste. En modo oscuro, un color casi negro se sustituye por el del texto para que no desaparezca.
-- **Movimiento**: solo CSS. Con «reducir movimiento», todo queda quieto.
+El kit no trae componentes, bloques ni gráficos. Trae su estructura: las secciones, sus categorías, el visor y los estados vacíos. Cada sistema la llena con lo que ya existe en su producto o con lo que diseñe desde cero.
 
-## Medidas
-
-Tomadas de capturas a 2x y convertidas a píxeles lógicos. Viven como tokens en `app/shell.css`.
-
-| Elemento | Medida |
+| Sección | Categorías (`categoria`) |
 | --- | --- |
-| Barra de título | 44 px de alto, fondo `#f2f2f2` |
-| Rail | 52 px de ancho; botones de 36 px separados 8 px; activo en `#e6e7e7`; iconos de 18 px |
-| Panel | Radio superior izquierdo de 12 px; borde `#e6e6e6` |
-| Barra de sección | 292 px, fondo `#fbfbfb`, borde derecho de 0,5 px en `#e1e1e1`, 8 px de margen |
-| Fila | 29 px de alto + 2 px de separación, radio de 8 px, texto de 14 px en `#3b3d3f`, activa en `#eeefef` |
-| Etiqueta de grupo | 14 px en `#8c8d8e` |
-| Cabecera de la barra | 18 px, seminegrita |
-| Página | 50 px de margen lateral, 28 px arriba; título de 24/32 px |
-| Pastillas | 36 px de alto, radio completo, 13 px; activa en `#f2f3f3`; inactiva en `#6a6b6d` |
-| Texto | 14/22 px en `#1a1c1f`; secundario `#6a6b6d`; terciario `#8c8d8e` |
-| Paleta ⌘K | 520 px de ancho, radio de 16 px, fondo atenuado al 14 % |
-| Menú | ~220 px, filas de 28 px, radio de 14 px |
+| Bloques | `seccion`, `pantalla`, `flujo` |
+| Gráficos | `area`, `barras`, `lineas`, `circular`, `radar`, `radial`, `tooltip` |
 
-El modo oscuro es una aproximación pendiente de calibrar con capturas.
+Una categoría desconocida también funciona: se muestra con su nombre, después de las conocidas.
+
+## Tecnología
+
+- **Tailwind 4 y primitivas de shadcn/ui** (estilo new-york-v4, licencia MIT), copiadas en `components/ui/`. Solo las usa la interfaz del kit. Los ejemplos de las fichas no las usan: se pintan en un iframe con el CSS de producción.
+- **Tokens** en `app/globals.css`, con la convención de shadcn (pares `x` y `x-foreground` en oklch, escala de radios), más `--estado-*` y `--nuevo`.
+- **Tipografía**: Geist y Geist Mono.
+- **Código**: resaltado con Shiki, con un tema claro y otro oscuro.
 
 ## Atajos
 
-- `⌘K`: buscar fichas y acciones rápidas. `⌃1`–`⌃9` abre un resultado.
-- `⌘\`: mostrar u ocultar la barra lateral (también desde el rail, encima del sistema).
+- `⌘K` o `/`: buscar.
+- `⌘D`: modo claro u oscuro.

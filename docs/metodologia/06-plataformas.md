@@ -5,7 +5,7 @@ resumen: Web, iOS y Android en la misma ficha; landing y portal dentro de web.
 
 ## Plataformas
 
-Cada componente y patrón tiene pestañas de plataforma: **Web**, **iOS** y **Android**. Cada pestaña tiene su propio estado y su archivo (`web.md`, `ios.md`, `android.md`). Lo común (cuándo usarlo, reglas, accesibilidad) vive en `index.md` y se muestra en todas.
+Cada componente y bloque tiene pestañas de plataforma: **Web**, **iOS** y **Android**. Cada pestaña tiene su propio estado y su archivo (`web.md`, `ios.md`, `android.md`). Lo común (cuándo usarlo, reglas, accesibilidad) vive en `index.md` y se muestra en todas.
 
 Cuando una plataforma no tiene implementación, la pestaña muestra «Sin iniciar» y un prompt para que un agente prepare la primera versión en exploración.
 

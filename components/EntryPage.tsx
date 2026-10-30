@@ -1,14 +1,17 @@
+import { ArrowUpRightIcon } from 'lucide-react';
 import Link from 'next/link';
-import { loadEntries, loadProductionTokens, loadSyncReport, modeLabel, PLATFORMS, resolvedTokenValue, SECTIONS, STATUSES, tokenModes, tokenValue } from '@/lib/core.mjs';
-import type { Entry, System } from '@/lib/nav';
+import { loadEntries, loadProductionTokens, loadSyncReport, modeLabel, PLATFORM_SECTIONS, PLATFORMS, resolvedTokenValue, SECTIONS, STATUSES, SYNC_STATES, tokenModes, tokenValue } from '@/lib/core.mjs';
+import { createSlugger, prepareMarkdown, type TocItem } from '@/lib/markdown';
+import type { Entry, Nav, System } from '@/lib/nav';
 import { sitePath } from '@/lib/site';
 import { previewSurfaces } from '@/lib/surfaces';
+import { Badge } from '@/components/ui/badge';
 import { CodeBlock } from './CodeBlock';
+import { DocsArticle } from './docs/DocsArticle';
+import { StatusBadge, StatusDot } from './docs/StatusBadge';
 import { Markdown } from './Markdown';
-import { StatusBadge, SyncBadge } from './Status';
 
 const isColor = (value: string) => /^(#|rgba?\(|hsla?\(|hwb\(|(ok)?(lab|lch)\(|color\()/i.test(value.trim());
-const PLATFORM_SECTIONS = ['componentes', 'patrones'];
 
 type TokenRow = { nombre: string; rol?: string };
 type TokenValues = Record<string, string | Record<string, string>>;
@@ -16,11 +19,11 @@ type Source = { clave: string; plataforma: string; superficie: string; fuente: s
 
 // Se escribe el valor tal cual está en producción; la muestra usa el valor con sus var() resueltas.
 function TokenValue({ raw, resolved }: { raw?: string; resolved?: string }) {
-  if (raw === undefined) return <span style={{ color: 'var(--ds-text-3)' }}>—</span>;
+  if (raw === undefined) return <span className="text-muted-foreground">—</span>;
   const color = resolved ?? raw;
   return (
-    <span className="ds-mono" title={resolved !== raw ? resolved : undefined}>
-      {isColor(color) && <i className="ds-swatch" style={{ background: color }} />}
+    <span className="inline-flex items-center gap-2 font-mono text-[0.8rem]" title={resolved !== raw ? resolved : undefined}>
+      {isColor(color) && <span className="size-3.5 shrink-0 rounded-sm border" style={{ background: color }} />}
       {raw}
     </span>
   );
@@ -33,7 +36,16 @@ function TokenCells({ values, name, modes }: { values: TokenValues; name: string
   return <>{cells.map((c, i) => <td key={modes[i]}><TokenValue {...c} /></td>)}</>;
 }
 
-export function EntryPage({ system, entry, platform }: { system: System; entry: Entry; platform: string }) {
+/** Título de un apartado generado (no viene del Markdown): lleva id y entra en «En esta página». */
+function Heading({ id, children }: { id: string; children: React.ReactNode }) {
+  return <h2 id={id}>{children}</h2>;
+}
+
+/**
+ * Ficha con la anatomía de una página de componente de shadcn: cabecera, insignias, conmutador de plataforma,
+ * ejemplos en vivo con su código y, después, lo que el sistema añade (tokens, enlace con producción, relacionados).
+ */
+export function EntryPage({ system, entry, platform, nav }: { system: System; entry: Entry; platform: string; nav: Nav }) {
   const report = loadSyncReport(system);
   const sync = report?.entradas?.[entry.id];
   const tokens = loadProductionTokens(system) as Record<string, TokenValues>;
@@ -44,31 +56,62 @@ export function EntryPage({ system, entry, platform }: { system: System; entry: 
   const modeSelectors = (id: string) => (report?.tokens?.[id]?.modos ?? null) as Record<string, string[]> | null;
   const modes = Object.fromEntries(surfaceIds.map((id) => [id, tokenModes(tokens[id], modeSelectors(id))]));
   const modeColumns = surfaceIds.flatMap((id) => (modes[id].length ? modes[id] : [null]).map((mode) => ({ id, mode })));
-  const section = SECTIONS.find((s) => s.id === entry.section);
   const showPlatforms = PLATFORM_SECTIONS.includes(entry.section);
-  // Solo se muestran las plataformas que existen; con una sola, no hay pestañas.
+  // Solo se muestran las plataformas que existen; con una sola, no hay conmutador.
   const available = Object.entries(PLATFORMS).filter(([id]) => entry.platforms[id as keyof typeof entry.platforms].estado !== 'sin-iniciar' || id === platform);
   const current = entry.platforms[platform as keyof typeof entry.platforms];
   const all = loadEntries(system);
   const related = ((entry.data.relacionados ?? []) as string[]).map((id) => all.find((e) => e.id === id)).filter(Boolean) as Entry[];
   const tokenRows: TokenRow[] = (entry.data.tokens ?? []).map((t: string | TokenRow) => (typeof t === 'string' ? { nombre: t } : t));
+  const item = nav.items.find((i) => i.href === entry.href)!;
+  const sources = ((sync?.fuentes ?? []) as Source[]).filter((f) => f.superficie !== 'tokens');
   const startPrompt = `Implementa «${entry.titulo}» para ${PLATFORMS[platform as keyof typeof PLATFORMS]} en el sistema ${system.id}. Lee ${sitePath(entry.href)}.md y docs/metodologia/06-plataformas.md. Crea ${entry.file.replace(/index\.md$|\.md$/, '')}/${platform}.md con estado exploracion y no toques producción.`;
 
-  return (
-    <article className="ds-page">
-      <header>
-        <h1 className="ds-title">{entry.titulo}</h1>
-        {entry.resumen && <p className="ds-summary">{entry.resumen}</p>}
-      </header>
+  // Un solo generador de ids para toda la página: los títulos repetidos («Reglas» en web.md y en index.md) no chocan.
+  const slug = createSlugger();
+  // En una ficha de un solo archivo, el cuerpo común es la versión web: solo falta si la web está sin iniciar.
+  const hasPlatformBody = Boolean(current.body) || (platform === 'web' && current.estado !== 'sin-iniciar');
+  const platformMd = showPlatforms && current.body ? prepareMarkdown(current.body, slug) : null;
+  const commonMd = entry.body.trim() ? prepareMarkdown(entry.body, slug) : null;
+  const extra = (title: string): TocItem => ({ id: slug(title), title, depth: 2 });
+  const tokensHeading = entry.section !== 'tokens' && tokenRows.length > 0 ? extra('Tokens que usa') : null;
+  const productionHeading = sources.length > 0 ? extra('Enlace con producción') : null;
+  const relatedHeading = related.length > 0 ? extra('Relacionados') : null;
+  const toc = [...(platformMd?.toc ?? []), ...(commonMd?.toc ?? []), ...[tokensHeading, productionHeading, relatedHeading].filter((t): t is TocItem => t !== null)];
 
+  const badges = (
+    <>
+      <StatusBadge item={item} />
+      {item.fuente && (
+        <Badge asChild variant="secondary" className="rounded-full">
+          <a href={item.fuente} target="_blank" rel="noreferrer">Código <ArrowUpRightIcon /></a>
+        </Badge>
+      )}
+      {item.iniciativa && (
+        <Badge asChild variant="secondary" className="rounded-full">
+          <Link href={item.iniciativa.href}>Iniciativa: {item.iniciativa.titulo}</Link>
+        </Badge>
+      )}
+    </>
+  );
+
+  return (
+    <DocsArticle nav={nav} href={entry.href} title={entry.titulo} description={entry.resumen} md={`${entry.href}.md`} badges={badges} toc={toc}>
       {showPlatforms && available.length > 1 && (
-        <nav className="ds-pills" aria-label="Plataforma">
+        <nav aria-label="Plataforma" className="mb-4 inline-flex w-full items-center gap-6">
           {available.map(([id, label]) => {
             const href = id === 'web' ? entry.href : `${entry.href}/${id}`;
             const info = entry.platforms[id as keyof typeof entry.platforms];
             return (
-              <Link key={id} href={href} className={`ds-pill${id === platform ? ' is-active' : ''}`} aria-current={id === platform ? 'page' : undefined} title={STATUSES[info.estado as keyof typeof STATUSES]?.label}>
-                <i className="ds-dot" data-s={info.estado} />
+              <Link
+                key={id}
+                href={href}
+                data-active={id === platform}
+                aria-current={id === platform ? 'page' : undefined}
+                title={STATUSES[info.estado as keyof typeof STATUSES]?.label}
+                className="relative inline-flex items-center justify-center gap-1.5 pt-1 pb-0.5 text-base font-medium text-muted-foreground transition-colors after:absolute after:inset-x-0 after:bottom-[-4px] after:h-0.5 after:bg-foreground after:opacity-0 after:transition-opacity hover:text-foreground data-[active=true]:text-foreground data-[active=true]:after:opacity-100"
+              >
+                <StatusDot item={{ estado: info.estado, sync: null }} className="size-1.5" />
                 {label}
               </Link>
             );
@@ -76,27 +119,26 @@ export function EntryPage({ system, entry, platform }: { system: System; entry: 
         </nav>
       )}
 
-      <div className="ds-content">
-        {/* En una ficha de un solo archivo, el cuerpo común es la versión web: solo falta si la web está sin iniciar. */}
-        {showPlatforms && (current.body || (platform === 'web' && current.estado !== 'sin-iniciar') ? (
-          current.body && <Markdown source={current.body} surfaces={surfaces} />
-        ) : (
-          <div className="ds-empty">
-            <h3>{STATUSES[current.estado as keyof typeof STATUSES]?.label ?? 'Sin iniciar'} en {PLATFORMS[platform as keyof typeof PLATFORMS]}</h3>
-            <p>Esta ficha aún no tiene implementación para esta plataforma. Copia el prompt para que un agente prepare la primera versión en exploración.</p>
-            <CodeBlock code={startPrompt} lang="prompt" />
-          </div>
-        ))}
+      {showPlatforms && !hasPlatformBody && (
+        <div className="mb-8 rounded-xl border p-6">
+          <h3 className="font-semibold">{STATUSES[current.estado as keyof typeof STATUSES]?.label ?? 'Sin iniciar'} en {PLATFORMS[platform as keyof typeof PLATFORMS]}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Esta ficha aún no tiene implementación para esta plataforma. Copia el prompt para que un agente prepare la primera versión en exploración.</p>
+          <CodeBlock code={startPrompt} lang="prompt" className="mx-0 mt-4" />
+        </div>
+      )}
 
-        {entry.section === 'tokens' && tokenRows.length > 0 && (
-          <div className="ds-table-wrap">
-            <p className="ds-note" style={{ margin: '0 0 8px' }}>
-              Valores leídos del código de producción en el último sync. Cómo se usan, en su fundamento.
-              {surfaceIds.filter((id) => modes[id].length).map((id) => (
-                <span key={id}> {surfaceIds.length > 1 ? `${surfaceNames[id] ?? id}: ` : 'Un valor por modo: '}{modes[id].map((m) => `${modeLabel(m)}${modeSelectors(id)?.[m] ? ` (${modeSelectors(id)?.[m].join(', ')})` : ''}`).join(' · ')}.</span>
-              ))}
-            </p>
-            <table className="ds-table">
+      {platformMd && <Markdown prepared={platformMd.parts} surfaces={surfaces} />}
+
+      {entry.section === 'tokens' && tokenRows.length > 0 && (
+        <div className="ds-prose">
+          <p className="text-sm text-muted-foreground">
+            Valores leídos del código de producción en el último sync. Cómo se usan, en su fundamento.
+            {surfaceIds.filter((id) => modes[id].length).map((id) => (
+              <span key={id}> {surfaceIds.length > 1 ? `${surfaceNames[id] ?? id}: ` : 'Un valor por modo: '}{modes[id].map((m) => `${modeLabel(m)}${modeSelectors(id)?.[m] ? ` (${modeSelectors(id)?.[m].join(', ')})` : ''}`).join(' · ')}.</span>
+            ))}
+          </p>
+          <div className="ds-table-scroll">
+            <table>
               <thead>
                 <tr>
                   <th>Token</th>
@@ -110,7 +152,7 @@ export function EntryPage({ system, entry, platform }: { system: System; entry: 
                   const theme = surfaceIds.map((id) => report?.tokens?.[id]?.theme?.[t.nombre] as string | undefined).find(Boolean);
                   return (
                     <tr key={t.nombre}>
-                      <td className="ds-mono">--{t.nombre}{theme?.includes('var(') && <div className="ds-note">@theme: {theme}</div>}</td>
+                      <td><code>--{t.nombre}</code>{theme?.includes('var(') && <div className="mt-1 text-xs text-muted-foreground">@theme: {theme}</div>}</td>
                       <td>{t.rol}</td>
                       {surfaceIds.map((id) => <TokenCells key={id} values={tokens[id] ?? {}} name={t.nombre} modes={modes[id]} />)}
                     </tr>
@@ -119,83 +161,92 @@ export function EntryPage({ system, entry, platform }: { system: System; entry: 
               </tbody>
             </table>
           </div>
-        )}
+        </div>
+      )}
 
-        {entry.body.trim() && <Markdown source={entry.body} surfaces={surfaces} />}
+      {commonMd && <div className={platformMd ? 'mt-12' : undefined}><Markdown prepared={commonMd.parts} surfaces={surfaces} /></div>}
 
-        {entry.section !== 'tokens' && tokenRows.length > 0 && (
+      <div className="ds-prose">
+        {tokensHeading && (
           <>
-            <h2 className="ds-section-title">Tokens que usa</h2>
-            <div className="ds-chips">
+            <Heading id={tokensHeading.id}>{tokensHeading.title}</Heading>
+            <div className="mt-4 flex flex-wrap gap-2">
               {tokenRows.map((t) => {
                 const id = surfaceIds.find((s) => tokens[s]?.[t.nombre] !== undefined);
                 const list = id ? (modes[id].length ? modes[id] : [undefined]).map((mode) => ({ mode, raw: tokenValue(tokens[id][t.nombre], mode), color: resolvedTokenValue(tokens[id], t.nombre, mode) })) : [];
                 const colors = [...new Set(list.map((v) => v.color).filter((c): c is string => !!c && isColor(c)))];
                 return (
-                  <span key={t.nombre} className="ds-chip" title={list.map((v) => (v.mode ? `${modeLabel(v.mode)}: ${v.raw ?? '—'}` : v.raw)).join(' · ') || undefined}>
-                    {colors.map((c) => <i key={c} className="ds-swatch" style={{ background: c }} />)}
+                  <Badge key={t.nombre} variant="outline" className="gap-1.5 rounded-full font-mono font-normal" title={list.map((v) => (v.mode ? `${modeLabel(v.mode)}: ${v.raw ?? '—'}` : v.raw)).join(' · ') || undefined}>
+                    {colors.map((c) => <span key={c} className="size-2.5 rounded-full border" style={{ background: c }} />)}
                     --{t.nombre}
-                  </span>
+                  </Badge>
                 );
               })}
             </div>
           </>
         )}
 
-        {sync && (sync.fuentes as Source[]).some((f) => f.superficie !== 'tokens') && (
+        {productionHeading && report && (
           <>
-            <h2 className="ds-section-title" id="produccion">Enlace con producción</h2>
-            <div className="ds-table-wrap">
-              <table className="ds-table">
+            <Heading id={productionHeading.id}>{productionHeading.title}</Heading>
+            <div className="ds-table-scroll">
+              <table>
                 <thead>
                   <tr><th>Superficie</th><th>Fuente</th><th>Estado</th><th>Huella</th><th>Revisada en</th></tr>
                 </thead>
                 <tbody>
-                  {(sync.fuentes as Source[]).filter((f) => f.superficie !== 'tokens').map((f) => (
+                  {sources.map((f) => (
                     <tr key={f.clave}>
                       <td>{surfaceNames[f.superficie] ?? f.superficie}</td>
                       <td>
-                        {f.superficie === 'tokens' ? <span className="ds-mono">{f.fuente}</span> : <a className="ds-mono" href={`${system.produccion?.codigo ?? ''}${f.fuente}`} target="_blank" rel="noreferrer">{f.fuente}</a>}
-                        {f.clases.length > 0 && <div className="ds-note">{f.clases.map((c) => `.${c}`).join('  ')}</div>}
-                        {f.motivo && <div className="ds-note">{f.motivo}</div>}
+                        <a href={`${system.produccion?.codigo ?? ''}${f.fuente}`} target="_blank" rel="noreferrer" className="font-mono text-[0.8rem]">{f.fuente}</a>
+                        {f.clases.length > 0 && <div className="mt-1 font-mono text-xs text-muted-foreground">{f.clases.map((c) => `.${c}`).join('  ')}</div>}
+                        {f.motivo && <div className="mt-1 text-xs text-muted-foreground">{f.motivo}</div>}
                       </td>
-                      <td><SyncBadge estado={f.estado} /></td>
-                      <td className="ds-mono">{f.huella ?? '—'}</td>
-                      <td className="ds-mono">{f.commitRevisado ?? '—'}</td>
+                      <td>
+                        <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                          <StatusDot item={{ estado: 'produccion', sync: f.estado }} className="size-1.5" />
+                          {SYNC_STATES[f.estado as keyof typeof SYNC_STATES]?.label ?? f.estado}
+                        </span>
+                      </td>
+                      <td className="font-mono text-[0.8rem]">{f.huella ?? '—'}</td>
+                      <td className="font-mono text-[0.8rem]">{f.commitRevisado ?? '—'}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="ds-note">
-              Producción en el commit <span className="ds-mono">{report.commit}</span> ({report.fechaCommit}). Sync del {report.generado.slice(0, 10)}.
+            <p className="text-sm text-muted-foreground">
+              Producción en el commit <code>{report.commit}</code> ({report.fechaCommit}). Sync del {report.generado.slice(0, 10)}.
               {report.sinCommit?.length > 0 && ' La instantánea incluye cambios de producción aún sin commit.'}
             </p>
-            {sync.avisos.map((a: string) => <p key={a} className="ds-note">Aviso: {a}</p>)}
+            {sync.avisos.map((a: string) => <p key={a} className="text-sm text-muted-foreground">Aviso: {a}</p>)}
           </>
         )}
 
-        {related.length > 0 && (
+        {relatedHeading && (
           <>
-            <h2 className="ds-section-title">Relacionados</h2>
-            <ul className="ds-list">
+            <Heading id={relatedHeading.id}>{relatedHeading.title}</Heading>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {related.map((r) => (
-                <li key={r.id} className="ds-list-item">
-                  <Link href={r.href}>
-                    <span><strong>{SECTIONS.find((x) => x.id === r.section)?.label} › {r.titulo}</strong><p>{r.resumen}</p></span>
-                    <StatusBadge estado={r.estado} />
-                  </Link>
-                </li>
+                <Link key={r.id} href={r.href} data-slot="card" className="flex flex-col gap-1 rounded-xl border p-4 text-sm transition-colors hover:bg-accent/50">
+                  <span className="text-xs text-muted-foreground">{SECTIONS.find((x) => x.id === r.section)?.label}</span>
+                  <span className="flex items-center gap-2 font-medium">
+                    {r.titulo}
+                    {r.estado !== 'produccion' && <StatusDot item={{ estado: r.estado, sync: null }} className="size-1.5" />}
+                  </span>
+                  <span className="line-clamp-2 text-muted-foreground">{r.resumen}</span>
+                </Link>
               ))}
-            </ul>
+            </div>
           </>
         )}
 
-        <p className="ds-footnote">
-          <span className="ds-mono">{entry.id}</span>
+        <p className="mt-16 text-xs text-muted-foreground">
+          <code>{entry.id}</code>
           {entry.data.actualizado && <> · Actualizado el {entry.data.actualizado}</>}
         </p>
       </div>
-    </article>
+    </DocsArticle>
   );
 }

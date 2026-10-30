@@ -1,6 +1,6 @@
 ---
 titulo: Capas y sistemas anidados
-resumen: Diseño atómico en cinco capas y sistemas que heredan de otros.
+resumen: Las capas del sistema, de los fundamentos a los gráficos, y sistemas que heredan de otros.
 ---
 
 ## Las capas
@@ -11,15 +11,20 @@ Cada ficha pertenece a una capa. Las capas van del criterio a lo más compuesto;
 | --- | --- | --- |
 | **Fundamentos** | Reglas de criterio: tipografía, color, maquetación, movimiento, voz, ilustración. Explican cómo y cuándo, y enlazan a sus tokens. | «Los titulares van en serif ligera» |
 | **Tokens** | Valores con nombre y su rol, uno por modo si el producto tiene varios (claro, oscuro). Se leen del código de producción. | `--ink`, `--radius-lg`, `--dur-micro` |
-| **Componentes** | Piezas reutilizables. Se navegan **por función** (Acciones, Navegación, Formularios, Feedback, Contenido, Superposiciones) y llevan su **nivel atómico** como dato. | Botón, Enlace de texto, Cabecera |
-| **Patrones** | Composiciones que resuelven un problema: **secciones**, **pantallas** y **flujos**. | Hero, Precios |
+| **Componentes** | Piezas reutilizables. Se listan **por orden alfabético**, como en shadcn; su **función** y su **nivel atómico** son datos de la ficha. | Botón, Enlace de texto, Cabecera |
+| **Bloques** | Composiciones que resuelven un problema. Se agrupan por `categoria`: **secciones**, **pantallas** y **flujos**. | Hero, Precios, Alta |
+| **Gráficos** | Cómo presenta datos el producto. Se agrupan por `categoria`: área, barras, líneas, circular, radar, radial y tooltip. | Ingresos por mes |
 | **Superficies** | Las páginas reales de producción. Hoy viven en producción; el sistema las enlaza. | Landing, área de cliente |
 
-### Función para navegar, nivel atómico para componer
+### Lista alfabética para navegar, nivel atómico para componer
 
-Shopify, Vercel y la mayoría de sistemas de referencia listan los componentes por función, no por átomos, moléculas y organismos. Nosotros hacemos lo mismo en la interfaz. El nivel atómico (`nivel: atomo | molecula | organismo`) se mantiene en cada ficha como regla interna: un átomo no usa otros componentes, una molécula usa átomos y un organismo usa moléculas o átomos. Sirve para el método y para los agentes, no para buscar.
+shadcn/ui lista los componentes por orden alfabético y marca los nuevos; nosotros también. La `funcion` (acciones, navegación, formularios, feedback, contenido, superposiciones) ordena `llms.txt` y el registry, pero no la barra lateral. El nivel atómico (`nivel: atomo | molecula | organismo`) se mantiene en cada ficha como regla interna: un átomo no usa otros componentes, una molécula usa átomos y un organismo usa moléculas o átomos. Sirve para el método y para los agentes, no para buscar.
+
+Bloques y Gráficos son estructura: el kit no trae ninguno. Cada sistema los llena con lo que existe en su producto.
 
 Las **iniciativas** no son una capa: agrupan trabajo en curso que atraviesa capas (ver Estados).
+
+Antes de la 1.0, los bloques se llamaban **patrones** y su categoría iba en `nivel`. Las dos formas se siguen leyendo: `content/patrones/` aparece como Bloques y `nivel: seccion` cuenta como `categoria: seccion`.
 
 ## Sistemas anidados
 

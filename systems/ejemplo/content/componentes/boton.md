@@ -4,6 +4,7 @@ resumen: Componente de ejemplo. Lanza una acción o lleva al siguiente paso.
 estado: exploracion
 funcion: acciones
 nivel: atomo
+destacado: true
 creado: 2026-10-11
 actualizado: 2026-10-11
 relacionados: [fundamentos/ejemplo]

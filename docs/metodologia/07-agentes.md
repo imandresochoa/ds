@@ -46,7 +46,7 @@ El kit instala skills en `.claude/skills/` de cada sistema (`ds init` y `ds skil
 | --- | --- |
 | `crear-sistema` | Adaptar un sistema recién creado a un repo de producción. |
 | `inventariar-produccion` | Planificar qué documentar, con prioridades y tandas. |
-| `nueva-ficha` | Documentar un componente, patrón, fundamento, token o iniciativa. |
+| `nueva-ficha` | Documentar un componente, bloque, gráfico, fundamento, token o iniciativa. |
 | `auditar-sistema` | Comprobar que todo cuadra con producción y arreglarlo. Antes de publicar, tras cada merge en producción y como rutina diaria programada (apartado «Rutina diaria» de `AGENTS.md`). |
 | `revisar-sync` | Entender qué cambió en producción y actualizar o aceptar fichas. |
 | `actualizar-kit` | Subir de versión el kit en un sistema. |

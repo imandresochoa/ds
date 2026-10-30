@@ -70,7 +70,7 @@ plataformas:
 
 ## Reglas
 
-- Una ficha en producción sin fuentes no se puede verificar; el sync lo avisa en componentes y patrones.
+- Una ficha en producción sin fuentes no se puede verificar; el sync lo avisa en componentes y bloques.
 - Solo se acepta una huella después de leer el cambio y actualizar la ficha. Aceptar sin revisar rompe el enlace.
 - Cuando producción cambia por una decisión de diseño, primero se actualiza la ficha y después se acepta.
 - `check:sync` debe pasar antes de publicar el sistema.

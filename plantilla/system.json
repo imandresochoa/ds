@@ -6,6 +6,7 @@
   "descripcion": "Sistema de diseño de NOMBRE_DEL_SISTEMA.",
   "extiende": null,
   "metodologia": false,
+  "abrirEnAgentes": false,
   "plataformas": ["web", "ios", "android"],
   "produccion": {
     "repo": "../RUTA-AL-REPO-DE-PRODUCCION",

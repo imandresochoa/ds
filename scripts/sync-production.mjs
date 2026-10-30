@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import postcss from 'postcss';
-import { listSystems, loadEntries, loadLock, previewClasses, resolveVars, tokenValue } from '../lib/core.mjs';
+import { PLATFORM_SECTIONS, listSystems, loadEntries, loadLock, previewClasses, resolveVars, tokenValue } from '../lib/core.mjs';
 
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
@@ -379,7 +379,7 @@ for (const system of listSystems()) {
     const order = ['ausente', 'desajuste', 'nuevo', 'ok'];
     const estado = fuentes.length ? order.find((s) => fuentes.some((f) => f.estado === s)) : null;
     const avisos = [];
-    if (entry.estado === 'produccion' && !fuentes.length && ['componentes', 'patrones'].includes(entry.section)) avisos.push('Estado «produccion» sin fuentes declaradas: no se puede verificar.');
+    if (entry.estado === 'produccion' && !fuentes.length && PLATFORM_SECTIONS.includes(entry.section)) avisos.push('Estado «produccion» sin fuentes declaradas: no se puede verificar.');
     if (entry.estado !== 'produccion' && entry.estado !== 'obsoleto' && fuentes.some((f) => f.estado !== 'ausente')) avisos.push('Tiene fuentes en producción pero su estado no es «produccion».');
     if (invented.length) avisos.push(`Clases de los ejemplos que no existen: ${invented.join(', ')}`);
 
