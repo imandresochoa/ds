@@ -73,15 +73,12 @@ Decidido (ver «Registry por piezas» en `DECISIONES.md`):
 - `ds info` y `ds search` siguen leyendo las fichas, sin build. `ds search --json` devuelve piezas con la forma del índice y `ds ver <pieza>`, el JSON de una pieza.
 - La lista del Directorio sale de un repo de directorio aparte: un `directorio.json` con las carpetas de los sistemas, que se sirven juntos. Así el kit no nombra ningún producto y no hace falta pedir nada por red.
 
-Por decidir (Directorio):
-- Cómo se crea y se sirve el repo de directorio (`ds init --directorio`, `ds dev` y `ds build` cuando hay `directorio.json`).
-- Qué es la cobertura en la tarjeta: fichas en producción, estado del sync o las dos.
-- Si cada sistema tiene que aceptar salir en el Directorio desde su `system.json`.
+- El directorio se crea con `ds init --directorio` y sirve todos sus sistemas en un sitio, con el Directorio en `/` y `/directorio.json` para agentes (ver «Directorio» en `DECISIONES.md`).
 
 Tareas:
 - [x] Propuesta y preguntas.
 - [x] `/r/<pieza>.json` e índice en `ds build`, `ds search` con la misma forma y `ds ver`.
-- [ ] Directorio.
+- [x] Directorio.
 
 ### Fase 5 · Metodología, plantilla y 1.0.0
 

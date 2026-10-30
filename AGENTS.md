@@ -18,7 +18,7 @@ El kit contiene la interfaz (con la estructura de ui.shadcn.com), el CLI `ds`, l
 | `scripts/` | `sync-production.mjs`, `build-public.mjs`, `doctor.mjs`. |
 | `plantilla/` | Lo que `ds init` copia a un repo de sistema. Usa `NOMBRE_DEL_SISTEMA` e `ID_DEL_SISTEMA`. |
 | `skills/` | Skills que `ds init` y `ds skills` instalan en cada sistema (`.claude/skills/` y `.agents/skills/`). `montar-sistema` es la de entrada: `ds instalar` la deja en la carpeta de usuario. |
-| `systems/ejemplo/` | Sistema de ejemplo para desarrollar sin datos reales. |
+| `systems/ejemplo/` | Sistema de ejemplo para desarrollar sin datos reales. Con dos carpetas o más en `systems/`, `npm run dev` enseña el Directorio. |
 | `docs/metodologia/` | La metodología. `docs/DECISIONES.md`, `docs/TAREAS.md`. |
 
 ## Reglas
@@ -59,3 +59,13 @@ Antes de terminar: `npm run typecheck`, `npm run build` y, si tocaste el CLI o l
 4. Si el workflow falla, no muevas ni borres la etiqueta. Arregla el fallo en un PR que suba la versión de parche y publica esa.
 
 El historial del repo antiguo (`design-system-agentic-first-kit-legacy`, remoto `legacy`) nombra productos: no subas a este repo ninguna rama ni etiqueta que venga de él.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
