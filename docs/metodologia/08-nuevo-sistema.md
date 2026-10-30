@@ -5,34 +5,43 @@ resumen: Cómo aplicar esta estructura a cualquier producto, paso a paso, con o 
 
 Un sistema de diseño es un **repo propio** que solo contiene contenido. La interfaz, los scripts y esta metodología vienen del kit como dependencia (ver «Kit y sistemas»). Crear uno nuevo es instalar el kit, ejecutar `ds init` y rellenar.
 
-La metodología es documentación interna. Un sistema para un cliente no la muestra: en `system.json`, `"metodologia": false` (es el valor de la plantilla). Solo los sistemas propios del estudio la activan.
+El sitio de un sistema solo muestra esta metodología si la activa: en `system.json`, `"metodologia": true`. La plantilla la trae apagada, porque el sitio de un producto es para quien lo usa, no para quien construye el sistema.
 
 ## Antes de empezar
 
-- El repo de producción del producto clonado en local. El sistema lo lee por ruta relativa; no se modifica.
-- Node 20.9 o superior y acceso de lectura al repo del kit.
+- Si partes de un repo: el repo de producción clonado en local. El sistema lo lee por ruta relativa y no lo modifica.
+- Node 20.9 o superior.
 
-## Pasos
+## Con un agente
 
-1. **Crea el repo del sistema** junto al de producción (por ejemplo, `producto/` y `producto-design-system/` en la misma carpeta):
+```bash
+npx @imandresochoa/ds@latest instalar
+```
 
-   ```bash
-   mkdir producto-design-system && cd producto-design-system
-   git init && npm init -y
-   npm install github:USUARIO/design-system-agentic-first-kit
-   npx ds init "Nombre del producto"
-   ```
+Instala la skill `montar-sistema` para Claude Code y Codex en tu carpeta de usuario. Después, abre el agente en el repo del producto (o en una carpeta vacía) y escribe «monta el sistema de diseño». La skill:
 
-   `ds init` crea `system.json`, `DESIGN.md`, `AGENTS.md`, `CLAUDE.md`, `.gitignore`, una ficha de ejemplo, los scripts de `package.json` y las skills en `.claude/skills/`.
+1. Pregunta **de dónde partís**: de un repo con código, de una web o de Figma, o de nada todavía. Lo hace con los componentes de preguntas del agente (ver «Capa para agentes»).
+2. Pide lo que falte según la respuesta (la ruta, la URL o qué es el producto), el nombre y la carpeta. Por defecto, `../<producto>-design-system`.
+3. Crea el repo del sistema con `ds init`, que se niega a hacerlo dentro de producción.
+4. Lo llena según el origen:
+   - **Repo**: superficies, primer sync, `DESIGN.md`, fichas de tokens y plan de fichas.
+   - **Web o Figma**: primitivos sacados de lo publicado, en exploración.
+   - **Nada**: `DESIGN.md` con lo que cuentes y unos primitivos de partida.
 
-2. **Conecta producción.** En `system.json`, rellena `produccion.repo` (ruta relativa al repo del producto), `codigo` (URL base para ver archivos), `web` y las **superficies**: cada parte del producto con su propio código y sus hojas de estilo. Comprueba con `npx ds doctor`.
-3. **Primer sync.** `npx ds sync`. Ya tienes la instantánea del CSS, los tokens de producción y la lista de clases sin documentar (cobertura).
-4. **DESIGN.md.** Contexto del producto, orden de prioridades, integración, lenguaje visual, antipatrones con nombre y accesibilidad. Es lo primero que lee un agente.
-5. **Rellena por capas**, siguiendo la cobertura: fundamentos, tokens (los valores salen solos), componentes, bloques y gráficos. Cada ficha sigue «Anatomía de una ficha».
-6. **Revisa y acepta huellas**: `npx ds sync --accept <id>` por cada ficha revisada. `npx ds check` debe pasar.
-7. **Publica**: `npx ds build` deja el sitio estático en `out/`. Si va dentro de otro sitio, bajo una carpeta, declara antes la ruta en `publicacion.ruta` (ver «Git, GitHub y entornos»).
+## Sin agente
 
-Con un agente, los pasos 2 a 6 los guía la skill `crear-sistema`: pídele «adapta este sistema a mi repo de producción».
+```bash
+npx @imandresochoa/ds@latest init
+```
+
+`ds init` hace las mismas preguntas en la terminal y crea el repo del sistema: `system.json`, `DESIGN.md`, `AGENTS.md`, `CLAUDE.md`, `.gitignore`, una ficha de ejemplo, los scripts de `package.json`, el kit instalado y las skills en `.claude/skills/` y `.agents/skills/`. Después, a mano:
+
+1. **Conecta producción.** En `system.json`, rellena `produccion.codigo` (URL base para ver archivos), `web` y las **superficies**: cada parte del producto con su propio código y sus hojas de estilo. Comprueba con `npx ds doctor`.
+2. **Primer sync.** `npx ds sync`. Ya tienes la instantánea del CSS, los tokens de producción y la lista de clases sin documentar (cobertura).
+3. **DESIGN.md.** Contexto del producto, orden de prioridades, integración, lenguaje visual, antipatrones con nombre y accesibilidad. Es lo primero que lee un agente.
+4. **Rellena por capas**, siguiendo la cobertura: fundamentos, tokens (los valores salen solos), componentes, bloques y gráficos. Cada ficha sigue «Anatomía de una ficha».
+5. **Revisa y acepta huellas**: `npx ds sync --accept <id>` por cada ficha revisada. `npx ds check` debe pasar.
+6. **Publica**: `npx ds build` deja el sitio estático en `out/`. Si va dentro de otro sitio, bajo una carpeta, declara antes la ruta en `publicacion.ruta` (ver «Git, GitHub y entornos»).
 
 ## Qué no se toca en un repo de sistema
 

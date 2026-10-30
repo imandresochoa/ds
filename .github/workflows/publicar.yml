@@ -1,0 +1,25 @@
+# Publica el kit en npm con trusted publishing: sin tokens guardados y con procedencia (el repo tiene que ser público).
+# Solo se lanza a mano. Mientras package.json tenga "private": true, npm se niega a publicar.
+name: Publicar en npm
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      # Acciones fijadas por commit (actions/checkout v7.0.1, actions/setup-node v7.1.0).
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm publish

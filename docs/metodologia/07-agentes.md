@@ -13,7 +13,7 @@ resumen: Qué lee un agente, en qué orden, y cómo se mejora la guía con evalu
 | `/<sistema>/llms-full.txt` | Todas las fichas en un solo archivo. |
 | `<ruta de la ficha>.md` | Cada página en Markdown, en la misma ruta. |
 
-En la interfaz, el menú «…» de cada página copia la ficha como Markdown, y el icono del robot copia un contexto listo para pegar en un agente.
+En la interfaz, «Copiar página» copia cada página en Markdown y la tarjeta «¿Trabajas con un agente?» copia un contexto listo para pegar. Desde la terminal, `npx ds info --json` y `npx ds search <texto>` dan lo mismo a un agente sin abrir la web.
 
 ## Orden de lectura para un agente
 
@@ -22,7 +22,7 @@ En la interfaz, el menú «…» de cada página copia la ficha como Markdown, y
 3. Si va a escribir texto, la guía de voz enlazada desde Fundamentos.
 4. Si va a crear algo nuevo, esta metodología.
 
-## Prompts de la barra lateral
+## Prompts del botón «Nuevo»
 
 Cada sección tiene una acción («Proponer componente», «Abrir iniciativa»…) que copia un prompt con las rutas y las reglas del método. Viven en `lib/meta.mjs`.
 
@@ -40,11 +40,11 @@ Está pendiente en `docs/TAREAS.md`.
 
 ## Skills
 
-El kit instala skills en `.claude/skills/` de cada sistema (`ds init` y `ds skills`). Convierten los pasos de esta metodología en procedimientos que un agente sigue sin improvisar:
+El kit instala skills en cada sistema (`ds init` y `ds skills`): en `.claude/skills/` para Claude Code y en `.agents/skills/` para Codex. Convierten los pasos de esta metodología en procedimientos que un agente sigue sin improvisar:
 
 | Skill | Cuándo |
 | --- | --- |
-| `crear-sistema` | Adaptar un sistema recién creado a un repo de producción. |
+| `montar-sistema` | Montar un sistema desde el repo, la web o Figma de un producto, o desde cero. Es la de entrada: `ds instalar` la deja en la carpeta de usuario para usarla antes de que exista el sistema. |
 | `inventariar-produccion` | Planificar qué documentar, con prioridades y tandas. |
 | `nueva-ficha` | Documentar un componente, bloque, gráfico, fundamento, token o iniciativa. |
 | `auditar-sistema` | Comprobar que todo cuadra con producción y arreglarlo. Antes de publicar, tras cada merge en producción y como rutina diaria programada (apartado «Rutina diaria» de `AGENTS.md`). |
@@ -53,3 +53,12 @@ El kit instala skills en `.claude/skills/` de cada sistema (`ds init` y `ds skil
 | `mejorar-kit` | Llevar al kit una mejora detectada en un sistema. |
 
 Las skills viven en el kit (`skills/`) y se actualizan con él. No se editan en el repo del sistema.
+
+## Preguntas a la persona
+
+Cuando una skill necesita una decisión, la pregunta con la herramienta de preguntas del agente, no en texto suelto:
+
+- **Claude Code**: `AskUserQuestion`. De 1 a 4 preguntas por llamada, de 2 a 4 opciones cada una y la opción «Otra» siempre disponible.
+- **Codex**: `request_user_input`. Solo funciona en modo Plan; fuera de él la skill pregunta en texto.
+
+Las skills usan como mucho 3 opciones, cortas y con la recomendada primero, para que sirvan en los dos. Las respuestas libres (una ruta, una URL) se piden en un mensaje normal. Si no hay herramienta, se pregunta con opciones numeradas y se espera la respuesta.

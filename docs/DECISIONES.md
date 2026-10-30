@@ -100,3 +100,23 @@ La interfaz y la forma de pensar un sistema pasan a ser las de ui.shadcn.com. Es
 - **Compatibilidad**: `content/patrones/` se sigue leyendo como Bloques. `nivel: seccion` cuenta como `categoria: seccion`. Las huellas y los `relacionados` con `patrones/…` siguen funcionando.
 
 Se descartaron tres opciones: «Create», porque los sistemas ya tienen sus menús; «Typeset», porque la tipografía la define cada sistema; y un registry compatible con `npx shadcn add`, porque nada debe escribir en el repo de producción. El registry propio, de solo lectura, queda para una fase posterior.
+
+## 2026-10-30 · Instalación desde npm y skill de montaje con preguntas nativas
+
+Empezar un sistema pasa a ser un comando y una frase al agente: `npx @imandresochoa/ds instalar` y, después, «monta el sistema de diseño».
+
+- **Skill global.** `ds instalar` deja la skill de entrada en la carpeta de usuario de Claude Code (`~/.claude/skills/`) y de Codex (`~/.agents/skills/`). Así funciona antes de que exista el sistema y desde el repo del producto. Se descartó preguntar primero en la terminal con `ds init`: las preguntas se partían entre la terminal y el agente.
+- **Preguntas nativas.** La skill pregunta con `AskUserQuestion` en Claude Code y con `request_user_input` en Codex, con 3 opciones como mucho, la recomendada primero y un plan B en texto numerado. En Codex, `request_user_input` solo funciona en modo Plan.
+- **La primera pregunta es de dónde partís**: un repo, una web o Figma, o nada todavía. Sin repo no hay enlace con el código: los primitivos quedan en exploración hasta que lo haya.
+- **El sistema nunca se crea dentro de producción.** `ds init` lo impide y propone `../<producto>-design-system`.
+- **`ds info` y `ds search`** dan a un agente el estado del sistema y las fichas existentes sin abrir la web, como `shadcn info` y `shadcn search`. Las skills encuentran la metodología con `ds info`, sin depender de la ruta del paquete.
+- **npm.**
+  - El paquete es público y se llama `@imandresochoa/ds`. La metodología va dentro y deja de ser interna; el sitio de cada sistema solo la muestra si la activa.
+  - Se publica con trusted publishing desde GitHub Actions, sin tokens guardados. Para tener procedencia, el repo tiene que ser público.
+  - `"private": true` se mantiene hasta aprobar la primera publicación.
+
+## 2026-10-30 · Repo público nuevo, sin historial
+
+- **Por qué.** Los primeros commits del repo nombran productos concretos, y la regla del kit es no nombrar ninguno. Reescribir el historial cambiaría todos los hashes y rompería los sistemas que fijan el kit a un commit o a una etiqueta.
+- **Qué.** El kit sigue en `imandresochoa/ds`, público, a partir de una instantánea de la 0.8.0. El repo antiguo se renombra a `design-system-agentic-first-kit-legacy` y sigue privado: conserva el historial, las etiquetas hasta la 0.7.1 y los PRs. Como el nombre antiguo no se reutiliza, GitHub lo sigue redirigiendo al legacy y los sistemas fijados a versiones anteriores instalan igual.
+- **Cuidado.** Lo que sale del historial antiguo no se sube a `imandresochoa/ds`: los cambios pasan como commits nuevos.

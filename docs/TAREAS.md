@@ -21,10 +21,16 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 
 ## Siguientes fases
 
-- [ ] Instalación desde npm y skill de montaje con preguntas nativas del harness (`AskUserQuestion`, `request_user_input`) y `ds info --json` / `ds search`.
+- [x] Skill de montaje con preguntas nativas (`ds instalar`, `montar-sistema`), `ds init` con parámetros, `ds info` y `ds search`.
 - [ ] Lab de primitivos: colores con pares AA, estilos de texto, espaciado, radios y sombras; sale un preset.
 - [ ] Registry propio de solo lectura (`/r/<pieza>.json`) y Directorio con solo nuestros sistemas.
-- [ ] Publicación pública en npm: revisar el historial, lista blanca de `files`, procedencia. Nada se publica sin aprobación.
+- [x] Paquete preparado: `@imandresochoa/ds`, `files` en lista blanca y workflow manual con trusted publishing.
+- [x] Repo público nuevo sin historial (`imandresochoa/ds`); el antiguo, privado, como `design-system-agentic-first-kit-legacy`.
+- [ ] Antes de publicar en npm:
+  - Elegir licencia.
+  - Configurar el trusted publisher en npm.
+  - Quitar `"private": true`.
+  - Lanzar el workflow.
 
 ## Método y herramientas
 
