@@ -26,8 +26,8 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 - [ ] Registry propio de solo lectura (`/r/<pieza>.json`) y Directorio con solo nuestros sistemas.
 - [x] Paquete preparado: `@imandresochoa/ds`, `files` en lista blanca y workflow manual con trusted publishing.
 - [x] Repo público nuevo sin historial (`imandresochoa/ds`); el antiguo, privado, como `design-system-agentic-first-kit-legacy`.
+- [x] Licencia MIT.
 - [ ] Antes de publicar en npm:
-  - Elegir licencia.
   - Configurar el trusted publisher en npm.
   - Quitar `"private": true`.
   - Lanzar el workflow.

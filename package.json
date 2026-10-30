@@ -2,6 +2,7 @@
   "name": "@imandresochoa/ds",
   "version": "0.8.0",
   "private": true,
+  "license": "MIT",
   "description": "Kit para crear sistemas de diseño agentic-first enlazados 1:1 con producción.",
   "keywords": [
     "design-system",

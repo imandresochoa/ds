@@ -71,3 +71,7 @@ Para trabajar con datos reales, enlaza el kit desde un sistema (ver [`docs/metod
 | `systems/ejemplo/` | Sistema de ejemplo para desarrollar el kit. |
 | `docs/metodologia/` | La metodología. Va en el paquete; el sitio de cada sistema la muestra solo si la activa. |
 | `docs/DECISIONES.md`, `docs/TAREAS.md` | Decisiones con fecha y tareas del kit. |
+
+## Licencia
+
+[MIT](LICENSE). Las primitivas de `components/ui/` vienen de shadcn/ui, también con licencia MIT (ver su [README](components/ui/README.md)).
