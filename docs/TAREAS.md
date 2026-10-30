@@ -28,8 +28,9 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 - [x] Repo público nuevo sin historial (`imandresochoa/ds`); el antiguo, privado, como `design-system-agentic-first-kit-legacy`.
 - [x] Licencia MIT.
 - [x] Versión 0.9.0 sin `"private": true`.
-- [ ] Primera publicación en npm, a mano y con 2FA: npm no deja configurar el trusted publisher de un paquete que aún no existe.
-- [ ] Trusted publisher en npmjs.com (`imandresochoa/ds`, `publicar.yml`) y publicación solo con 2FA, sin tokens. Las versiones siguientes salen con el workflow.
+- [x] Primera publicación en npm: `@imandresochoa/ds@0.9.0`, a mano y con 2FA (2026-10-30).
+- [x] Trusted publisher configurado con `npm trust` (`imandresochoa/ds`, `publicar.yml`). Las versiones siguientes salen con el workflow.
+- [ ] En npmjs.com, «Publishing access» → «Require two-factor authentication and disallow tokens».
 
 ## Método y herramientas
 
