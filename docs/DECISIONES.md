@@ -155,3 +155,11 @@ Un sistema que parte de una web, de Figma o de nada ajusta sus primitivos en el 
 - Un código corto con un catálogo cerrado de opciones, como el de shadcn: los primitivos de un producto son libres.
 - Las fuentes de Google Fonts: enviarían a un tercero la IP de quien abre el Lab.
 - Bloquear el preset entero si cualquier par baja de AA: un producto puede arrastrar pares que el preset no toca.
+
+## 2026-10-30 · Una etiqueta publicada no se mueve
+
+- **Qué pasó.** El workflow no pudo publicar la 0.10.0: `npm ci` falló porque al `package-lock.json` le faltaban dos dependencias de los paquetes wasm opcionales. Lo generó en macOS una versión de npm más antigua que la de GitHub Actions.
+- **Qué se decidió.** La etiqueta `v0.10.0` se queda donde está. El arreglo sale como 0.10.1, con el mismo contenido. A partir de ahora, si el workflow falla, se publica la siguiente versión de parche (ver «Publicar una versión» en `AGENTS.md`).
+- **Por qué.** Una etiqueta pública puede estar ya fijada en un sistema (`github:imandresochoa/ds#vX.Y.Z`) o citada en un informe. Si se mueve, el mismo nombre deja de señalar el mismo código.
+- **Descartado.** Borrar `v0.10.0` y crearla en el commit arreglado. npm quedaría sin huecos, pero se reescribiría una etiqueta pública.
+- **Pendiente.** Un workflow en cada PR con `npm ci` (ver `TAREAS.md`), para que esto se vea antes de publicar.
