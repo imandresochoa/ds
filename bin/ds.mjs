@@ -12,7 +12,7 @@
 //   ds dev [--port 4100]      servidor de desarrollo con el contenido de este repo
 //   ds build                  exporta el sitio estático a ./out (bajo publicacion.ruta o DS_RUTA, si la hay)
 //   ds preset ver <preset>    lee un preset del Lab (código, enlace o JSON): valores y contraste
-//   ds preset aplicar <preset> [--solo color,texto,espaciado,radios,sombras] [--archivo tokens.css]
+//   ds preset aplicar <preset> [--solo color,texto,espaciado,radios,sombras,movimiento] [--archivo tokens.css]
 //        [--sobrescribir] [--aceptar-contraste]   escribe el preset en experimental/, nunca en producción
 //   ds preset resolver        el preset de experimental/tokens.css y el enlace para abrirlo en el Lab
 //   ds sync [--accept <id>]   lee producción: instantánea CSS, tokens, huellas e informe
@@ -480,7 +480,7 @@ const commands = {
       if (!code) fail(`--solo necesita un ${rel} generado por el Lab sobre el que aplicar`);
       const previous = lab.decodePreset(code).preset;
       if (preset.modo !== 'generar' || previous.modo !== 'generar') fail('--solo solo vale con presets de «Generar»');
-      const pick = { color: ['color', 'ajustes'], texto: ['texto'], espaciado: ['espaciado'], radios: ['radio'], sombras: ['sombra'] };
+      const pick = { color: ['color', 'ajustes'], texto: ['texto'], espaciado: ['espaciado'], radios: ['radio'], sombras: ['sombra'], movimiento: ['movimiento'] };
       preset = { ...previous, ...Object.fromEntries(solo.flatMap((g) => pick[g]).map((key) => [key, preset[key]])) };
     }
 
@@ -517,6 +517,8 @@ const commands = {
         console.log(`Generar · neutro ${color.neutro} · marca ${color.marca} · error ${color.error}`);
         console.log(`Texto: ${texto.sans}${texto.serif ? ` · serif ${texto.serif}` : ''} · ${texto.base} px · escala ${texto.escala} · interlineado ${texto.interlineado}`);
         console.log(`Espaciado ${preset.espaciado} px · radio ${preset.radio} px · sombras ${Math.round(sombra.opacidad * 100)} % × ${sombra.difuminado}`);
+        const { movimiento } = preset;
+        console.log(movimiento ? `Movimiento: ${movimiento.duracion} ms · escala ${movimiento.escala} · curvas ${lab.CURVAS[movimiento.curva].label.toLowerCase()}` : 'Movimiento: sin tokens (preset anterior al movimiento)');
       } else console.log(`Ajustar los tokens de «${preset.base}»`);
       const ajustes = Object.entries(preset.ajustes).flatMap(([mode, values]) => Object.entries(values).map(([name, value]) => `--${name} (${core.modeLabel(mode)}): ${value}`));
       if (ajustes.length) console.log(`Ajustes a mano:\n${ajustes.map((a) => `  ${a}`).join('\n')}`);

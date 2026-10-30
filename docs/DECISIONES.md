@@ -187,3 +187,13 @@ Un repo de directorio sirve juntos los sistemas que lista su `directorio.json`. 
 - **Una versión del kit.** Todos los sistemas del directorio se sirven con el kit del directorio. Si uno necesita otra versión, se publica por su cuenta.
 - **Sin terceros.** Solo nuestros sistemas, como se acordó: nada de registries ajenos.
 
+## 2026-10-30 · Movimiento en el Lab
+
+El Lab ajusta también el movimiento, el único primitivo que quedó fuera de la fase 3.
+
+- **Qué ajusta.** Una duración base y una escala, de las que salen `--duration-fast`, `--duration-normal` y `--duration-slow` (la base dividida, tal cual y multiplicada), y una familia de curvas que da `--ease-in`, `--ease-out` y `--ease-in-out`. «Estándar» son las curvas por defecto de Tailwind 4; «Suave», cúbicas; «Enfática», exponenciales. `--default-transition-duration` y `--default-transition-timing-function` apuntan a la normal y a `--ease-out`, para que una transición sin más ya use el sistema.
+- **Nombres.** Las curvas usan los de Tailwind 4. Las duraciones no tienen espacio de nombres en Tailwind, así que se usan con `duration-(--duration-fast)`.
+- **Curvas con nombre, no a mano.** Elegir entre tres familias coherentes es más fácil de juzgar que cuatro números de un `cubic-bezier`, y las tres curvas de una familia casan entre sí. Un producto con curvas propias las cambia en «Ajustar tokens».
+- **Muestra.** Un punto que va y vuelve con cada duración y cada curva. Con «reducir movimiento» se queda quieto.
+- **Compatibilidad.** Un preset anterior no trae movimiento y no escribe tokens de movimiento al aplicarlo. `--solo movimiento` lo añade.
+

@@ -327,3 +327,17 @@
     font-variant-ligatures: none;
   }
 }
+
+/* Muestra de movimiento del Lab: el punto va y vuelve con la duración y la curva de cada token. */
+@keyframes lab-move {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+.lab-move {
+  animation-name: lab-move;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-move { animation: none; }
+}

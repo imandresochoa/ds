@@ -11,6 +11,7 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
 - **`usa`**, clave nueva y opcional de la ficha: las piezas que compone. Los `tokens` entran solos en el grafo. La ficha la enseña en el apartado «Usa». Un id que no existe se avisa al generar.
 - **Directorio.** `ds init --directorio` crea un repo con `directorio.json`, que lista las carpetas de varios sistemas. `ds dev`, `ds build` y `ds doctor` los sirven juntos: la portada es el Directorio (una tarjeta por sistema con sus fichas, su sync y su cobertura de producción) y se publica `/directorio.json` para agentes. La ruta de publicación es la del directorio.
 - Workflow «Comprobar» en cada PR y en `main`: `npm ci`, typecheck, build y un `ds init` de prueba con Node 24, como «Publicar en npm».
+- **Movimiento en el Lab.** Duración base, escala y una familia de curvas (Estándar, Suave, Enfática) dan `--duration-fast|normal|slow`, `--ease-in|out|in-out` y las duraciones y curvas por defecto de las transiciones. Una muestra animada que respeta «reducir movimiento». `ds preset aplicar --solo movimiento`. Los presets anteriores no escriben tokens de movimiento.
 - **`ds ver <pieza>`** imprime el JSON de una pieza (por id o por slug). **`ds search --json`** devuelve piezas con la forma del índice, más `archivo`.
 - Migración:
   - Si algo lee `registry.json`: `fichas` pasa a `piezas`. `seccion`, `funcion`, `categoria` y `nivel` pasan a `tipo` y `categorias`. `plataformas`, `sync` y `tokens` de cada ficha están en su JSON (el enlace `json` de cada pieza).
