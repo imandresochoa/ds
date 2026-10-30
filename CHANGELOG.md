@@ -2,7 +2,7 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
-## Sin publicar
+## 0.9.0 · 2026-10-30
 
 - Interfaz nueva con la estructura de ui.shadcn.com: cabecera con Inicio, Docs, Componentes, Bloques, Gráficos e Iniciativas; Docs a tres columnas con «En esta página»; índice de componentes alfabético con «Nuevos»; galerías de Bloques y Gráficos con visor (Vista y Código, escritorio, tablet y móvil); ⌘K y modo oscuro (⌘D). Tailwind 4 y primitivas de shadcn/ui (MIT) en `components/ui/`, solo para la interfaz.
 - Desaparecen la portada con mosaico, el rail y `/<sistema>/inicio`. Lo que había en Inicio pasa a las páginas de Docs «Producción» y «Para agentes».
@@ -23,9 +23,9 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
 - `ds sync` ya no se cae con un repo de producción sin commits o sin `origin`: avisa y sigue.
 - El kit pasa a un repo público nuevo, `imandresochoa/ds`, que empieza en la 0.8.0 sin el historial anterior. El repo antiguo queda privado como `design-system-agentic-first-kit-legacy`, y la URL antigua redirige a él, así que los sistemas fijados a una versión anterior siguen instalando.
 - Licencia MIT (`LICENSE`). Las primitivas de `components/ui/` siguen con la licencia MIT de shadcn/ui, en su README.
-- El paquete pasa a llamarse `@imandresochoa/ds`. Sigue con `"private": true` hasta que se apruebe publicarlo. `files` en lista blanca y workflow manual de publicación con trusted publishing (`.github/workflows/publicar.yml`).
+- El paquete pasa a llamarse `@imandresochoa/ds` y se publica en npm. `files` en lista blanca y workflow manual de publicación con trusted publishing (`.github/workflows/publicar.yml`).
 - Seguridad: Next.js sube a 16.4.3 por una vulnerabilidad crítica de 16.0–16.4.
-- Migración: no es obligatoria. `content/patrones/` y `nivel: seccion|pantalla|flujo` se siguen leyendo, y las huellas y los `relacionados` con `patrones/…` siguen funcionando. Para pasar al formato nuevo, ejecuta `git mv content/patrones content/bloques`, cambia `nivel:` por `categoria:` en esas fichas y luego `npx ds sync`. Los enlaces guardados a `/<sistema>/inicio` pasan a `/<sistema>/docs/produccion`. Por el nuevo nombre del paquete, reinstala el kit (`npm uninstall design-system-agentic-first-kit` y después `npm install` con la versión nueva) y ejecuta `npx ds skills`. Así se borra `crear-sistema`, se copia `montar-sistema` y las skills llegan también a `.agents/skills/`. En `AGENTS.md`, cambia las rutas `node_modules/design-system-agentic-first-kit/docs/metodologia/` por «la ruta de `npx ds info --json` → `kit.metodologia`».
+- Migración: no es obligatoria. `content/patrones/` y `nivel: seccion|pantalla|flujo` se siguen leyendo, y las huellas y los `relacionados` con `patrones/…` siguen funcionando. Para pasar al formato nuevo, ejecuta `git mv content/patrones content/bloques`, cambia `nivel:` por `categoria:` en esas fichas y luego `npx ds sync`. Los enlaces guardados a `/<sistema>/inicio` pasan a `/<sistema>/docs/produccion`. Por el nuevo nombre del paquete, reinstala el kit (`npm uninstall design-system-agentic-first-kit` y `npm install @imandresochoa/ds@0.9.0`) y ejecuta `npx ds skills`. Así se borra `crear-sistema`, se copia `montar-sistema` y las skills llegan también a `.agents/skills/`. En `AGENTS.md`, cambia las rutas `node_modules/design-system-agentic-first-kit/docs/metodologia/` por «la ruta de `npx ds info --json` → `kit.metodologia`».
 
 ## 0.8.0 · 2026-10-29
 

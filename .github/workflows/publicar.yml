@@ -1,5 +1,6 @@
 # Publica el kit en npm con trusted publishing: sin tokens guardados y con procedencia (el repo tiene que ser público).
-# Solo se lanza a mano. Mientras package.json tenga "private": true, npm se niega a publicar.
+# Solo se lanza a mano, desde la etiqueta de la versión. Necesita el trusted publisher configurado en npmjs.com,
+# y npm solo deja configurarlo cuando el paquete ya existe: la primera versión se publicó a mano.
 name: Publicar en npm
 
 on:
@@ -22,4 +23,4 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
-      - run: npm publish
+      - run: npm publish --provenance

@@ -24,8 +24,6 @@ npx @imandresochoa/ds@latest init
 
 Hace las mismas preguntas en la terminal. Más detalle en [`docs/metodologia/08-nuevo-sistema.md`](docs/metodologia/08-nuevo-sistema.md).
 
-> El paquete aún no está publicado en npm. Mientras tanto: `npx github:imandresochoa/ds instalar`.
-
 ## Publicar
 
 `npx ds build` exporta un sitio estático a `out/`. Va en la raíz de un dominio salvo que `system.json` declare una ruta:

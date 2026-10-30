@@ -120,3 +120,9 @@ Empezar un sistema pasa a ser un comando y una frase al agente: `npx @imandresoc
 - **Por qué.** Los primeros commits del repo nombran productos concretos, y la regla del kit es no nombrar ninguno. Reescribir el historial cambiaría todos los hashes y rompería los sistemas que fijan el kit a un commit o a una etiqueta.
 - **Qué.** El kit sigue en `imandresochoa/ds`, público, a partir de una instantánea de la 0.8.0. El repo antiguo se renombra a `design-system-agentic-first-kit-legacy` y sigue privado: conserva el historial, las etiquetas hasta la 0.7.1 y los PRs. Como el nombre antiguo no se reutiliza, GitHub lo sigue redirigiendo al legacy y los sistemas fijados a versiones anteriores instalan igual.
 - **Cuidado.** Lo que sale del historial antiguo no se sube a `imandresochoa/ds`: los cambios pasan como commits nuevos.
+
+## 2026-10-30 · Primera publicación en npm
+
+- **Qué.** La 0.9.0 es la primera versión en npm. La publica Andrés a mano, con su cuenta y 2FA, porque npm no deja configurar el trusted publisher de un paquete que aún no existe.
+- **Después.** Se configura el trusted publisher (`imandresochoa/ds`, `publicar.yml`) y se prohíbe publicar con tokens. Las versiones siguientes salen del workflow, con procedencia.
+- **Descartado.** Publicar la primera versión desde Actions con un token de npm guardado como secreto: sería un token de escritura de larga duración que habría que acordarse de revocar.
