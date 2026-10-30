@@ -1,0 +1,34 @@
+# Comprueba cada PR con lo mismo que «Publicar en npm»: Node 24, npm ci, typecheck y build.
+# Así un package-lock.json desajustado se ve en el PR y no al publicar (pasó con la 0.10.0).
+# Además, crea un sistema con `ds init` en una carpeta vacía y lo lee con el CLI.
+name: Comprobar
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    steps:
+      # Las mismas acciones, fijadas por commit, que en publicar.yml.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - name: ds init en una carpeta vacía
+        run: |
+          mkdir -p "$RUNNER_TEMP/prueba"
+          cd "$RUNNER_TEMP/prueba"
+          node "$GITHUB_WORKSPACE/bin/ds.mjs" init "Prueba" prueba --carpeta . --desde cero --kit "file:$GITHUB_WORKSPACE"
+          npx ds info --json > /dev/null
+          npx ds search boton
+          npx ds ver boton > /dev/null
+          npx ds doctor

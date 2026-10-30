@@ -102,5 +102,5 @@ Tareas:
 - [ ] Evaluaciones de `design.md` con escenarios fijos (`evals/`).
 - [ ] Ejemplos en vivo en cada modo: conmutador claro/oscuro en el marco del ejemplo, con el selector del informe (`tokens.<superficie>.modos`).
 - [ ] Publicación: `ds build` + despliegue estático con `ds check` antes de cada despliegue.
-- [ ] Workflow en cada PR con `npm ci`, typecheck y build, con la misma versión de Node que «Publicar en npm». Así un `package-lock.json` desajustado se ve en el PR y no al publicar (pasó con la 0.10.0: npm 11.19.1 pedía dos dependencias de `@emnapi` que el lockfile no tenía).
+- [x] Workflow en cada PR (`comprobar.yml`) con `npm ci`, typecheck, build y un `ds init` de prueba, con la misma versión de Node que «Publicar en npm». Así un `package-lock.json` desajustado se ve en el PR y no al publicar (pasó con la 0.10.0: npm 11.19.1 pedía dos dependencias de `@emnapi` que el lockfile no tenía).
 - [x] `CHANGELOG.md` y etiquetas de versión (`vX.Y.Z`) para que los sistemas fijen versión.

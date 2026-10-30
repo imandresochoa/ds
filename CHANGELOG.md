@@ -9,6 +9,7 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
   - Cada pieza tiene su JSON en `/<sistema>/r/<sección>/<slug>.json`: estado por plataforma, `usa` y `usadoPor`, fuentes, sync, reglas y antipatrones.
   - `llms.txt` y la página «Para agentes» lo explican.
 - **`usa`**, clave nueva y opcional de la ficha: las piezas que compone. Los `tokens` entran solos en el grafo. La ficha la enseña en el apartado «Usa». Un id que no existe se avisa al generar.
+- Workflow «Comprobar» en cada PR y en `main`: `npm ci`, typecheck, build y un `ds init` de prueba con Node 24, como «Publicar en npm».
 - **`ds ver <pieza>`** imprime el JSON de una pieza (por id o por slug). **`ds search --json`** devuelve piezas con la forma del índice, más `archivo`.
 - Migración:
   - Si algo lee `registry.json`: `fichas` pasa a `piezas`. `seccion`, `funcion`, `categoria` y `nivel` pasan a `tipo` y `categorias`. `plataformas`, `sync` y `tokens` de cada ficha están en su JSON (el enlace `json` de cada pieza).
