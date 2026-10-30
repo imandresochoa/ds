@@ -39,3 +39,11 @@ npm run build
 Para probar con un sistema real: `npx ds enlazar <ruta a este kit>` desde el sistema y luego `npx ds dev`. No arranques a la vez `npm run dev` aquí y `ds dev` enlazado: comparten la carpeta `.next`.
 
 Antes de terminar: `npm run typecheck`, `npm run build` y, si tocaste el CLI o la plantilla, un `ds init` en una carpeta vacía.
+
+## Publicar una versión
+
+1. En un PR: sube `version` en `package.json` y cambia «Sin publicar» por `## X.Y.Z · <fecha>` en `CHANGELOG.md`.
+2. Tras fusionarlo, etiqueta `main` con `vX.Y.Z` y súbela.
+3. Lanza el workflow «Publicar en npm» desde esa etiqueta. Publica con trusted publishing, sin tokens.
+
+El historial del repo antiguo (`design-system-agentic-first-kit-legacy`, remoto `legacy`) nombra productos: no subas a este repo ninguna rama ni etiqueta que venga de él.
