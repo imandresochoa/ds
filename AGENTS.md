@@ -55,5 +55,6 @@ Antes de terminar: `npm run typecheck`, `npm run build` y, si tocaste el CLI o l
 1. En un PR: sube `version` en `package.json` y cambia «Sin publicar» por `## X.Y.Z · <fecha>` en `CHANGELOG.md`.
 2. Tras fusionarlo, etiqueta `main` con `vX.Y.Z` y súbela.
 3. Lanza el workflow «Publicar en npm» desde esa etiqueta. Publica con trusted publishing, sin tokens.
+4. Si el workflow falla, no muevas ni borres la etiqueta. Arregla el fallo en un PR que suba la versión de parche y publica esa.
 
 El historial del repo antiguo (`design-system-agentic-first-kit-legacy`, remoto `legacy`) nombra productos: no subas a este repo ninguna rama ni etiqueta que venga de él.

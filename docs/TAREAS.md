@@ -28,11 +28,11 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 - [x] Versión 0.9.0 sin `"private": true`.
 - [x] Primera publicación en npm: `@imandresochoa/ds@0.9.0`, a mano y con 2FA (2026-10-30).
 - [x] Trusted publisher configurado con `npm trust` (`imandresochoa/ds`, `publicar.yml`). Las versiones siguientes salen con el workflow.
-- [ ] En npmjs.com, «Publishing access» → «Require two-factor authentication and disallow tokens».
+- [x] En npmjs.com, «Publishing access» → «Require two-factor authentication and disallow tokens»: solo se publica desde el workflow.
 
 ## Fases pendientes
 
-El rediseño al modelo de shadcn/ui se acordó en cinco fases. La 1 (interfaz) y la 2 (instalación y `montar-sistema`) están hechas y salieron en la 0.9.0. La 3 (Lab de primitivos) sale en la 0.10.0. Lo decidido está en `DECISIONES.md`, entradas del 2026-10-30. Cada fase empieza con una propuesta y preguntas, no con código (ver «Cómo trabajamos» en `AGENTS.md`). Lo que pone «Por decidir» no está decidido: se pregunta.
+El rediseño al modelo de shadcn/ui se acordó en cinco fases. La 1 (interfaz) y la 2 (instalación y `montar-sistema`) están hechas y salieron en la 0.9.0. La 3 (Lab de primitivos) sale en la 0.10.1. La 0.10.0 no llegó a npm. Lo decidido está en `DECISIONES.md`, entradas del 2026-10-30. Cada fase empieza con una propuesta y preguntas, no con código (ver «Cómo trabajamos» en `AGENTS.md`). Lo que pone «Por decidir» no está decidido: se pregunta.
 
 ### Fase 3 · Lab de primitivos
 
@@ -56,7 +56,7 @@ Tareas:
 - [x] Propuesta y preguntas.
 - [x] Lab, preset (`ds preset`) y skill que lo aplica.
 - [ ] Movimiento (duraciones y curvas) en el Lab.
-- [ ] Publicar la 0.10.0 en npm: etiqueta `v0.10.0` en `main` y workflow «Publicar en npm» (ver «Publicar una versión» en `AGENTS.md`).
+- [ ] Publicar la 0.10.1 en npm: etiqueta `v0.10.1` en `main` y workflow «Publicar en npm» (ver «Publicar una versión» en `AGENTS.md`).
 
 ### Fase 4 · Registry propio y Directorio
 
@@ -96,4 +96,5 @@ Tareas:
 - [ ] Evaluaciones de `design.md` con escenarios fijos (`evals/`).
 - [ ] Ejemplos en vivo en cada modo: conmutador claro/oscuro en el marco del ejemplo, con el selector del informe (`tokens.<superficie>.modos`).
 - [ ] Publicación: `ds build` + despliegue estático con `ds check` antes de cada despliegue.
+- [ ] Workflow en cada PR con `npm ci`, typecheck y build, con la misma versión de Node que «Publicar en npm». Así un `package-lock.json` desajustado se ve en el PR y no al publicar (pasó con la 0.10.0: npm 11.19.1 pedía dos dependencias de `@emnapi` que el lockfile no tenía).
 - [x] `CHANGELOG.md` y etiquetas de versión (`vX.Y.Z`) para que los sistemas fijen versión.

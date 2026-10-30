@@ -2,6 +2,12 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## 0.10.1 · 2026-10-30
+
+- Mismo contenido que la 0.10.0, que no llegó a npm. El workflow de publicación falló en `npm ci`: a `package-lock.json` le faltaban `@emnapi/core` y `@emnapi/runtime`, que piden los paquetes wasm opcionales de Tailwind y de sharp, y npm 11.19 (el de Node 24 en GitHub Actions) no lo acepta. El lockfile está regenerado con esa versión de npm.
+- La etiqueta `v0.10.0` se queda donde está: una etiqueta publicada no se mueve.
+- Migración: ninguna. Instala `@imandresochoa/ds@0.10.1` (en npm no hay 0.10.0) y ejecuta `npx ds skills`. Si fijaste `github:imandresochoa/ds#v0.10.0`, sigue funcionando.
+
 ## 0.10.0 · 2026-10-30
 
 - **Lab de primitivos** (`/<sistema>/lab`), primera opción de «Nuevo» y en ⌘K:
