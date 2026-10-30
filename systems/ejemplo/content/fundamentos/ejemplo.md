@@ -12,6 +12,6 @@ Un fundamento explica el criterio (cómo y cuándo). Los valores van en Tokens y
 
 - Pendiente: escribe aquí reglas que se puedan comprobar mirando la interfaz.
 
-## Rechaza estos reflejos
+## Antipatrones
 
 - Pendiente: nombra los errores habituales para que un agente los reconozca.

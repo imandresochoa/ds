@@ -65,4 +65,4 @@ Cuando una iniciativa llega a producción, su estado pasa a `produccion` y sus f
 ## Trazabilidad
 
 - Los commits que tocan una ficha nombran su `id`: `feat(ds): componentes/boton añade variante light`.
-- Las decisiones de método, con fecha y motivo, van en `docs/DECISIONES.md`. No se reescriben: se añade una entrada nueva que corrige la anterior.
+- Las decisiones de método, con fecha y motivo, van en las [decisiones del kit](https://github.com/imandresochoa/ds/blob/main/docs/DECISIONES.md). No se reescriben: se añade una entrada nueva que corrige la anterior.

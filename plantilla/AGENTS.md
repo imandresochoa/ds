@@ -36,7 +36,9 @@ npx ds doctor        # comprueba la configuración
 npx ds info --json   # sistema, secciones, producción, skills y rutas del kit
 npx ds search boton  # busca fichas antes de crear una
 npx ds ver boton     # una pieza en JSON: lo que usa, quién la usa y su sync
-npx ds preset ver "<enlace del Lab>"   # lee un preset del Lab de primitivos; aplicar lo escribe en experimental/
+npx ds preset ver "<enlace del Lab>"      # lee un preset del Lab de primitivos: valores y contraste
+npx ds preset aplicar "<enlace del Lab>"  # lo escribe en experimental/, nunca en producción
+npx ds preset resolver                    # el enlace para reabrir en el Lab lo que hay en experimental/
 npx ds skills        # actualiza las skills del kit
 ```
 
@@ -55,7 +57,7 @@ Si pone «sin programar», prográmala siguiendo el apartado «Rutina diaria» d
 ## Skills
 
 - `montar-sistema`: monta el sistema desde el repo, la web o Figma del producto, o desde cero (superficies, tokens, primeras fichas), y aplica los presets del Lab de primitivos.
-- `nueva-ficha`: documenta un componente, bloque, gráfico, fundamento o token.
+- `nueva-ficha`: documenta un componente, bloque, gráfico, fundamento, token, iniciativa o página de Docs.
 - `auditar-sistema`: revisa que todo el sistema cuadre con producción y arregla lo que no. Antes de publicar y tras cada merge en producción.
 - `revisar-sync`: interpreta el informe de sync y propone qué actualizar o aceptar.
 - `inventariar-produccion`: lista priorizada de lo que falta documentar.

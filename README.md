@@ -34,13 +34,33 @@ Hace las mismas preguntas en la terminal. Más detalle en [`docs/metodologia/08-
 
 Con ella, páginas, assets, enlaces, `.md`, `llms.txt` y ejemplos en vivo llevan `/ds` delante, y `out/` se sirve bajo esa ruta. Hace falta cuando el sistema vive dentro de otro sitio de Next (su `/_next` chocaría con el del sistema). Detalles en [`docs/metodologia/10-git-y-entornos.md`](docs/metodologia/10-git-y-entornos.md).
 
-## Comandos (desde el repo del sistema)
+Cada sitio publica para agentes `llms.txt`, `design.md` y un registry de solo lectura: `/<sistema>/registry.json` es el índice y cada pieza tiene su JSON en `/<sistema>/r/<sección>/<slug>.json`.
+
+### Varios sistemas en un sitio
+
+```bash
+npx @imandresochoa/ds init --directorio "Nuestros sistemas" --carpeta ../directorio --sistemas ../a-design-system,../b-design-system
+```
+
+El repo de directorio sirve juntos los sistemas de su `directorio.json`. La portada es el Directorio, con una tarjeta por sistema, y se publica `/directorio.json` para agentes. Ver [`docs/metodologia/09-kit.md`](docs/metodologia/09-kit.md).
+
+## Comandos
+
+Fuera de un sistema:
 
 | Comando | Qué hace |
 | --- | --- |
-| `npx ds init "<Nombre>"` | Crea el repo del sistema: plantilla, kit y skills. Con `--json` y parámetros, lo usa el agente. |
+| `npx @imandresochoa/ds instalar` | Instala la skill `montar-sistema` en tu usuario, para Claude Code y Codex. |
+| `npx @imandresochoa/ds init "<Nombre>"` | Crea el repo del sistema: plantilla, kit y skills. Con `--json` y parámetros, lo usa el agente. |
+| `npx @imandresochoa/ds init --directorio` | Crea un repo de directorio, que sirve juntos varios sistemas. |
+
+Desde el repo del sistema:
+
+| Comando | Qué hace |
+| --- | --- |
 | `npx ds info [--json]` | Sistema, secciones, producción, último sync, skills y rutas del kit. |
 | `npx ds search <texto>` | Busca fichas antes de crear una. |
+| `npx ds ver <pieza>` | El JSON de una pieza, como en el registry: lo que usa, quién la usa, fuentes y sync. |
 | `npx ds dev` | Servidor de desarrollo en http://localhost:4100. |
 | `npx ds sync [--accept <id>]` | Lee producción: instantánea CSS, tokens, huellas, cobertura. |
 | `npx ds check` | Falla si algo está desajustado, ausente o inventado. |
@@ -48,6 +68,10 @@ Con ella, páginas, assets, enlaces, `.md`, `llms.txt` y ejemplos en vivo llevan
 | `npx ds build` | Exporta el sitio estático a `out/`, para la raíz de un dominio o para la ruta de `publicacion.ruta` (`DS_RUTA` la cambia). |
 | `npx ds skills` | Copia o actualiza las skills del kit en `.claude/skills/` (Claude Code) y `.agents/skills/` (Codex). |
 | `npx ds doctor` | Comprueba la configuración. |
+| `npx ds version` | Versión del kit instalada. |
+| `npx ds enlazar <ruta>` / `desenlazar` | Usa un checkout local del kit, o vuelve a la versión fijada. |
+
+`ds dev`, `ds build` y `ds doctor` también funcionan en un repo de directorio.
 
 ## Desarrollar el kit
 
@@ -63,7 +87,7 @@ Para trabajar con datos reales, enlaza el kit desde un sistema (ver [`docs/metod
 | Ruta | Qué hay |
 | --- | --- |
 | `bin/ds.mjs` | CLI. |
-| `app/`, `components/`, `lib/` | Interfaz (Next, exportación estática). `lib/meta.mjs` define secciones, estados y prompts. |
+| `app/`, `components/`, `lib/` | Interfaz (Next, exportación estática). `lib/meta.mjs` define secciones, estados y prompts; `lib/registry.mjs`, el registry; `lib/lab.mjs`, el Lab de primitivos. |
 | `scripts/` | Sync con producción, publicación para agentes y diagnóstico. |
 | `plantilla/` | Lo que `ds init` copia en un repo de sistema nuevo. |
 | `skills/` | Skills para agentes que se instalan en cada sistema. |

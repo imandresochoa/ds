@@ -52,7 +52,7 @@ Reglas:
 
 | | Kit | Sistema | Producción |
 | --- | --- | --- | --- |
-| **Comprobaciones antes del merge** | Tipos y build. | `ds sync` y `ds check` en verde. | Los tests del producto y, cuando haya CI, `ds check` del sistema. |
+| **Comprobaciones antes del merge** | El workflow «Comprobar»: `npm ci`, tipos, build y un `ds init` de prueba. | `ds sync` y `ds check` en verde. | Los tests del producto y, cuando haya CI, `ds check` del sistema. |
 | **Qué pasa al hacer merge** | Nada se publica solo. Si cambia algo que usan los sistemas, se etiqueta una versión (ver «Kit y sistemas»). | Se publica el sistema, si está desplegado. | Se despliega: en producción si no hay staging; en staging si lo hay. |
 | **Quién hace merge** | Quien mantiene el kit; un agente, si tiene autorización expresa y las comprobaciones pasan. | Igual que el kit. | **Siempre una persona responsable del producto.** Un agente abre el PR, pero no hace merge. |
 
@@ -85,7 +85,7 @@ Rama + PR ──▶ CI: tests + ds check ──▶ merge: main → staging ─�
 
 ## Publicar el sistema
 
-`npx ds build` exporta el sitio a `out/`: las páginas en HTML, su versión `.md`, `design.md`, `llms.txt`, `registry.json` con una pieza por archivo en `r/`, y la instantánea de producción que cargan los ejemplos en vivo (`/_ds/`). Es un sitio estático: lo sirve cualquier hosting de archivos que resuelva `/x` a `x.html`.
+`npx ds build` exporta el sitio a `out/`: las páginas en HTML, su versión `.md` (también las de Docs: `/<sistema>/docs.md` y `/<sistema>/docs/<página>.md`), `design.md`, `llms.txt`, `llms-full.txt`, `registry.json` con una pieza por archivo en `r/` y, en un directorio, `/directorio.json`. También la instantánea de producción que cargan los ejemplos en vivo (`/_ds/`). Es un sitio estático: lo sirve cualquier hosting de archivos que resuelva `/x` a `x.html`.
 
 ### En la raíz o bajo una ruta
 
@@ -97,7 +97,8 @@ Por defecto, el sitio va en la raíz de un dominio (`https://ds.producto.com/<id
 
 Con ella, `ds build` pone `/ds` delante de todo lo que el sitio escribe: las páginas, `/_next`, los enlaces de la interfaz y de las fichas, los `.md`, los enlaces de `llms.txt`, `design.md`, `registry.json` y las piezas de `r/`, y las hojas de los ejemplos en vivo. `out/` no cambia de forma (no lleva una carpeta `ds/` dentro): quien lo sirve quita la ruta antes de buscar el archivo, de modo que `https://dominio/ds/x` responde con `out/x`.
 
-- `DS_RUTA` gana a `system.json` en un build concreto: `DS_RUTA=/otra npx ds build`, o `DS_RUTA= npx ds build` para exportar en la raíz.
+- En un directorio, la ruta se declara en su `directorio.json` y la de cada sistema no cuenta.
+- `DS_RUTA` gana a `system.json` (y a `directorio.json`) en un build concreto: `DS_RUTA=/otra npx ds build`, o `DS_RUTA= npx ds build` para exportar en la raíz.
 - `ds dev` sirve siempre en la raíz, con o sin ruta.
 - `ds doctor` dice dónde se publica y falla si la ruta no es válida (una o más carpetas, sin espacios: `/ds`, `/sistema/diseno`).
 
@@ -106,7 +107,7 @@ Cuándo hace falta la ruta:
 | El sistema se publica… | Ruta |
 | --- | --- |
 | En su propio dominio o subdominio. | Ninguna. |
-| Dentro de otro sitio, con rewrites, y ese sitio no usa `/_next`, `/_ds`, `/llms.txt` ni `/<id>`. | Ninguna: se puede montar en la raíz. |
+| Dentro de otro sitio, con rewrites, y ese sitio no usa `/_next`, `/_ds`, `/llms.txt`, `/directorio.json` ni `/<id>`. | Ninguna: se puede montar en la raíz. |
 | Dentro de otro sitio que también es Next (un prototipo, la web del producto). | Sí: su `/_next` choca con el del sistema. |
 
 Con rewrites, la ruta es la misma en los dos lados: el sistema se exporta con `/ds` y el sitio que lo aloja lleva `/ds/:path*` al despliegue del sistema sin la ruta (`https://<despliegue del sistema>/:path*`). Cualquier control de acceso o `noindex` lo pone el sitio que lo aloja; el sistema no lo sabe.

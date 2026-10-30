@@ -27,6 +27,6 @@ Ficha de ejemplo del kit. Sustitúyela por un componente real de tu producto (ve
 - Un solo botón principal por vista.
 - El texto describe la acción con un verbo.
 
-## Rechaza estos reflejos
+## Antipatrones
 
 - **Dos principales juntos.** Si todo es importante, nada lo es.

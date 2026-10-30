@@ -12,7 +12,7 @@ El sistema vive en un repo distinto del producto. El enlace entre los dos lo hac
 3. **Huellas.** Para cada ficha con fuentes, reúne las reglas CSS de sus clases (o el archivo entero si es un componente de código) y calcula una huella. La compara con la última revisada en `produccion.lock.json`.
 4. **Clases inventadas.** Comprueba que cada clase usada en los ejemplos existe en producción o en el CSS experimental.
 5. **Cobertura.** Lista lo que producción tiene y ninguna ficha documenta: los tokens y, por superficie, las clases o los componentes. Es la lista de tareas pendientes del sistema. Ver «Cobertura».
-6. **Cambios sin commit.** Avisa si la instantánea incluye archivos de producción todavía sin commit.
+6. **Cambios sin commit.** El sync lee lo publicado (`origin/<rama>`). Si esa rama no existe, lee la copia local y avisa de los archivos que todavía no tienen commit. Sin `origin/<rama>`, `ds check` falla: el sistema no puede comparar con lo publicado.
 
 ## Modos y `@theme`
 
@@ -73,4 +73,4 @@ plataformas:
 - Una ficha en producción sin fuentes no se puede verificar; el sync lo avisa en componentes y bloques.
 - Solo se acepta una huella después de leer el cambio y actualizar la ficha. Aceptar sin revisar rompe el enlace.
 - Cuando producción cambia por una decisión de diseño, primero se actualiza la ficha y después se acepta.
-- `check:sync` debe pasar antes de publicar el sistema.
+- `npx ds check` debe pasar antes de publicar el sistema.

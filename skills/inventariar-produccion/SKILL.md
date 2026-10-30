@@ -14,7 +14,7 @@ Solo lectura. El resultado es un plan, no fichas.
    - **Gráficos**: visualizaciones de datos (librería de gráficos, `<svg>` o `<canvas>` con datos).
    - **Fundamentos**: tipografía, color, espaciado, iconografía, movimiento, voz (busca guías en `docs/`).
 3. Cruza con las fichas existentes (`content/`) para no repetir.
-4. Para cada pieza: nombre propuesto, sección, `funcion` y `nivel` (componentes) o `categoria` (bloques y gráficos), fuente en producción, clases principales, **uso** (cuántas páginas o archivos la usan: `grep -rl`) y dependencias (qué otras piezas usa).
+4. Para cada pieza: nombre propuesto, sección, `funcion` y `nivel` (componentes) o `categoria` (bloques y gráficos), fuente en producción, clases principales, **uso** (cuántas páginas o archivos la usan: `grep -rl`) y dependencias: los ids de las piezas que compone, que irán en `usa`.
 5. Prioriza: primero lo más usado y lo que otras piezas necesitan (átomos antes que organismos), después lo visible en las páginas principales.
 
 ## Entrega

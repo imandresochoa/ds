@@ -42,6 +42,8 @@ En este orden, omitiendo lo que no aplique:
 4. **Accesibilidad**.
 5. **Diferencias entre superficies**: observaciones del sync. No son decisiones.
 
+Los títulos `## Reglas` y `## Antipatrones` pasan tal cual al JSON de la pieza (`reglas` y `antipatrones`): no los renombres. `## Rechaza estos reflejos`, el nombre anterior, se sigue leyendo como antipatrones.
+
 ## Cuerpo por plataforma (`web.md`)
 
 - Un apartado por superficie (Landing, Portal).

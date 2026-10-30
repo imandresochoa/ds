@@ -197,3 +197,10 @@ El Lab ajusta también el movimiento, el único primitivo que quedó fuera de la
 - **Muestra.** Un punto que va y vuelve con cada duración y cada curva. Con «reducir movimiento» se queda quieto.
 - **Compatibilidad.** Un preset anterior no trae movimiento y no escribe tokens de movimiento al aplicarlo. `--solo movimiento` lo añade.
 
+## 2026-10-30 · 1.0.0
+
+- **Qué la hace estable.** Las cinco fases del rediseño están cerradas. La metodología, la plantilla y las skills están revisadas contra lo que hace el código. Cada PR pasa el workflow «Comprobar» (`npm ci`, tipos, build y un `ds init` de prueba), así que un fallo como el de la 0.10.0 se ve antes de publicar.
+- **Qué promete.** Desde la 1.0.0, la versión mayor solo cambia si hay que tocar fichas o `system.json`, o si cambia la forma de lo que se publica para agentes (`registry.json`, las piezas de `r/`, `directorio.json`). Se descartó contar solo las fichas y `system.json`: los agentes leen el registry, y un cambio de forma les rompe igual.
+- **Antipatrones con un solo título.** La metodología decía «Antipatrones» y la plantilla, «Rechaza estos reflejos». Como el título pasa al JSON de la pieza, el canónico es `## Antipatrones`. El otro se sigue leyendo para no tocar fichas existentes.
+- **Enlaces fuera del paquete.** La metodología va en el paquete, pero `TAREAS.md` y `DECISIONES.md` no. Sus enlaces apuntan al repo del kit en GitHub.
+

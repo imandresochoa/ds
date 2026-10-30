@@ -5,7 +5,7 @@ resumen: Las capas del sistema, de los fundamentos a los gráficos, y sistemas q
 
 ## Las capas
 
-Cada ficha pertenece a una capa. Las capas van del criterio a lo más compuesto; una capa solo usa piezas de las anteriores. Los fundamentos van primero porque son el porqué; los tokens son ese criterio convertido en valores.
+Cada ficha pertenece a una capa. Las capas van del criterio a lo más compuesto; una capa solo usa piezas de las anteriores. Lo que compone una pieza se declara en `usa` (ver «Anatomía de una ficha»). Los fundamentos van primero porque son el porqué; los tokens son ese criterio convertido en valores.
 
 | Capa | Qué contiene | Ejemplo |
 | --- | --- | --- |
@@ -18,7 +18,7 @@ Cada ficha pertenece a una capa. Las capas van del criterio a lo más compuesto;
 
 ### Lista alfabética para navegar, nivel atómico para componer
 
-shadcn/ui lista los componentes por orden alfabético y marca los nuevos; nosotros también. La `funcion` (acciones, navegación, formularios, feedback, contenido, superposiciones) ordena `llms.txt` y el registry, pero no la barra lateral. El nivel atómico (`nivel: atomo | molecula | organismo`) se mantiene en cada ficha como regla interna: un átomo no usa otros componentes, una molécula usa átomos y un organismo usa moléculas o átomos. Sirve para el método y para los agentes, no para buscar.
+shadcn/ui lista los componentes por orden alfabético y marca los nuevos; nosotros también. La `funcion` (acciones, navegación, formularios, feedback, contenido, superposiciones) ordena `llms.txt` y el registry, pero no la barra lateral. El nivel atómico (`nivel: atomo | molecula | organismo`) se mantiene en cada ficha como regla interna: un átomo no usa otros componentes, una molécula usa átomos y un organismo usa moléculas o átomos. Lo que usa cada uno va en `usa`. Sirve para el método y para los agentes, no para buscar.
 
 Bloques y Gráficos son estructura: el kit no trae ninguno. Cada sistema los llena con lo que existe en su producto.
 
@@ -42,7 +42,7 @@ Reglas de la herencia:
 - Las fichas del padre aparecen en el hijo salvo que el hijo las sustituya con el mismo `id`.
 - La metodología es común: vive en el kit (`docs/metodologia/`), no se duplica por sistema y el sitio de un sistema solo la muestra si la activa (`"metodologia": true`).
 
-El sistema `base` y la resolución de herencia están pendientes (ver `docs/TAREAS.md`).
+El sistema `base` y la resolución de herencia están pendientes (ver las [tareas del kit](https://github.com/imandresochoa/ds/blob/main/docs/TAREAS.md)).
 
 ## Tres niveles de token
 
@@ -56,7 +56,7 @@ Empieza por los semánticos y añade los de componente cuando un componente los 
 
 ## Nombres de los tokens
 
-- **Un sistema nuevo** usa los nombres de shadcn para los semánticos: pares `x` y `x-foreground` (`--primary` y `--primary-foreground`), `--background`, `--foreground`, `--muted`, `--border`, `--ring` y `--radius` con su escala. Para el resto usa los de Tailwind 4: `--spacing`, `--text-*`, `--font-*`, `--leading-*` y `--shadow-*`. Son los que genera el Lab de primitivos, y un agente los reconoce sin explicación.
+- **Un sistema nuevo** usa los nombres de shadcn para los semánticos: pares `x` y `x-foreground` (`--primary` y `--primary-foreground`), `--background`, `--foreground`, `--muted`, `--border`, `--ring` y `--radius` con su escala. Para el resto usa los de Tailwind 4: `--spacing`, `--text-*`, `--font-*`, `--leading-*`, `--shadow-*` y `--ease-*`. Las duraciones, que no tienen nombre en Tailwind, son `--duration-fast`, `--duration-normal` y `--duration-slow`. Son los que genera el Lab de primitivos, y un agente los reconoce sin explicación.
 - **Un producto que ya existe** conserva los suyos. El sistema documenta cómo es el producto: no lo renombra.
 
 ## Modos

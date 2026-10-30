@@ -7,6 +7,7 @@ La interfaz copia la estructura y el estilo de ui.shadcn.com: neutra, sin decora
 
 ## Estructura
 
+- **Portada** (`/`). Con un sistema, lleva a él. Con varios (un directorio), es el Directorio: una tarjeta por sistema con sus fichas, su sync y su cobertura, y los enlaces a su registry y su `design.md` (ver «Kit y sistemas»).
 - **Cabecera** (fija). A la izquierda, la marca del sistema (un selector si hay varios) y la navegación: Inicio, Docs, Componentes, Bloques, Gráficos e Iniciativas. A la derecha, buscar, el repo de código (si `produccion.codigo` existe), modo claro u oscuro y **Nuevo**, con el Lab de primitivos, el prompt de cada sección y «Pedir un cambio».
 - **Home** (`/<sistema>`). Un aviso con la última ficha creada, el nombre y la descripción del sistema, «Empezar» y «Ver componentes». Debajo, un escaparate con los ejemplos en vivo de las fichas marcadas con `destacado: true`. Si no hay ninguna, usa las que tienen ejemplo, primero las de producción, hasta nueve. Sin ejemplos, muestra una tarjeta por sección.
 - **Docs.** Tres columnas, como en shadcn:
@@ -14,7 +15,7 @@ La interfaz copia la estructura y el estilo de ui.shadcn.com: neutra, sin decora
   - **Contenido**: título, descripción, insignias (estado, código, iniciativa), «Copiar página» en Markdown y anterior y siguiente.
   - **Derecha**: «En esta página» y la tarjeta «¿Trabajas con un agente?», que copia el contexto del sistema.
 - **Índice de sección** (`/<sistema>/componentes`, `/fundamentos`, `/tokens`). Como el índice de componentes de shadcn: «Nuevos» (creadas en los últimos 30 días, con punto azul) y «Todos», en rejilla alfabética. Fundamentos y Tokens se agrupan por `grupo`.
-- **Ficha.** Los ejemplos en vivo con su código debajo. Si el código pasa de ocho líneas, se pliega con «Ver código». Las pestañas Web, iOS y Android siguen el conmutador de base de shadcn y solo aparecen las plataformas que existen. Al final van «Tokens que usa», «Enlace con producción» y «Relacionados».
+- **Ficha.** Los ejemplos en vivo con su código debajo. Si el código pasa de ocho líneas, se pliega con «Ver código». Las pestañas Web, iOS y Android siguen el conmutador de base de shadcn y solo aparecen las plataformas que existen. Al final van «Tokens que usa», «Enlace con producción», «Usa» (las piezas que compone) y «Relacionados».
 - **Páginas anchas.** Bloques y Gráficos tienen la forma de Blocks y Charts: cabecera, navegación por categoría y galería.
   - Cada bloque va en un visor con Vista y Código, anchos de escritorio, tablet y móvil, y un botón que copia el prompt para que un agente lo use. Es el equivalente a `npx shadcn add`.
   - Los gráficos van en tarjetas, en rejilla.
