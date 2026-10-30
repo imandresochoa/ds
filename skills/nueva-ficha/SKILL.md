@@ -1,6 +1,6 @@
 ---
 name: nueva-ficha
-description: Crea o completa una ficha del sistema de diseño (componente, patrón, fundamento, token o iniciativa) enlazada a producción. Úsala cuando pidan documentar una pieza, «añade el componente X» o «documenta esta sección».
+description: Crea o completa una ficha del sistema de diseño (componente, bloque, gráfico, fundamento, token o iniciativa) enlazada a producción. Úsala cuando pidan documentar una pieza, «añade el componente X» o «documenta esta sección».
 ---
 
 # Crear una ficha
@@ -14,7 +14,9 @@ Lee primero `node_modules/design-system-agentic-first-kit/docs/metodologia/05-fi
 | Criterio (cómo y cuándo) | `fundamentos` | `relacionados` a sus tokens |
 | Valores con nombre | `tokens` | `grupo`, `tokens: [{nombre, rol}]` |
 | Pieza reutilizable | `componentes` | `funcion` (acciones, navegacion, formularios, feedback, contenido, superposiciones), `nivel` (atomo, molecula, organismo) |
-| Composición | `patrones` | `nivel` (seccion, pantalla, flujo), `relacionados` |
+| Composición | `bloques` | `categoria` (seccion, pantalla, flujo), `relacionados` |
+| Presentación de datos | `graficos` | `categoria` (area, barras, lineas, circular, radar, radial, tooltip), `tokens` de color |
+| Página de documentación | `content/docs/` | `titulo`, `resumen`; orden en `content/docs/meta.json` |
 | Trabajo en curso | `iniciativas` | secciones fijas: Resumen, Referencias, Exploración, Flujos, Handoff, Playground |
 
 Archivo único `content/<sección>/<slug>.md`, o carpeta `<slug>/index.md` + `web.md`/`ios.md`/`android.md` si hay varias plataformas.

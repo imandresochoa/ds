@@ -12,8 +12,10 @@ Una ficha es un archivo `slug.md` o una carpeta `slug/` con `index.md` y un arch
 titulo: Botón
 resumen: Una frase. Qué es y cuándo se usa.
 estado: produccion            # exploracion | desarrollo | produccion | obsoleto
-funcion: acciones             # componentes: acciones | navegacion | formularios | feedback | contenido | superposiciones (agrupa la barra lateral)
-nivel: atomo                  # componentes: atomo | molecula | organismo (regla de composición) · patrones: seccion | pantalla | flujo
+funcion: acciones             # componentes: acciones | navegacion | formularios | feedback | contenido | superposiciones (ordena llms.txt y el registry)
+nivel: atomo                  # componentes: atomo | molecula | organismo (regla de composición)
+categoria: seccion            # bloques: seccion | pantalla | flujo · gráficos: area | barras | lineas | circular | radar | radial | tooltip
+destacado: true               # opcional: su primer ejemplo sale en la home
 grupo: Base                   # tokens y fundamentos: agrupación en la barra lateral
 creado: 2026-10-11
 actualizado: 2026-10-11
@@ -45,6 +47,10 @@ En este orden, omitiendo lo que no aplique:
 - Ejemplos en vivo con bloques ` ```html preview ` . Opciones: `superficie=portal`, `fondo=night` (cualquier token de color).
 - El código de uso para copiar (` ```tsx `, ` ```swift `, ` ```kotlin `).
 - La **API** en tabla: clases o props, qué hacen y valores por defecto.
+
+## Páginas de Docs
+
+Las páginas que no son fichas (introducción, instalación, guías) van en `content/docs/`. `index.md` es la Introducción; sin él, la Introducción es `DESIGN.md` sin su título. El orden se fija en `content/docs/meta.json` con `{"paginas": ["instalacion", "..."]}`. `produccion` y `agentes` están reservados: esas páginas las pone el kit.
 
 ## Fundamento y tokens: sin solaparse
 

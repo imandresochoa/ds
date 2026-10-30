@@ -4,8 +4,8 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 
 ## Hecho
 
-- [x] Interfaz al estilo de Codex: barra de título, rail, barra de sección, pastillas, paleta ⌘K, menús y avisos.
-- [x] Secciones: Inicio, Fundamentos, Tokens, Componentes (por función), Patrones, Iniciativas y Metodología (interna).
+- [x] Interfaz con la estructura de ui.shadcn.com: cabecera, Docs a tres columnas, índice con «Nuevos», galerías de Bloques y Gráficos, ⌘K.
+- [x] Secciones: Fundamentos, Tokens, Componentes, Bloques, Gráficos, Iniciativas y Metodología (interna); páginas de Docs por sistema en `content/docs/`.
 - [x] Estados por ficha y por plataforma; pestañas Web, iOS y Android cuando hay más de una.
 - [x] Sync con producción: instantánea de CSS, tokens, huellas, clases inventadas, cobertura y cambios sin commit.
 - [x] Capa para agentes: `llms.txt`, `design.md`, `registry.json`, `llms-full.txt` y `.md` por página.
@@ -15,12 +15,16 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 
 ## Interfaz
 
-- [ ] Revisar contra Codex al lado y ajustar medidas finas (pesos, interlineados, iconos propios).
-- [ ] Modo oscuro calibrado con capturas de Codex en oscuro.
-- [ ] Barra lateral en móvil: superposición con cierre al tocar fuera.
-- [ ] Índice de la página (los h2) en la barra de título.
+- [ ] Revisar contra ui.shadcn.com al lado y ajustar detalles finos.
+- [ ] Visor de bloques redimensionable arrastrando, como en shadcn.
 - [x] Inicio con un solo sistema: redirige al sistema.
-- [x] Portada animada con el mosaico de secciones; Inicio en `/<sistema>/inicio`.
+
+## Siguientes fases
+
+- [ ] Instalación desde npm y skill de montaje con preguntas nativas del harness (`AskUserQuestion`, `request_user_input`) y `ds info --json` / `ds search`.
+- [ ] Lab de primitivos: colores con pares AA, estilos de texto, espaciado, radios y sombras; sale un preset.
+- [ ] Registry propio de solo lectura (`/r/<pieza>.json`) y Directorio con solo nuestros sistemas.
+- [ ] Publicación pública en npm: revisar el historial, lista blanca de `files`, procedencia. Nada se publica sin aprobación.
 
 ## Método y herramientas
 

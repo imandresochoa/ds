@@ -1,9 +1,20 @@
+import { SiteFooter } from '@/components/site/SiteFooter';
+import { SiteHeader } from '@/components/site/SiteHeader';
 import { listSystems } from '@/lib/core.mjs';
+import { buildNav } from '@/lib/nav';
 
 export const dynamicParams = false;
 export const generateStaticParams = () => listSystems().map((s) => ({ system: s.id }));
 
-// La portada (/<sistema>) va sin shell; el resto de páginas lo pone (shell)/layout.tsx.
-export default function SystemLayout({ children }: { children: React.ReactNode }) {
-  return children;
+/** Estructura de ui.shadcn.com: cabecera fija, contenido y pie. */
+export default async function SystemLayout({ children, params }: { children: React.ReactNode; params: Promise<{ system: string }> }) {
+  const { system } = await params;
+  const nav = buildNav(system);
+  return (
+    <div data-slot="layout" className="relative z-10 flex min-h-svh flex-col bg-background">
+      <SiteHeader nav={nav} />
+      <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+      <SiteFooter nav={nav} />
+    </div>
+  );
 }

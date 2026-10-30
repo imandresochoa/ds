@@ -8,7 +8,7 @@ Repo del sistema de diseño de NOMBRE_DEL_SISTEMA. Aquí solo vive el **contenid
 | --- | --- |
 | `system.json` | Configuración: id, nombre, repo de producción, superficies y plataformas. |
 | `DESIGN.md` | Criterio para agentes, escrito a mano. Se publica como `/<id>/design.md` con un apéndice generado. |
-| `content/<sección>/` | Fichas en Markdown con frontmatter YAML: `fundamentos`, `tokens`, `componentes`, `patrones`, `iniciativas`. |
+| `content/<sección>/` | Fichas en Markdown con frontmatter YAML: `fundamentos`, `tokens`, `componentes`, `bloques`, `graficos`, `iniciativas`. Las páginas de Docs, en `content/docs/`. |
 | `experimental/` | CSS de piezas en exploración o desarrollo (aún no están en producción). |
 | `produccion/`, `tokens.produccion.json`, `sync-report.json` | Generados por `ds sync`. No se editan. |
 | `produccion.lock.json` | Huellas revisadas. Solo cambia con `ds sync --accept`. |
@@ -51,7 +51,7 @@ Si pone «sin programar», prográmala siguiendo el apartado «Rutina diaria» d
 ## Skills
 
 - `crear-sistema`: adapta este repo a un producto (superficies, tokens, primeras fichas).
-- `nueva-ficha`: documenta un componente, patrón, fundamento o token.
+- `nueva-ficha`: documenta un componente, bloque, gráfico, fundamento o token.
 - `auditar-sistema`: revisa que todo el sistema cuadre con producción y arregla lo que no. Antes de publicar y tras cada merge en producción.
 - `revisar-sync`: interpreta el informe de sync y propone qué actualizar o aceptar.
 - `inventariar-produccion`: lista priorizada de lo que falta documentar.

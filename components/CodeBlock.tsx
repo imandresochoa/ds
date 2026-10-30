@@ -1,30 +1,43 @@
 'use client';
 
-import { Check, Copy } from 'lucide-react';
-import { useState } from 'react';
-import { STROKE } from './icons';
+import { CheckIcon, CopyIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useCopy } from '@/lib/use-copy';
+import { Button } from '@/components/ui/button';
 
-/** Bloque de código con botón de copiar. */
-export function CodeBlock({ code, lang }: { code: string; lang?: string }) {
-  const [copied, setCopied] = useState(false);
+export function CopyButton({ value, className, label = 'Copiar código' }: { value: string; className?: string; label?: string }) {
+  const { copy, copied } = useCopy();
   return (
-    <div className={`ds-code${lang === 'prompt' ? ' is-wrap' : ''}`}>
-      <div className="ds-code-tools">
-        {lang && <span className="ds-code-lang">{lang}</span>}
-        <button
-          type="button"
-          className="ds-icon-btn"
-          aria-label="Copiar código"
-          onClick={async () => {
-            await navigator.clipboard.writeText(code);
-            setCopied(true);
-            window.setTimeout(() => setCopied(false), 1500);
-          }}
-        >
-          {copied ? <Check size={15} strokeWidth={STROKE} /> : <Copy size={15} strokeWidth={STROKE} />}
-        </button>
-      </div>
-      <pre><code>{code}</code></pre>
-    </div>
+    <Button
+      data-slot="copy-button"
+      size="icon"
+      variant="ghost"
+      className={cn('absolute top-3 right-2 z-10 size-7 bg-code text-code-foreground opacity-70 hover:opacity-100 focus-visible:opacity-100', className)}
+      onClick={() => copy(value)}
+    >
+      <span className="sr-only">{label}</span>
+      {copied ? <CheckIcon /> : <CopyIcon />}
+    </Button>
+  );
+}
+
+/**
+ * Bloque de código con el estilo de shadcn: fondo `code`, radio grande, sin borde y botón de copiar.
+ * `html` es el código ya resaltado en el servidor; si no hay, se pinta el texto.
+ */
+export function CodeBlock({ code, html, lang, title, className }: { code: string; html?: string | null; lang?: string; title?: string; className?: string }) {
+  const wrap = lang === 'prompt' || lang === 'text' || !lang;
+  return (
+    <figure data-slot="code-block" className={cn('relative -mx-1 mt-6 overflow-hidden rounded-2xl bg-code text-sm text-code-foreground', className)}>
+      {title && <figcaption className="border-b border-border/30 px-4 py-2.5 font-mono text-sm text-code-foreground">{title}</figcaption>}
+      <CopyButton value={code} className={title ? 'top-1.5' : undefined} />
+      {html ? (
+        <div className="no-scrollbar overflow-x-auto px-4 py-3.5 pr-12 [&_pre]:bg-transparent!" dangerouslySetInnerHTML={{ __html: html }} />
+      ) : (
+        <pre className={cn('no-scrollbar overflow-x-auto px-4 py-3.5 pr-12', wrap && 'whitespace-pre-wrap')}>
+          <code>{code}</code>
+        </pre>
+      )}
+    </figure>
   );
 }

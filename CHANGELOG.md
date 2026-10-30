@@ -2,6 +2,18 @@
 
 Versiones del kit. Los sistemas fijan una versión con `npm install github:imandresochoa/design-system-agentic-first-kit#vX.Y.Z`.
 
+## Sin publicar
+
+- Interfaz nueva con la estructura de ui.shadcn.com: cabecera con Inicio, Docs, Componentes, Bloques, Gráficos e Iniciativas; Docs a tres columnas con «En esta página»; índice de componentes alfabético con «Nuevos»; galerías de Bloques y Gráficos con visor (Vista y Código, escritorio, tablet y móvil); ⌘K y modo oscuro (⌘D). Tailwind 4 y primitivas de shadcn/ui (MIT) en `components/ui/`, solo para la interfaz.
+- Desaparecen la portada con mosaico, el rail y `/<sistema>/inicio`. Lo que había en Inicio pasa a las páginas de Docs «Producción» y «Para agentes».
+- Secciones nuevas: **Bloques**, que sustituye a Patrones y agrupa por `categoria` (`seccion`, `pantalla`, `flujo`), y **Gráficos** (`area`, `barras`, `lineas`, `circular`, `radar`, `radial`, `tooltip`). Son estructura: el kit no trae ninguna pieza.
+- Páginas de Docs por sistema en `content/docs/` (`index.md` es la Introducción; sin él, se usa `DESIGN.md`). Se publican en `/<sistema>/docs.md` y `/<sistema>/docs/<página>.md`.
+- `destacado: true` en una ficha la saca en el escaparate de la home.
+- `registry.json`: campos `categoria` y `destacado`. `llms.txt`: páginas de Docs; componentes agrupados por función, y bloques y gráficos por categoría.
+- `"abrirEnAgentes": true` en `system.json` activa «Abrir en Claude» y «Abrir en ChatGPT» en «Copiar página». Por defecto está apagado, porque envía la URL de la página a un servicio externo.
+- Seguridad: Next.js sube a 16.4.3 por una vulnerabilidad crítica de 16.0–16.4.
+- Migración: no es obligatoria. `content/patrones/` y `nivel: seccion|pantalla|flujo` se siguen leyendo, y las huellas y los `relacionados` con `patrones/…` siguen funcionando. Para pasar al formato nuevo, ejecuta `git mv content/patrones content/bloques`, cambia `nivel:` por `categoria:` en esas fichas y luego `npx ds sync`. Los enlaces guardados a `/<sistema>/inicio` pasan a `/<sistema>/docs/produccion`.
+
 ## 0.8.0 · 2026-10-29
 
 - Ruta de publicación: `system.json` → `"publicacion": { "ruta": "/ds" }` exporta el sitio para servirlo bajo esa carpeta de otro sitio. `ds build` la aplica como `basePath` de Next (páginas, `/_next` y `<Link>`) y la pone delante de lo que no pasa por Next: los enlaces a `.md`, `design.md`, `llms.txt` y `registry.json` de la interfaz, «Copiar como Markdown», «Abrir .md», el contexto para agentes, los enlaces del cuerpo de las fichas, las hojas de los ejemplos en vivo (también las `url(assets/…)` de las superficies Tailwind) y, en los archivos publicados, los enlaces de `llms.txt`, `design.md` (también en la parte escrita a mano), los `.md` de cada ficha y `md`/`url` de `registry.json`. `out/` no cambia de forma: se sirve tal cual bajo la ruta.

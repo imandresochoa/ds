@@ -4,7 +4,7 @@ Guía para agentes que trabajan en el **kit**: el motor común de los sistemas d
 
 ## Qué es
 
-El kit contiene la interfaz (al estilo de Codex), el CLI `ds`, los scripts de sync y publicación, la plantilla de sistemas, las skills y la metodología. Cada sistema de diseño vive en su propio repo, solo con contenido, y usa el kit como dependencia. La metodología (`docs/metodologia/`) es la fuente de verdad sobre cómo se trabaja; es interna y solo se publica en sistemas con `"metodologia": true`.
+El kit contiene la interfaz (con la estructura de ui.shadcn.com), el CLI `ds`, los scripts de sync y publicación, la plantilla de sistemas, las skills y la metodología. Cada sistema de diseño vive en su propio repo, solo con contenido, y usa el kit como dependencia. La metodología (`docs/metodologia/`) es la fuente de verdad sobre cómo se trabaja; es interna y solo se publica en sistemas con `"metodologia": true`.
 
 ## Mapa
 
@@ -13,7 +13,7 @@ El kit contiene la interfaz (al estilo de Codex), el CLI `ds`, los scripts de sy
 | `bin/ds.mjs` | CLI: `init`, `dev`, `build`, `sync`, `check`, `skills`, `doctor`. |
 | `lib/core.mjs` | Lee sistemas y fichas. `DS_SISTEMAS` apunta a repos externos; sin ella, `systems/`. |
 | `lib/meta.mjs` | Secciones, estados, grupos y prompts de acción. |
-| `app/`, `components/` | Interfaz. `app/shell.css` tiene todos los tokens `--ds-*`. |
+| `app/`, `components/` | Interfaz. `app/globals.css` tiene los tokens; `components/ui/`, las primitivas de shadcn/ui (MIT), solo para la interfaz. |
 | `scripts/` | `sync-production.mjs`, `build-public.mjs`, `doctor.mjs`. |
 | `plantilla/` | Lo que `ds init` copia a un repo de sistema. Usa `NOMBRE_DEL_SISTEMA` e `ID_DEL_SISTEMA`. |
 | `skills/` | Skills que `ds init` y `ds skills` instalan en cada sistema. |

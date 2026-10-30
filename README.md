@@ -1,6 +1,6 @@
 # Design System Agentic First Kit
 
-Kit para crear sistemas de diseño **agentic-first** enlazados 1:1 con producción. Interfaz al estilo de Codex. No nombra ningún producto: cada sistema vive en su propio repo y usa este kit como dependencia.
+Kit para crear sistemas de diseño **agentic-first** enlazados 1:1 con producción. Interfaz con la estructura de ui.shadcn.com. No nombra ningún producto: cada sistema vive en su propio repo y usa este kit como dependencia.
 
 ```
 kit (este repo) ──npm──▶ <producto>-design-system ──ds sync──▶ repo de producción

@@ -28,7 +28,7 @@ La metodología es documentación interna. Un sistema para un cliente no la mues
 2. **Conecta producción.** En `system.json`, rellena `produccion.repo` (ruta relativa al repo del producto), `codigo` (URL base para ver archivos), `web` y las **superficies**: cada parte del producto con su propio código y sus hojas de estilo. Comprueba con `npx ds doctor`.
 3. **Primer sync.** `npx ds sync`. Ya tienes la instantánea del CSS, los tokens de producción y la lista de clases sin documentar (cobertura).
 4. **DESIGN.md.** Contexto del producto, orden de prioridades, integración, lenguaje visual, antipatrones con nombre y accesibilidad. Es lo primero que lee un agente.
-5. **Rellena por capas**, siguiendo la cobertura: fundamentos, tokens (los valores salen solos), componentes y patrones. Cada ficha sigue «Anatomía de una ficha».
+5. **Rellena por capas**, siguiendo la cobertura: fundamentos, tokens (los valores salen solos), componentes, bloques y gráficos. Cada ficha sigue «Anatomía de una ficha».
 6. **Revisa y acepta huellas**: `npx ds sync --accept <id>` por cada ficha revisada. `npx ds check` debe pasar.
 7. **Publica**: `npx ds build` deja el sitio estático en `out/`. Si va dentro de otro sitio, bajo una carpeta, declara antes la ruta en `publicacion.ruta` (ver «Git, GitHub y entornos»).
 
@@ -41,4 +41,4 @@ Con un agente, los pasos 2 a 6 los guía la skill `crear-sistema`: pídele «ada
 
 ## Orden recomendado de relleno
 
-Fundamentos → tokens → átomos → moléculas → organismos → patrones. Cada capa usa la anterior, así que documentarlas en orden evita fichas que hablan de piezas que aún no existen. Si hay prisa por enseñar algo, empieza por el componente más usado (normalmente el botón) y completa sus tokens.
+Fundamentos → tokens → átomos → moléculas → organismos → bloques. Cada capa usa la anterior, así que documentarlas en orden evita fichas que hablan de piezas que aún no existen. Si hay prisa por enseñar algo, empieza por el componente más usado (normalmente el botón) y completa sus tokens.

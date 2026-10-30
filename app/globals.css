@@ -1,0 +1,329 @@
+/*
+ * Interfaz del kit, con la estructura y el estilo de ui.shadcn.com: tokens semánticos en pares
+ * (x / x-foreground), Geist y modo oscuro con la clase .dark. Ver docs/metodologia/01-interfaz.md.
+ *
+ * Las fuentes de Tailwind se declaran a mano: cuando el kit se ejecuta desde .ds/kit (ignorado por git
+ * en el repo del sistema), la detección automática no vería estos archivos.
+ */
+@import "tailwindcss" source(none);
+@import "tw-animate-css";
+
+@source "../app";
+@source "../components";
+@source "../lib";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+  --color-code: var(--code);
+  --color-code-foreground: var(--code-foreground);
+  --color-selection: var(--selection);
+  --color-selection-foreground: var(--selection-foreground);
+  /* Estados de una ficha: un color por estado y por resultado del sync. */
+  --color-estado-ok: var(--estado-ok);
+  --color-estado-aviso: var(--estado-aviso);
+  --color-estado-error: var(--estado-error);
+  --color-estado-desarrollo: var(--estado-desarrollo);
+  --color-estado-exploracion: var(--estado-exploracion);
+  --color-estado-obsoleto: var(--estado-obsoleto);
+  --color-nuevo: var(--nuevo);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --surface: oklch(0.98 0 0);
+  --surface-foreground: var(--foreground);
+  --code: var(--surface);
+  --code-foreground: var(--surface-foreground);
+  --selection: oklch(0.145 0 0);
+  --selection-foreground: oklch(1 0 0);
+  --estado-ok: oklch(0.627 0.17 149);
+  --estado-aviso: oklch(0.705 0.17 62);
+  --estado-error: oklch(0.577 0.245 27.325);
+  --estado-desarrollo: oklch(0.546 0.215 262);
+  --estado-exploracion: oklch(0.558 0.24 293);
+  --estado-obsoleto: oklch(0.556 0 0);
+  --nuevo: oklch(0.623 0.214 259.815);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.371 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --surface: oklch(0.2 0 0);
+  --surface-foreground: oklch(0.708 0 0);
+  --code: var(--surface);
+  --code-foreground: var(--surface-foreground);
+  --selection: oklch(0.922 0 0);
+  --selection-foreground: oklch(0.205 0 0);
+  --estado-ok: oklch(0.723 0.19 150);
+  --estado-aviso: oklch(0.769 0.165 70);
+  --estado-error: oklch(0.704 0.191 22.216);
+  --estado-desarrollo: oklch(0.707 0.165 255);
+  --estado-exploracion: oklch(0.702 0.183 293);
+  --estado-obsoleto: oklch(0.708 0 0);
+}
+
+@layer base {
+  html {
+    scroll-padding-top: var(--header-height);
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  ::selection {
+    @apply bg-selection text-selection-foreground;
+  }
+  html {
+    @apply overscroll-y-none;
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@utility container-wrapper {
+  @apply mx-auto w-full px-2;
+}
+
+@utility container {
+  @apply mx-auto max-w-[1400px] px-4 lg:px-8;
+}
+
+@utility border-grid {
+  @apply border-border/50 dark:border-border;
+}
+
+@utility section-soft {
+  @apply bg-linear-to-b from-background to-surface/40 dark:bg-background;
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility extend-touch-target {
+  @media (pointer: coarse) {
+    @apply relative touch-manipulation after:absolute after:-inset-2;
+  }
+}
+
+/*
+ * Texto de las páginas (Markdown). Escala y ritmo de las páginas de documentación de shadcn:
+ * cuerpo a 1 em con interlineado 1,75 y un flujo de 1,25 em entre bloques.
+ */
+@layer components {
+  .ds-prose {
+    --flow: 1.25em;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--color-foreground);
+    overflow-wrap: break-word;
+    @media (min-width: 40rem) {
+      font-size: 15px;
+    }
+  }
+  /* El Markdown llega en envoltorios `display: contents`: el primer bloque real puede estar un nivel más abajo. */
+  .ds-prose > :first-child,
+  .ds-prose > .contents:first-child > :first-child {
+    margin-block-start: 0;
+  }
+  .ds-prose :where(p, ul, ol, blockquote, table, pre, dl, details):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    margin-block: var(--flow) 0;
+  }
+  .ds-prose :where(h2, h3, h4):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-foreground);
+    scroll-margin-top: calc(var(--header-height) + 1.5rem);
+  }
+  .ds-prose :where(h2):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    font-size: 1.25em;
+    line-height: 1.4;
+    margin-block: calc(var(--flow) * 2.4) 0;
+  }
+  .ds-prose :where(h3):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    font-size: 1.125em;
+    line-height: 1.45;
+    margin-block: calc(var(--flow) * 1.6) 0;
+  }
+  .ds-prose :where(h4):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    font-size: 1em;
+    margin-block: var(--flow) 0;
+  }
+  .ds-prose :where(h2 + *, h3 + *, h4 + *):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    margin-block-start: 1em;
+  }
+  .ds-prose :where(a):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    font-weight: 500;
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
+  }
+  .ds-prose :where(a:hover):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    text-decoration-color: currentColor;
+  }
+  .ds-prose :where(strong) {
+    font-weight: 600;
+  }
+  .ds-prose :where(ul):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    list-style-type: disc;
+    padding-inline-start: 1.5em;
+  }
+  .ds-prose :where(ol):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    list-style-type: decimal;
+    padding-inline-start: 1.5em;
+  }
+  .ds-prose :where(li):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    margin-block-start: 0.5em;
+    padding-inline-start: 0.4em;
+  }
+  .ds-prose :where(li)::marker {
+    color: var(--color-muted-foreground);
+  }
+  .ds-prose :where(:not(pre) > code):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background: var(--color-muted);
+    border-radius: calc(var(--radius) * 0.6);
+    padding: 0.2em 0.35em;
+    overflow-wrap: anywhere;
+  }
+  .ds-prose :where(blockquote):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    border-inline-start: 2px solid var(--color-border);
+    padding-inline-start: 1em;
+    color: var(--color-muted-foreground);
+  }
+  .ds-prose :where(hr):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    border: 0;
+    border-block-start: 1px solid var(--color-border);
+    margin-block: calc(var(--flow) * 2.4) 0;
+  }
+  .ds-prose :where(img):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    border-radius: var(--radius);
+    max-width: 100%;
+    height: auto;
+  }
+  .ds-prose :where(table):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    width: 100%;
+    font-size: 0.95em;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-block-end: 1px solid var(--color-border);
+  }
+  .ds-prose :where(thead th):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    font-weight: 500;
+    text-align: start;
+    white-space: nowrap;
+    padding: 0.65em 1em;
+  }
+  .ds-prose :where(tbody td, tbody th):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    padding: 0.75em 1em;
+    text-align: start;
+    vertical-align: top;
+    border-block-start: 1px solid var(--color-border);
+  }
+  .ds-prose :where(th:first-child, td:first-child):not(:where(.ds-prose [data-slot], .ds-prose [data-slot] *)) {
+    padding-inline-start: 0;
+  }
+  .ds-prose :where(.ds-table-scroll) {
+    margin-block-start: var(--flow);
+    overflow-x: auto;
+  }
+  .ds-prose :where(.ds-table-scroll > table) {
+    margin-block-start: 0;
+  }
+
+  /* Código resaltado con Shiki: un tema claro y otro oscuro en variables. */
+  .shiki,
+  .shiki span {
+    color: var(--shiki-light);
+    background-color: transparent !important;
+  }
+  .dark .shiki,
+  .dark .shiki span {
+    color: var(--shiki-dark);
+  }
+  [data-slot="code-block"] pre {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.7;
+    tab-size: 2;
+    font-variant-ligatures: none;
+  }
+}
