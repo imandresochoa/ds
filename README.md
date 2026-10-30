@@ -8,15 +8,21 @@ kit (este repo) ──npm──▶ <producto>-design-system ──ds sync──�
 
 ## Crear un sistema
 
+Con un agente (Claude Code o Codex):
+
 ```bash
-mkdir producto-design-system && cd producto-design-system
-git init && npm init -y
-npm install github:imandresochoa/design-system-agentic-first-kit
-npx ds init "Nombre del producto"
-npx ds doctor
+npx @imandresochoa/ds@latest instalar
 ```
 
-Después, pide a tu agente «adapta este sistema a mi repo de producción» (skill `crear-sistema`) o sigue [`docs/metodologia/08-nuevo-sistema.md`](docs/metodologia/08-nuevo-sistema.md).
+Instala la skill `montar-sistema` en tu usuario (`~/.claude/skills/` y `~/.agents/skills/`). Después, abre el agente en el repo de tu producto, o en una carpeta vacía, y escribe «monta el sistema de diseño». La skill pregunta de dónde partís (un repo, una web o Figma, o nada todavía) con los componentes de preguntas del agente, crea el repo del sistema junto al del producto y lo llena. Para quitar la skill: `npx @imandresochoa/ds instalar --quitar`.
+
+Sin agente:
+
+```bash
+npx @imandresochoa/ds@latest init
+```
+
+Hace las mismas preguntas en la terminal. Más detalle en [`docs/metodologia/08-nuevo-sistema.md`](docs/metodologia/08-nuevo-sistema.md).
 
 ## Publicar
 
@@ -32,12 +38,14 @@ Con ella, páginas, assets, enlaces, `.md`, `llms.txt` y ejemplos en vivo llevan
 
 | Comando | Qué hace |
 | --- | --- |
-| `npx ds init "<Nombre>"` | Crea `system.json`, `DESIGN.md`, `AGENTS.md`, ficha de ejemplo y skills. |
+| `npx ds init "<Nombre>"` | Crea el repo del sistema: plantilla, kit y skills. Con `--json` y parámetros, lo usa el agente. |
+| `npx ds info [--json]` | Sistema, secciones, producción, último sync, skills y rutas del kit. |
+| `npx ds search <texto>` | Busca fichas antes de crear una. |
 | `npx ds dev` | Servidor de desarrollo en http://localhost:4100. |
 | `npx ds sync [--accept <id>]` | Lee producción: instantánea CSS, tokens, huellas, cobertura. |
 | `npx ds check` | Falla si algo está desajustado, ausente o inventado. |
 | `npx ds build` | Exporta el sitio estático a `out/`, para la raíz de un dominio o para la ruta de `publicacion.ruta` (`DS_RUTA` la cambia). |
-| `npx ds skills` | Copia o actualiza las skills del kit en `.claude/skills/`. |
+| `npx ds skills` | Copia o actualiza las skills del kit en `.claude/skills/` (Claude Code) y `.agents/skills/` (Codex). |
 | `npx ds doctor` | Comprueba la configuración. |
 
 ## Desarrollar el kit
@@ -59,5 +67,9 @@ Para trabajar con datos reales, enlaza el kit desde un sistema (ver [`docs/metod
 | `plantilla/` | Lo que `ds init` copia en un repo de sistema nuevo. |
 | `skills/` | Skills para agentes que se instalan en cada sistema. |
 | `systems/ejemplo/` | Sistema de ejemplo para desarrollar el kit. |
-| `docs/metodologia/` | La metodología (interna). |
+| `docs/metodologia/` | La metodología. Va en el paquete; el sitio de cada sistema la muestra solo si la activa. |
 | `docs/DECISIONES.md`, `docs/TAREAS.md` | Decisiones con fecha y tareas del kit. |
+
+## Licencia
+
+[MIT](LICENSE). Las primitivas de `components/ui/` vienen de shadcn/ui, también con licencia MIT (ver su [README](components/ui/README.md)).

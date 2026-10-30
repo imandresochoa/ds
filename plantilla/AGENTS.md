@@ -1,6 +1,6 @@
 # AGENTS.md — NOMBRE_DEL_SISTEMA
 
-Repo del sistema de diseño de NOMBRE_DEL_SISTEMA. Aquí solo vive el **contenido**: la interfaz, los scripts y la metodología vienen del kit (`design-system-agentic-first-kit`, dependencia de npm). Léelo entero antes de cambiar nada.
+Repo del sistema de diseño de NOMBRE_DEL_SISTEMA. Aquí solo vive el **contenido**: la interfaz, los scripts y la metodología vienen del kit (`@imandresochoa/ds`, dependencia de npm). Léelo entero antes de cambiar nada.
 
 ## Mapa
 
@@ -12,8 +12,8 @@ Repo del sistema de diseño de NOMBRE_DEL_SISTEMA. Aquí solo vive el **contenid
 | `experimental/` | CSS de piezas en exploración o desarrollo (aún no están en producción). |
 | `produccion/`, `tokens.produccion.json`, `sync-report.json` | Generados por `ds sync`. No se editan. |
 | `produccion.lock.json` | Huellas revisadas. Solo cambia con `ds sync --accept`. |
-| `.claude/skills/` | Skills del kit. Se actualizan con `npx ds skills`; no las edites aquí. |
-| `node_modules/design-system-agentic-first-kit/docs/metodologia/` | La metodología completa. Es la fuente de verdad. |
+| `.claude/skills/`, `.agents/skills/` | Skills del kit para Claude Code y para Codex. Se actualizan con `npx ds skills`; no las edites aquí. |
+| Metodología del kit | La fuente de verdad. Su ruta: `npx ds info --json` → `kit.metodologia`. |
 
 ## Reglas
 
@@ -33,6 +33,8 @@ npx ds sync          # lee producción: instantánea CSS, tokens, huellas e info
 npx ds check         # falla si hay fichas desajustadas, ausentes o con clases inventadas
 npx ds build         # exporta el sitio estático a out/ (bajo publicacion.ruta, si la hay)
 npx ds doctor        # comprueba la configuración
+npx ds info --json   # sistema, secciones, producción, skills y rutas del kit
+npx ds search boton  # busca fichas antes de crear una
 npx ds skills        # actualiza las skills del kit
 ```
 
@@ -50,7 +52,7 @@ Si pone «sin programar», prográmala siguiendo el apartado «Rutina diaria» d
 
 ## Skills
 
-- `crear-sistema`: adapta este repo a un producto (superficies, tokens, primeras fichas).
+- `montar-sistema`: monta el sistema desde el repo, la web o Figma del producto, o desde cero (superficies, tokens, primeras fichas).
 - `nueva-ficha`: documenta un componente, bloque, gráfico, fundamento o token.
 - `auditar-sistema`: revisa que todo el sistema cuadre con producción y arregla lo que no. Antes de publicar y tras cada merge en producción.
 - `revisar-sync`: interpreta el informe de sync y propone qué actualizar o aceptar.

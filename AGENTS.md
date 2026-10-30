@@ -4,19 +4,19 @@ Guía para agentes que trabajan en el **kit**: el motor común de los sistemas d
 
 ## Qué es
 
-El kit contiene la interfaz (con la estructura de ui.shadcn.com), el CLI `ds`, los scripts de sync y publicación, la plantilla de sistemas, las skills y la metodología. Cada sistema de diseño vive en su propio repo, solo con contenido, y usa el kit como dependencia. La metodología (`docs/metodologia/`) es la fuente de verdad sobre cómo se trabaja; es interna y solo se publica en sistemas con `"metodologia": true`.
+El kit contiene la interfaz (con la estructura de ui.shadcn.com), el CLI `ds`, los scripts de sync y publicación, la plantilla de sistemas, las skills y la metodología. Cada sistema de diseño vive en su propio repo, solo con contenido, y usa el kit como dependencia. La metodología (`docs/metodologia/`) es la fuente de verdad sobre cómo se trabaja. Va dentro del paquete; el sitio de un sistema solo la muestra con `"metodologia": true`.
 
 ## Mapa
 
 | Ruta | Qué hay |
 | --- | --- |
-| `bin/ds.mjs` | CLI: `init`, `dev`, `build`, `sync`, `check`, `skills`, `doctor`. |
+| `bin/ds.mjs` | CLI: `instalar`, `init`, `info`, `search`, `dev`, `build`, `sync`, `check`, `skills`, `doctor`. |
 | `lib/core.mjs` | Lee sistemas y fichas. `DS_SISTEMAS` apunta a repos externos; sin ella, `systems/`. |
 | `lib/meta.mjs` | Secciones, estados, grupos y prompts de acción. |
 | `app/`, `components/` | Interfaz. `app/globals.css` tiene los tokens; `components/ui/`, las primitivas de shadcn/ui (MIT), solo para la interfaz. |
 | `scripts/` | `sync-production.mjs`, `build-public.mjs`, `doctor.mjs`. |
 | `plantilla/` | Lo que `ds init` copia a un repo de sistema. Usa `NOMBRE_DEL_SISTEMA` e `ID_DEL_SISTEMA`. |
-| `skills/` | Skills que `ds init` y `ds skills` instalan en cada sistema. |
+| `skills/` | Skills que `ds init` y `ds skills` instalan en cada sistema (`.claude/skills/` y `.agents/skills/`). `montar-sistema` es la de entrada: `ds instalar` la deja en la carpeta de usuario. |
 | `systems/ejemplo/` | Sistema de ejemplo para desarrollar sin datos reales. |
 | `docs/metodologia/` | La metodología. `docs/DECISIONES.md`, `docs/TAREAS.md`. |
 
@@ -39,3 +39,11 @@ npm run build
 Para probar con un sistema real: `npx ds enlazar <ruta a este kit>` desde el sistema y luego `npx ds dev`. No arranques a la vez `npm run dev` aquí y `ds dev` enlazado: comparten la carpeta `.next`.
 
 Antes de terminar: `npm run typecheck`, `npm run build` y, si tocaste el CLI o la plantilla, un `ds init` en una carpeta vacía.
+
+## Publicar una versión
+
+1. En un PR: sube `version` en `package.json` y cambia «Sin publicar» por `## X.Y.Z · <fecha>` en `CHANGELOG.md`.
+2. Tras fusionarlo, etiqueta `main` con `vX.Y.Z` y súbela.
+3. Lanza el workflow «Publicar en npm» desde esa etiqueta. Publica con trusted publishing, sin tokens.
+
+El historial del repo antiguo (`design-system-agentic-first-kit-legacy`, remoto `legacy`) nombra productos: no subas a este repo ninguna rama ni etiqueta que venga de él.

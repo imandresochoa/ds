@@ -23,7 +23,7 @@ const acceptAt = args.indexOf('--accept');
 const ACCEPT = acceptAt >= 0 ? args[acceptAt + 1] ?? 'all' : null;
 
 const sha = (text) => crypto.createHash('sha256').update(text).digest('hex').slice(0, 16);
-const git = (repo, ...cmd) => execFileSync('git', ['-C', repo, ...cmd], { encoding: 'utf8' }).trim();
+const git = (repo, ...cmd) => execFileSync('git', ['-C', repo, ...cmd], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 // Colores en hexadecimal, normalizados a #rrggbb en minúsculas.
 const hexes = (text) => [...new Set([...text.matchAll(/#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![\w-])/g)].map(([, h]) => '#' + (h.length === 3 ? [...h].map((c) => c + c).join('') : h.slice(0, 6)).toLowerCase()))];
 const classPattern = (name) => new RegExp(`\\.${name.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}(?![\\w-])`);
@@ -209,6 +209,14 @@ for (const system of listSystems()) {
 
   if (!fs.existsSync(repo)) {
     log(`repo de producción no encontrado en ${repo}; se conserva la última instantánea`);
+    if (CHECK) failed = true;
+    continue;
+  }
+
+  try {
+    git(repo, 'rev-parse', '--verify', '--quiet', 'HEAD');
+  } catch {
+    log(`el repo de producción aún no tiene commits; se conserva la última instantánea`);
     if (CHECK) failed = true;
     continue;
   }
@@ -432,7 +440,12 @@ for (const system of listSystems()) {
   const counts = Object.values(report.entradas).reduce((acc, e) => ((acc[e.estado ?? 'sin-fuente'] = (acc[e.estado ?? 'sin-fuente'] ?? 0) + 1), acc), {});
   log(`producción ${ref} @ ${commit} (${commitDate}) · fichas: ${JSON.stringify(counts)}`);
   if (src === repo && !LOCAL) {
-    const atras = Number(git(repo, 'rev-list', '--count', `HEAD..origin/${rama}`) || 0);
+    let atras = 0;
+    try {
+      atras = Number(git(repo, 'rev-list', '--count', `HEAD..origin/${rama}`) || 0);
+    } catch {
+      // Sin origin/<rama> no hay con qué comparar.
+    }
     if (atras) log(`aviso: la copia local va ${atras} commits por detrás de origin/${rama}`);
   }
   if (src !== repo) fs.rmSync(src, { recursive: true, force: true });

@@ -1,0 +1,5 @@
+# Metadatos para Codex y la app de ChatGPT. Claude Code los ignora.
+interface:
+  display_name: Montar sistema de diseño
+  short_description: Monta el sistema de diseño de un producto desde su repo, su web o Figma, o desde cero.
+  default_prompt: Monta el sistema de diseño de este producto.

@@ -1,8 +1,8 @@
 # Changelog
 
-Versiones del kit. Los sistemas fijan una versión con `npm install github:imandresochoa/design-system-agentic-first-kit#vX.Y.Z`.
+Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
-## Sin publicar
+## 0.9.0 · 2026-10-30
 
 - Interfaz nueva con la estructura de ui.shadcn.com: cabecera con Inicio, Docs, Componentes, Bloques, Gráficos e Iniciativas; Docs a tres columnas con «En esta página»; índice de componentes alfabético con «Nuevos»; galerías de Bloques y Gráficos con visor (Vista y Código, escritorio, tablet y móvil); ⌘K y modo oscuro (⌘D). Tailwind 4 y primitivas de shadcn/ui (MIT) en `components/ui/`, solo para la interfaz.
 - Desaparecen la portada con mosaico, el rail y `/<sistema>/inicio`. Lo que había en Inicio pasa a las páginas de Docs «Producción» y «Para agentes».
@@ -11,8 +11,21 @@ Versiones del kit. Los sistemas fijan una versión con `npm install github:imand
 - `destacado: true` en una ficha la saca en el escaparate de la home.
 - `registry.json`: campos `categoria` y `destacado`. `llms.txt`: páginas de Docs; componentes agrupados por función, y bloques y gráficos por categoría.
 - `"abrirEnAgentes": true` en `system.json` activa «Abrir en Claude» y «Abrir en ChatGPT» en «Copiar página». Por defecto está apagado, porque envía la URL de la página a un servicio externo.
+- Instalación y montaje:
+  - `ds instalar` deja la skill `montar-sistema` en la carpeta de usuario de Claude Code (`~/.claude/skills/`) y de Codex (`~/.agents/skills/`). Con `--aqui`, la deja en la carpeta actual; con `--quitar`, la borra.
+  - La skill pregunta de dónde partís (repo, web o Figma, o nada) con las herramientas de preguntas del agente y monta el sistema. Sustituye a `crear-sistema`.
+  - `ds init` crea la carpeta, hace `git init` e instala el kit.
+  - `ds init` acepta `--carpeta`, `--desde`, `--produccion`, `--url`, `--kit` y `--json` para el agente. Sin nombre, en una terminal, hace las preguntas.
+  - `ds init` se niega a crear el sistema dentro del repo de producción o en una carpeta con otro proyecto.
+  - `ds init` guarda el origen en `system.json` (`origen`).
+  - `ds info [--json]` y `ds search <texto>`, como `shadcn info` y `shadcn search`.
+  - Las skills se instalan también en `.agents/skills/` para Codex. Las que necesitan la metodología la buscan con `ds info --json` (`kit.metodologia`), sin depender del nombre del paquete.
+- `ds sync` ya no se cae con un repo de producción sin commits o sin `origin`: avisa y sigue.
+- El kit pasa a un repo público nuevo, `imandresochoa/ds`, que empieza en la 0.8.0 sin el historial anterior. El repo antiguo queda privado como `design-system-agentic-first-kit-legacy`, y la URL antigua redirige a él, así que los sistemas fijados a una versión anterior siguen instalando.
+- Licencia MIT (`LICENSE`). Las primitivas de `components/ui/` siguen con la licencia MIT de shadcn/ui, en su README.
+- El paquete pasa a llamarse `@imandresochoa/ds` y se publica en npm. `files` en lista blanca y workflow manual de publicación con trusted publishing (`.github/workflows/publicar.yml`).
 - Seguridad: Next.js sube a 16.4.3 por una vulnerabilidad crítica de 16.0–16.4.
-- Migración: no es obligatoria. `content/patrones/` y `nivel: seccion|pantalla|flujo` se siguen leyendo, y las huellas y los `relacionados` con `patrones/…` siguen funcionando. Para pasar al formato nuevo, ejecuta `git mv content/patrones content/bloques`, cambia `nivel:` por `categoria:` en esas fichas y luego `npx ds sync`. Los enlaces guardados a `/<sistema>/inicio` pasan a `/<sistema>/docs/produccion`.
+- Migración: no es obligatoria. `content/patrones/` y `nivel: seccion|pantalla|flujo` se siguen leyendo, y las huellas y los `relacionados` con `patrones/…` siguen funcionando. Para pasar al formato nuevo, ejecuta `git mv content/patrones content/bloques`, cambia `nivel:` por `categoria:` en esas fichas y luego `npx ds sync`. Los enlaces guardados a `/<sistema>/inicio` pasan a `/<sistema>/docs/produccion`. Por el nuevo nombre del paquete, reinstala el kit (`npm uninstall design-system-agentic-first-kit` y `npm install @imandresochoa/ds@0.9.0`) y ejecuta `npx ds skills`. Así se borra `crear-sistema`, se copia `montar-sistema` y las skills llegan también a `.agents/skills/`. En `AGENTS.md`, cambia las rutas `node_modules/design-system-agentic-first-kit/docs/metodologia/` por «la ruta de `npx ds info --json` → `kit.metodologia`».
 
 ## 0.8.0 · 2026-10-29
 
