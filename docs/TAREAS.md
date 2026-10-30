@@ -32,7 +32,7 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 
 ## Fases pendientes
 
-El rediseño al modelo de shadcn/ui se acordó en cinco fases. La 1 (interfaz) y la 2 (instalación y `montar-sistema`) están hechas y salieron en la 0.9.0. La 3 (Lab de primitivos) sale en la 0.10.1. La 0.10.0 no llegó a npm. Lo decidido está en `DECISIONES.md`, entradas del 2026-10-30. Cada fase empieza con una propuesta y preguntas, no con código (ver «Cómo trabajamos» en `AGENTS.md`). Lo que pone «Por decidir» no está decidido: se pregunta.
+El rediseño al modelo de shadcn/ui se acordó en cinco fases. La 1 (interfaz) y la 2 (instalación y `montar-sistema`) salieron en la 0.9.0, y la 3 (Lab de primitivos) en la 0.10.1 (la 0.10.0 no llegó a npm). La 4 (registry y Directorio), el movimiento del Lab y la 5 (metodología) salen en la 1.0.0. Lo decidido está en `DECISIONES.md`, entradas del 2026-10-30. Cada fase empieza con una propuesta y preguntas, no con código (ver «Cómo trabajamos» en `AGENTS.md`). Lo que pone «Por decidir» no está decidido: se pregunta.
 
 ### Fase 3 · Lab de primitivos
 
@@ -84,12 +84,12 @@ Tareas:
 
 Cerrar el rediseño con la documentación al día y una versión estable.
 
-Por decidir: qué tiene que cumplirse para llamarla 1.0.0.
+Decidido: la 1.0.0 sale con las fases 1 a 5 cerradas, la metodología, la plantilla y las skills revisadas, y el workflow «Comprobar» en cada PR.
 
 Tareas:
-- [ ] Revisar `docs/metodologia/` entera con lo de las fases 1 a 4.
-- [ ] Revisar la plantilla y las skills contra la metodología (regla 5 de `AGENTS.md`).
-- [ ] Entradas en `DECISIONES.md` y `CHANGELOG.md`, con la migración.
+- [x] Revisar `docs/metodologia/` entera con lo de las fases 1 a 4.
+- [x] Revisar la plantilla y las skills contra la metodología (regla 5 de `AGENTS.md`).
+- [x] Entradas en `DECISIONES.md` y `CHANGELOG.md`, con la migración.
 - [ ] Publicar la 1.0.0 (ver «Publicar una versión» en `AGENTS.md`).
 
 ## Método y herramientas

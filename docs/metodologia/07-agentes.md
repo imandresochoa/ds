@@ -42,7 +42,7 @@ Adaptado de cómo trabaja Vercel con su `DESIGN.md`:
 - Se repiten los escenarios para confirmar que la corrección se mantiene, y se guarda un pequeño conjunto oculto que no se mira al editar.
 - Una persona revisa cada cambio final.
 
-Está pendiente en `docs/TAREAS.md`.
+Está pendiente en las [tareas del kit](https://github.com/imandresochoa/ds/blob/main/docs/TAREAS.md).
 
 ## Skills
 

@@ -27,4 +27,4 @@ Un sistema de diseño agentic-first es uno que una persona y un agente leen igua
 
 ## Origen
 
-Esta metodología nace del primer sistema que construimos con ella (octubre de 2026) y está pensada para replicarse en cualquier producto. Las decisiones y su motivo quedan en `docs/DECISIONES.md`.
+Esta metodología nace del primer sistema que construimos con ella (octubre de 2026) y está pensada para replicarse en cualquier producto. Las decisiones y su motivo quedan en las [decisiones del kit](https://github.com/imandresochoa/ds/blob/main/docs/DECISIONES.md).

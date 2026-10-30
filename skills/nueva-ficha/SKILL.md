@@ -41,7 +41,7 @@ Si son tokens y la persona quiere elegir sus valores, que los ajuste en el Lab d
 
 - Una frase de `resumen`: qué es y cuándo se usa.
 - Reglas **observables** (que se puedan comprobar mirando la interfaz).
-- **Rechaza estos reflejos**: antipatrones con nombre.
+- `## Antipatrones`: los errores habituales, con nombre en negrita. `## Reglas` y `## Antipatrones` pasan tal cual al JSON de la pieza: no les cambies el título.
 - Lo que no sepas: «Pendiente».
 
 ## 5. Cierra

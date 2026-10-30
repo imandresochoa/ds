@@ -10,7 +10,7 @@ resumen: Qué vive en el kit, qué vive en cada sistema y cómo se mantienen sin
 | **Kit** (paquete `@imandresochoa/ds`, repo `imandresochoa/ds`) | El motor: interfaz, CLI `ds`, scripts de sync y publicación, plantilla, skills y esta metodología. No nombra ningún producto. | Uno solo, compartido. |
 | **Sistema** (`<producto>-design-system`) | El contenido de un producto: `system.json`, `DESIGN.md`, fichas, CSS experimental, instantánea de producción y huellas. | Uno por producto. |
 | **Producción** | El código real del producto. El sistema lo lee; no lo modifica. | El repo de cada producto. |
-| **Directorio** (opcional) | Solo un `directorio.json` con las carpetas de los sistemas que se sirven juntos. | Uno por estudio o equipo. |
+| **Directorio** (opcional) | Un `directorio.json` con las carpetas de los sistemas que se sirven juntos, y el kit como dependencia. Sin contenido propio. | Uno por estudio o equipo. |
 
 ```
 kit ──(dependencia npm)──▶ sistema ──(lee por ruta, ds sync)──▶ producción
@@ -83,4 +83,4 @@ La skill `actualizar-kit` lo hace y resume el changelog.
 
 - **Parche**: arreglos de interfaz sin cambios en el contenido.
 - **Menor**: funciones nuevas compatibles (una sección, un campo opcional).
-- **Mayor**: cambios que obligan a tocar fichas o `system.json`. Van con una guía de migración en `CHANGELOG.md`.
+- **Mayor**: cambios que obligan a tocar fichas o `system.json`, o que cambian la forma de lo que se publica para agentes (`registry.json`, las piezas de `r/`, `directorio.json`). Van con una guía de migración en `CHANGELOG.md`.

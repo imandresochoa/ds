@@ -78,7 +78,7 @@ npx ESPEC_DEL_KIT init "<Nombre>" --carpeta <carpeta> --desde <repo|web|figma|ce
    - Si no puedes acceder, dilo y pide una exportación. No adivines valores.
 2. Escribe los primitivos como propiedades personalizadas en `experimental/tokens.css`:
    - Color, en pares de texto y fondo, en `:root` y, si hay modo oscuro, en `.dark`.
-   - Tipografía, espaciado, radios y sombras.
+   - Tipografía, espaciado, radios, sombras y movimiento (duraciones y curvas).
    - Los valores van tal cual los encontraste, con los nombres del producto. Marca lo dudoso.
 3. Crea las fichas de tokens en `exploracion`, con `nombre` y `rol`.
 4. **Contraste.** Abre el Lab de primitivos (`npx ds dev` → `/<id>/lab`, pestaña «Ajustar tokens»): enseña el contraste de cada par. Si alguno no llega a AA, o si la persona quiere afinar un valor, lo ajusta ahí. Aplica lo que te pase con «Aplicar un preset del Lab».

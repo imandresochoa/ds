@@ -2,7 +2,9 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
-## Sin publicar
+## 1.0.0 · 2026-10-30
+
+Cierra el rediseño al modelo de shadcn/ui en cinco fases: interfaz (0.9.0), instalación con `montar-sistema` (0.9.0), Lab de primitivos (0.10.1), registry propio y Directorio, y metodología al día. Desde aquí, la versión mayor solo cambia si hay que tocar fichas, `system.json` o lo que se publica para agentes (ver «Versiones del kit» en la metodología).
 
 - **Registry por piezas**, de solo lectura:
   - `/<sistema>/registry.json` pasa a ser el índice: `piezas` con lo justo para elegir una y el enlace a su JSON.
@@ -13,11 +15,19 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
 - Workflow «Comprobar» en cada PR y en `main`: `npm ci`, typecheck, build y un `ds init` de prueba con Node 24, como «Publicar en npm».
 - **Movimiento en el Lab.** Duración base, escala y una familia de curvas (Estándar, Suave, Enfática) dan `--duration-fast|normal|slow`, `--ease-in|out|in-out` y las duraciones y curvas por defecto de las transiciones. Una muestra animada que respeta «reducir movimiento». `ds preset aplicar --solo movimiento`. Los presets anteriores no escriben tokens de movimiento.
 - **`ds ver <pieza>`** imprime el JSON de una pieza (por id o por slug). **`ds search --json`** devuelve piezas con la forma del índice, más `archivo`.
-- Migración:
+- **Metodología, plantilla y skills revisadas** contra lo que hace el kit:
+  - Las skills `revisar-sync` y `auditar-sistema` comparan con `origin/<produccion.rama>`, no con `HEAD` ni con `main` fijo.
+  - `auditar-sistema` incluye los avisos de `usa`.
+  - El título canónico de los antipatrones es `## Antipatrones`, porque pasa tal cual al JSON de la pieza. `## Rechaza estos reflejos` se sigue leyendo.
+  - Están documentadas las claves de `system.json` que faltaban (`iniciales`, `color`, `abrirEnAgentes`, `produccion.publico`, `superficies.*.url` y `fondo`), la portada con varios sistemas y lo que exporta `ds build`.
+  - Los enlaces a `TAREAS.md` y `DECISIONES.md` apuntan al repo del kit, porque esos archivos no van en el paquete.
+- `ds preset ver|resolver --port <n>` da el enlace al Lab de un `ds dev` en otro puerto.
+- Migración desde la 0.10.1:
   - Si algo lee `registry.json`: `fichas` pasa a `piezas`. `seccion`, `funcion`, `categoria` y `nivel` pasan a `tipo` y `categorias`. `plataformas`, `sync` y `tokens` de cada ficha están en su JSON (el enlace `json` de cada pieza).
   - Si algo lee `ds search --json`: `seccion` pasa a `tipo`.
   - En los bloques, pasa a `usa` los componentes que tenías en `relacionados`. Lo que no cambies sigue saliendo en «Relacionados».
-  - `npx ds skills` para tener la skill `nueva-ficha` al día.
+  - Si tus fichas usan `## Rechaza estos reflejos`, no hace falta cambiarlas. En las nuevas, usa `## Antipatrones`.
+  - `npm install @imandresochoa/ds@1.0.0` y `npx ds skills`, para tener las skills al día.
 
 ## 0.10.1 · 2026-10-30
 

@@ -14,7 +14,7 @@
 //   ds preset ver <preset>    lee un preset del Lab (código, enlace o JSON): valores y contraste
 //   ds preset aplicar <preset> [--solo color,texto,espaciado,radios,sombras,movimiento] [--archivo tokens.css]
 //        [--sobrescribir] [--aceptar-contraste]   escribe el preset en experimental/, nunca en producción
-//   ds preset resolver        el preset de experimental/tokens.css y el enlace para abrirlo en el Lab
+//   ds preset resolver        el preset de experimental/tokens.css y el enlace para abrirlo en el Lab (--port si ds dev usa otro)
 //   ds sync [--accept <id>]   lee producción: instantánea CSS, tokens, huellas e informe
 //   ds check                  falla si algo está desajustado, ausente o inventado
 //   ds skills                 copia (o actualiza) las skills del kit en .claude/skills/ y .agents/skills/
@@ -451,7 +451,8 @@ const commands = {
     const file = path.resolve(expDir, option('--archivo') ?? 'tokens.css');
     if (!isInside(expDir, file) || !file.endsWith('.css')) fail('--archivo tiene que ser un .css dentro de experimental/');
     const rel = path.relative(SITE, file);
-    const labUrl = (code) => `http://localhost:4100/${system.id}/lab${code ? `?preset=${code}` : ''}`;
+    // El enlace apunta a `ds dev`: con otro puerto, `--port` lo cambia también aquí.
+    const labUrl = (code) => `http://localhost:${option('--port') ?? '4100'}/${system.id}/lab${code ? `?preset=${code}` : ''}`;
     const savedCode = () => (fs.existsSync(file) ? lab.presetFromCss(fs.readFileSync(file, 'utf8')) : null);
 
     if (action === 'resolver') {

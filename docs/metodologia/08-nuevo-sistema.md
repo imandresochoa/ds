@@ -34,9 +34,9 @@ Instala la skill `montar-sistema` para Claude Code y Codex en tu carpeta de usua
 npx @imandresochoa/ds@latest init
 ```
 
-`ds init` hace las mismas preguntas en la terminal y crea el repo del sistema: `system.json`, `DESIGN.md`, `AGENTS.md`, `CLAUDE.md`, `.gitignore`, una ficha de ejemplo, los scripts de `package.json`, el kit instalado y las skills en `.claude/skills/` y `.agents/skills/`. Después, a mano:
+`ds init` hace las mismas preguntas en la terminal (o las toma de `--desde repo|web|figma|cero`, `--produccion <ruta>`, `--url <url>` y `--carpeta <ruta>`) y crea el repo del sistema: `system.json`, `DESIGN.md`, `AGENTS.md`, `CLAUDE.md`, `.gitignore`, una ficha de ejemplo, los scripts de `package.json`, el kit instalado y las skills en `.claude/skills/` y `.agents/skills/`. Después, a mano:
 
-1. **Conecta producción.** En `system.json`, rellena `produccion.codigo` (URL base para ver archivos), `web` y las **superficies**: cada parte del producto con su propio código y sus hojas de estilo. Comprueba con `npx ds doctor`.
+1. **Conecta producción.** Si partiste de una web, de Figma o de nada, `produccion` es `null`: créalo entero (`repo`, `rama`, `codigo`, `web` y `superficies`) cuando haya repo (ver «Plataformas y superficies»). En `system.json`, rellena `produccion.codigo` (URL base para ver archivos), `web` y las **superficies**: cada parte del producto con su propio código y sus hojas de estilo. Comprueba con `npx ds doctor`.
 2. **Primer sync.** `npx ds sync`. Ya tienes la instantánea del CSS, los tokens de producción y la lista de clases sin documentar (cobertura).
 3. **DESIGN.md.** Contexto del producto, orden de prioridades, integración, lenguaje visual, antipatrones con nombre y accesibilidad. Es lo primero que lee un agente.
 4. **Rellena por capas**, siguiendo la cobertura: fundamentos, tokens (los valores salen solos), componentes, bloques y gráficos. Cada ficha sigue «Anatomía de una ficha».
@@ -63,6 +63,9 @@ Con un producto que ya existe, el Lab abre sus tokens en «Ajustar tokens». Lo 
 
 - El motor (interfaz, scripts, metodología). Si un sistema necesita algo nuevo, se añade al kit para todos (skill `mejorar-kit`).
 - Los archivos generados por el sync (`produccion/`, `tokens.produccion.json`, `sync-report.json`).
+- Las skills (`.claude/skills/` y `.agents/skills/`): se actualizan con `npx ds skills`.
+
+El resto de `system.json`: `iniciales` y `color` son la marca del sistema en la cabecera; `metodologia: true` muestra esta metodología en el sitio; `abrirEnAgentes: true` añade «Abrir en Claude» y «Abrir en ChatGPT» a «Copiar página», que envían la URL de la página a ese servicio.
 
 ## Orden recomendado de relleno
 
