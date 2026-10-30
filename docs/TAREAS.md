@@ -30,9 +30,9 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 - [x] Trusted publisher configurado con `npm trust` (`imandresochoa/ds`, `publicar.yml`). Las versiones siguientes salen con el workflow.
 - [x] En npmjs.com, «Publishing access» → «Require two-factor authentication and disallow tokens»: solo se publica desde el workflow.
 
-## Fases pendientes
+## Fases del rediseño
 
-El rediseño al modelo de shadcn/ui se acordó en cinco fases. La 1 (interfaz) y la 2 (instalación y `montar-sistema`) salieron en la 0.9.0, y la 3 (Lab de primitivos) en la 0.10.1 (la 0.10.0 no llegó a npm). La 4 (registry y Directorio), el movimiento del Lab y la 5 (metodología) salen en la 1.0.0. Lo decidido está en `DECISIONES.md`, entradas del 2026-10-30. Cada fase empieza con una propuesta y preguntas, no con código (ver «Cómo trabajamos» en `AGENTS.md`). Lo que pone «Por decidir» no está decidido: se pregunta.
+El rediseño al modelo de shadcn/ui se acordó en cinco fases. La 1 (interfaz) y la 2 (instalación y `montar-sistema`) salieron en la 0.9.0, y la 3 (Lab de primitivos) en la 0.10.1 (la 0.10.0 no llegó a npm). La 4 (registry y Directorio), el movimiento del Lab y la 5 (metodología) salieron en la 1.0.0. Las cinco están cerradas. Lo decidido está en `DECISIONES.md`, entradas del 2026-10-30. Cada fase empieza con una propuesta y preguntas, no con código (ver «Cómo trabajamos» en `AGENTS.md`). Lo que pone «Por decidir» no está decidido: se pregunta.
 
 ### Fase 3 · Lab de primitivos
 
@@ -90,7 +90,7 @@ Tareas:
 - [x] Revisar `docs/metodologia/` entera con lo de las fases 1 a 4.
 - [x] Revisar la plantilla y las skills contra la metodología (regla 5 de `AGENTS.md`).
 - [x] Entradas en `DECISIONES.md` y `CHANGELOG.md`, con la migración.
-- [ ] Publicar la 1.0.0 (ver «Publicar una versión» en `AGENTS.md`).
+- [x] Publicar la 1.0.0: etiqueta `v1.0.0` y workflow «Publicar en npm», con procedencia (2026-10-30).
 
 ## Método y herramientas
 
