@@ -1,0 +1,5 @@
+/* CSS provisional del sistema de ejemplo. En un sistema real, el CSS de producción llega con ds sync. */
+:root { --ejemplo-tinta: #1a1c1f; --ejemplo-papel: #ffffff; --ejemplo-radio: 999px; }
+body { font: 14px/1.4 system-ui, sans-serif; color: var(--ejemplo-tinta); }
+.ejemplo-boton { display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: var(--ejemplo-radio); border: 1px solid var(--ejemplo-tinta); background: var(--ejemplo-tinta); color: var(--ejemplo-papel); font: inherit; font-weight: 500; cursor: pointer; }
+.ejemplo-boton--secundario { background: transparent; color: var(--ejemplo-tinta); }

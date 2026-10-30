@@ -1,0 +1,11 @@
+{
+  "id": "ejemplo",
+  "nombre": "Sistema de ejemplo",
+  "iniciales": "SE",
+  "color": "#1a1c1f",
+  "descripcion": "Sistema de ejemplo del kit. Contenido provisional para desarrollar la interfaz sin depender de ningún producto.",
+  "extiende": null,
+  "metodologia": true,
+  "plataformas": ["web", "ios", "android"],
+  "produccion": null
+}

@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.next-build/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.DS_Store
+# Generado por scripts/build-public.mjs a partir de systems/ y docs/
+/public/

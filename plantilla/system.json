@@ -1,0 +1,26 @@
+{
+  "id": "ID_DEL_SISTEMA",
+  "nombre": "NOMBRE_DEL_SISTEMA",
+  "iniciales": "NN",
+  "color": "#1a1c1f",
+  "descripcion": "Sistema de diseño de NOMBRE_DEL_SISTEMA.",
+  "extiende": null,
+  "metodologia": false,
+  "plataformas": ["web", "ios", "android"],
+  "produccion": {
+    "repo": "../RUTA-AL-REPO-DE-PRODUCCION",
+    "rama": "main",
+    "publico": "public",
+    "codigo": "https://github.com/USUARIO/REPO/blob/main/",
+    "web": "https://ejemplo.com",
+    "superficies": {
+      "web": {
+        "nombre": "Web",
+        "url": "https://ejemplo.com",
+        "estilos": ["src/app/globals.css"],
+        "cobertura": true,
+        "fondo": "#fff"
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+---
+name: nueva-ficha
+description: Crea o completa una ficha del sistema de diseño (componente, patrón, fundamento, token o iniciativa) enlazada a producción. Úsala cuando pidan documentar una pieza, «añade el componente X» o «documenta esta sección».
+---
+
+# Crear una ficha
+
+Lee primero `node_modules/design-system-agentic-first-kit/docs/metodologia/05-ficha.md` (anatomía) y `03-estados.md` (estados).
+
+## 1. Decide sección y forma
+
+| Qué es | Sección | Campos clave |
+| --- | --- | --- |
+| Criterio (cómo y cuándo) | `fundamentos` | `relacionados` a sus tokens |
+| Valores con nombre | `tokens` | `grupo`, `tokens: [{nombre, rol}]` |
+| Pieza reutilizable | `componentes` | `funcion` (acciones, navegacion, formularios, feedback, contenido, superposiciones), `nivel` (atomo, molecula, organismo) |
+| Composición | `patrones` | `nivel` (seccion, pantalla, flujo), `relacionados` |
+| Trabajo en curso | `iniciativas` | secciones fijas: Resumen, Referencias, Exploración, Flujos, Handoff, Playground |
+
+Archivo único `content/<sección>/<slug>.md`, o carpeta `<slug>/index.md` + `web.md`/`ios.md`/`android.md` si hay varias plataformas.
+
+## 2. Si existe en producción
+
+1. Busca la pieza en el repo de producción y lee su código y su CSS.
+2. Declara `plataformas.web.superficies` con `id` (superficie de `system.json`), `fuente` (ruta en producción) y `clases` (las clases propias de la pieza, sin las de utilidades).
+3. Estado `produccion`.
+4. Ejemplos en vivo con ```` ```html preview superficie=<id> ```` usando **solo clases que existen** y **textos copiados de producción** (nunca inventados ni reescritos).
+5. `npx ds sync`: la ficha queda «Pendiente de verificar». Revisa el informe; si las clases existen y la ficha describe el código real, `npx ds sync --accept <sección>/<slug>`.
+
+## 3. Si no existe en producción
+
+Estado `exploracion`. Si necesita estilos, van en `experimental/<slug>.css`. Si forma parte de un proyecto mayor, añade `iniciativa: <slug>`.
+
+## 4. Contenido
+
+- Una frase de `resumen`: qué es y cuándo se usa.
+- Reglas **observables** (que se puedan comprobar mirando la interfaz).
+- **Rechaza estos reflejos**: antipatrones con nombre.
+- Lo que no sepas: «Pendiente».
+
+## 5. Cierra
+
+Reinicia `npx ds dev` (las rutas son estáticas), revisa la página y ejecuta `npx ds check`.
