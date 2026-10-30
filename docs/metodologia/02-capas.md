@@ -10,7 +10,7 @@ Cada ficha pertenece a una capa. Las capas van del criterio a lo más compuesto;
 | Capa | Qué contiene | Ejemplo |
 | --- | --- | --- |
 | **Fundamentos** | Reglas de criterio: tipografía, color, maquetación, movimiento, voz, ilustración. Explican cómo y cuándo, y enlazan a sus tokens. | «Los titulares van en serif ligera» |
-| **Tokens** | Valores con nombre y su rol, uno por modo si el producto tiene varios (claro, oscuro). Se leen del código de producción. | `--ink`, `--radius-lg`, `--dur-micro` |
+| **Tokens** | Valores con nombre y su rol, uno por modo si el producto tiene varios (claro, oscuro). Se leen del código de producción o, mientras no están en él, de `experimental/`. | `--ink`, `--radius-lg`, `--dur-micro` |
 | **Componentes** | Piezas reutilizables. Se listan **por orden alfabético**, como en shadcn; su **función** y su **nivel atómico** son datos de la ficha. | Botón, Enlace de texto, Cabecera |
 | **Bloques** | Composiciones que resuelven un problema. Se agrupan por `categoria`: **secciones**, **pantallas** y **flujos**. | Hero, Precios, Alta |
 | **Gráficos** | Cómo presenta datos el producto. Se agrupan por `categoria`: área, barras, líneas, circular, radar, radial y tooltip. | Ingresos por mes |
@@ -53,6 +53,11 @@ Cuando un sistema crece, los tokens se separan en tres niveles:
 3. **De componente**: ajustes locales (`--btn-bg`).
 
 Empieza por los semánticos y añade los de componente cuando un componente los necesite. Los primitivos solo hacen falta cuando hay varias marcas o temas que comparten paleta.
+
+## Nombres de los tokens
+
+- **Un sistema nuevo** usa los nombres de shadcn para los semánticos: pares `x` y `x-foreground` (`--primary` y `--primary-foreground`), `--background`, `--foreground`, `--muted`, `--border`, `--ring` y `--radius` con su escala. Para el resto usa los de Tailwind 4: `--spacing`, `--text-*`, `--font-*`, `--leading-*` y `--shadow-*`. Son los que genera el Lab de primitivos, y un agente los reconoce sin explicación.
+- **Un producto que ya existe** conserva los suyos. El sistema documenta cómo es el producto: no lo renombra.
 
 ## Modos
 

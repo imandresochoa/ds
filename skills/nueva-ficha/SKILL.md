@@ -33,6 +33,8 @@ Archivo único `content/<sección>/<slug>.md`, o carpeta `<slug>/index.md` + `we
 
 Estado `exploracion`. Si necesita estilos, van en `experimental/<slug>.css`. Si forma parte de un proyecto mayor, añade `iniciativa: <slug>`.
 
+Si son tokens y la persona quiere elegir sus valores, que los ajuste en el Lab de primitivos (`/<id>/lab` con `npx ds dev`) y sigue el apartado «Aplicar un preset del Lab» de la skill `montar-sistema`. Si no, escríbelos en `experimental/tokens.css`. La ficha enseña los valores de `experimental/` en su columna «Experimental».
+
 ## 4. Contenido
 
 - Una frase de `resumen`: qué es y cuándo se usa.

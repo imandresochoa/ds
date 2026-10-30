@@ -8,6 +8,10 @@
 //   ds search <texto> [--seccion <id>] [--limite 10] [--json]   busca fichas antes de crear una
 //   ds dev [--port 4100]      servidor de desarrollo con el contenido de este repo
 //   ds build                  exporta el sitio estático a ./out (bajo publicacion.ruta o DS_RUTA, si la hay)
+//   ds preset ver <preset>    lee un preset del Lab (código, enlace o JSON): valores y contraste
+//   ds preset aplicar <preset> [--solo color,texto,espaciado,radios,sombras] [--archivo tokens.css]
+//        [--sobrescribir] [--aceptar-contraste]   escribe el preset en experimental/, nunca en producción
+//   ds preset resolver        el preset de experimental/tokens.css y el enlace para abrirlo en el Lab
 //   ds sync [--accept <id>]   lee producción: instantánea CSS, tokens, huellas e informe
 //   ds check                  falla si algo está desajustado, ausente o inventado
 //   ds skills                 copia (o actualiza) las skills del kit en .claude/skills/ y .agents/skills/
@@ -42,7 +46,7 @@ const INIT_ALLOWED = new Set(['.git', '.gitignore', '.DS_Store', 'package.json',
 const ORIGINS = ['repo', 'web', 'figma', 'cero'];
 
 // Opciones: `--clave valor` e interruptores (`--json`). El resto son argumentos posicionales.
-const VALUE_OPTIONS = new Set(['--carpeta', '--desde', '--produccion', '--url', '--kit', '--seccion', '--limite', '--port', '--accept']);
+const VALUE_OPTIONS = new Set(['--carpeta', '--desde', '--produccion', '--url', '--kit', '--seccion', '--limite', '--port', '--accept', '--solo', '--archivo']);
 const option = (name) => {
   const at = args.indexOf(name);
   return at >= 0 ? args[at + 1] : undefined;
@@ -361,6 +365,135 @@ const commands = {
     // Con output: 'export', Next 16 deja el sitio exportado en distDir (.next-build).
     fs.cpSync(path.join(dir, '.next-build'), path.join(SITE, 'out'), { recursive: true });
     console.log('Sitio exportado en ./out');
+  },
+  async preset() {
+    requireSystem();
+    const [action, input] = positional;
+    if (!['ver', 'aplicar', 'resolver'].includes(action)) fail('uso: ds preset ver|aplicar <preset> · ds preset resolver');
+    const core = await loadCore();
+    const lab = await import('../lib/lab.mjs');
+    const { setTokenValues } = await import('../lib/css-tokens.mjs');
+    const [system] = core.listSystems();
+    const expDir = path.join(SITE, 'experimental');
+    const file = path.resolve(expDir, option('--archivo') ?? 'tokens.css');
+    if (!isInside(expDir, file) || !file.endsWith('.css')) fail('--archivo tiene que ser un .css dentro de experimental/');
+    const rel = path.relative(SITE, file);
+    const labUrl = (code) => `http://localhost:4100/${system.id}/lab${code ? `?preset=${code}` : ''}`;
+    const savedCode = () => (fs.existsSync(file) ? lab.presetFromCss(fs.readFileSync(file, 'utf8')) : null);
+
+    if (action === 'resolver') {
+      const code = savedCode();
+      if (JSON_OUT) return console.log(JSON.stringify({ archivo: rel, preset: code, ruta: `/${system.id}/lab${code ? `?preset=${code}` : ''}`, url: labUrl(code) }, null, 2));
+      if (!code) return console.log(`${rel} no lo generó el Lab. Con npx ds dev, el Lab abre con los tokens del sistema cargados (pestaña «Ajustar tokens»):\n  ${labUrl(null)}`);
+      return console.log(`Preset de ${rel}:\n  ${code}\n\nCon npx ds dev, ábrelo en el Lab:\n  ${labUrl(code)}`);
+    }
+
+    if (!input) fail(`uso: ds preset ${action} "<código, enlace del Lab o JSON>"`);
+    let read;
+    try {
+      read = lab.decodePreset(input);
+    } catch (error) {
+      fail(`el preset no se puede leer (${error instanceof Error ? error.message : error}). Copia el enlace otra vez desde el Lab.`);
+    }
+    let { preset } = read;
+    for (const aviso of read.avisos) log(`aviso: ${aviso}`);
+
+    // --solo: aplica solo esos grupos sobre el preset que ya hay en el archivo (como `shadcn apply --only`).
+    const solo = option('--solo')?.split(',').map((g) => g.trim()).filter(Boolean);
+    if (solo) {
+      const unknown = solo.filter((g) => !lab.GRUPOS.includes(g));
+      if (unknown.length) fail(`--solo admite ${lab.GRUPOS.join(', ')} (no ${unknown.join(', ')})`);
+      const code = savedCode();
+      if (!code) fail(`--solo necesita un ${rel} generado por el Lab sobre el que aplicar`);
+      const previous = lab.decodePreset(code).preset;
+      if (preset.modo !== 'generar' || previous.modo !== 'generar') fail('--solo solo vale con presets de «Generar»');
+      const pick = { color: ['color', 'ajustes'], texto: ['texto'], espaciado: ['espaciado'], radios: ['radio'], sombras: ['sombra'] };
+      preset = { ...previous, ...Object.fromEntries(solo.flatMap((g) => pick[g]).map((key) => [key, preset[key]])) };
+    }
+
+    // Los tokens por modo, para medir el contraste: los generados o los del sistema con los ajustes encima.
+    const report = core.loadSyncReport(system);
+    const experimental = core.loadExperimentalTokens(system);
+    let byMode;
+    let selectores = null;
+    let originales;
+    if (preset.modo === 'generar') byMode = lab.deriveTokens(preset).modos;
+    else {
+      const production = core.loadProductionTokens(system);
+      const fromExperimental = preset.base === 'experimental';
+      const values = fromExperimental ? experimental?.values : production[preset.base ?? ''];
+      if (!values) fail(`el preset ajusta los tokens de «${preset.base}», y este sistema no los tiene`);
+      selectores = fromExperimental ? experimental.info.modos : report?.tokens?.[preset.base]?.modos ?? null;
+      const modes = core.tokenModes(values, selectores);
+      originales = lab.baseByMode(values, modes);
+      byMode = lab.baseByMode(values, modes, preset.ajustes);
+    }
+    const contraste = lab.checkContrast(byMode);
+    // Al ajustar, solo cuentan los pares que el preset cambia; los que ya fallaban así se avisan, sin bloquear.
+    const touched = (r) => preset.modo === 'generar' || [r.texto, r.fondo].some((t) => preset.ajustes[r.modo]?.[t] !== undefined);
+    const failing = contraste.filter((r) => r.ok === false && touched(r));
+    const previous = contraste.filter((r) => r.ok === false && !touched(r));
+    const below = (n) => `${n} ${n === 1 ? 'par no llega' : 'pares no llegan'} a AA`;
+    const describe = (r) => `  ${core.modeLabel(r.modo)}: --${r.texto} sobre --${r.fondo} ${r.ratio}:1 (mínimo ${r.minimo}:1)${r.sugerencia ? ` → --${r.sugerencia.token}: ${r.sugerencia.valor}` : ''}`;
+
+    if (action === 'ver') {
+      const code = lab.encodePreset(preset);
+      if (JSON_OUT) return console.log(JSON.stringify({ preset, avisos: read.avisos, contraste, css: lab.presetCss(preset, { selectores, originales }), url: labUrl(code) }, null, 2));
+      const { color, texto, sombra } = preset;
+      if (preset.modo === 'generar') {
+        console.log(`Generar · neutro ${color.neutro} · marca ${color.marca} · error ${color.error}`);
+        console.log(`Texto: ${texto.sans}${texto.serif ? ` · serif ${texto.serif}` : ''} · ${texto.base} px · escala ${texto.escala} · interlineado ${texto.interlineado}`);
+        console.log(`Espaciado ${preset.espaciado} px · radio ${preset.radio} px · sombras ${Math.round(sombra.opacidad * 100)} % × ${sombra.difuminado}`);
+      } else console.log(`Ajustar los tokens de «${preset.base}»`);
+      const ajustes = Object.entries(preset.ajustes).flatMap(([mode, values]) => Object.entries(values).map(([name, value]) => `--${name} (${core.modeLabel(mode)}): ${value}`));
+      if (ajustes.length) console.log(`Ajustes a mano:\n${ajustes.map((a) => `  ${a}`).join('\n')}`);
+      const measured = contraste.filter((r) => r.ok !== null).length;
+      console.log(failing.length ? `Contraste: de ${measured} pares, ${below(failing.length)}:\n${failing.map(describe).join('\n')}` : `Contraste: los pares que cambia el preset llegan a AA.`);
+      if (previous.length) console.log(`Ya estaban así (el preset no los cambia): ${below(previous.length)}:\n${previous.map(describe).join('\n')}`);
+      return console.log(`Lab: ${labUrl(code)}`);
+    }
+
+    // aplicar. Un par por debajo de AA solo se escribe si la persona lo ha aceptado.
+    if (failing.length && !flag('--aceptar-contraste')) {
+      console.error(`ds: ${below(failing.length)}:\n${failing.map(describe).join('\n')}`);
+      fail('no escribo nada. Ajústalos en el Lab (botón «Ajustar») o, si la persona lo acepta, repite con --aceptar-contraste.');
+    }
+    fs.mkdirSync(expDir, { recursive: true });
+    const written = [];
+    if (preset.modo === 'ajustar' && preset.base === 'experimental') {
+      // Los tokens de experimental/ escritos a mano se cambian en su sitio, en la hoja que los declara.
+      let pending = lab.pinInherited(preset.ajustes, originales);
+      const baseMode = Object.keys(experimental.info.modos)[0] ?? 'base';
+      for (const name of fs.readdirSync(expDir).filter((f) => f.endsWith('.css')).sort()) {
+        const target = path.join(expDir, name);
+        const before = fs.readFileSync(target, 'utf8');
+        const result = setTokenValues(before, pending, baseMode);
+        if (result.css !== before) {
+          fs.writeFileSync(target, result.css);
+          written.push(path.relative(SITE, target));
+        }
+        pending = result.pending;
+      }
+      // Lo que un modo heredaba de :root se declara en ese modo, al final de la hoja de tokens.
+      if (Object.keys(pending).length) {
+        const extra = lab.presetCss({ ...preset, ajustes: pending }, { selectores }).replace(/^\/\*[\s\S]*?\*\/\n\n/, '');
+        fs.appendFileSync(file, `${fs.existsSync(file) ? '\n' : ''}${extra}`);
+        if (!written.includes(rel)) written.push(rel);
+      }
+    } else {
+      // Un archivo que no generó el Lab no se pisa sin permiso.
+      if (fs.existsSync(file) && !savedCode() && !flag('--sobrescribir')) fail(`${rel} no lo generó el Lab y no lo sobrescribo. Usa --archivo <otro>.css o, si la persona lo confirma, --sobrescribir.`);
+      fs.writeFileSync(file, lab.presetCss(preset, { selectores, originales }));
+      written.push(rel);
+    }
+    const result = { escrito: written, contraste: { pares: contraste.length, porDebajoDeAA: failing.length, yaEstaban: previous.length }, produccion: Boolean(system.produccion) };
+    if (JSON_OUT) return console.log(JSON.stringify(result, null, 2));
+    console.log(written.length ? `Escrito: ${written.join(', ')}` : 'Nada que cambiar.');
+    if (failing.length) console.log(`Aceptado por la persona: ${below(failing.length)}.`);
+    if (previous.length) console.log(`Aviso: ${below(previous.length)} y ya estaba así antes del preset.`);
+    console.log(system.produccion
+      ? 'Producción no cambia. Lleva el cambio a una iniciativa y anota en sus fichas de tokens los valores nuevos (estado exploracion).'
+      : 'Crea o actualiza las fichas de tokens en content/tokens/ (estado exploracion), con nombre y rol. Para verlo: npx ds dev.');
   },
   async sync() {
     requireSystem();

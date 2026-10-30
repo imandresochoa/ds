@@ -2,6 +2,24 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## 0.10.0 · 2026-10-30
+
+- **Lab de primitivos** (`/<sistema>/lab`), primera opción de «Nuevo» y en ⌘K:
+  - «Generar» crea los tokens con los nombres de shadcn a partir de neutro, marca y error, texto, espaciado, radio y sombras.
+  - «Ajustar tokens» cambia los que el sistema ya tiene: los de cada superficie de producción o los de `experimental/`.
+  - Muestra claro y oscuro con el contraste de cada par, avisa de los que no llegan a AA y propone el valor más cercano que llega.
+  - No escribe nada ni hace peticiones de red: el estado va en la URL (`?preset=`).
+- **`ds preset ver|aplicar|resolver`.** Lee un preset del Lab (código, enlace o JSON), lo escribe en `experimental/` y devuelve el enlace para volver a abrirlo.
+  - Escribe en `experimental/tokens.css`. Al ajustar tokens de `experimental/`, los cambia en la hoja que los declara.
+  - Nunca escribe en producción.
+  - No escribe pares por debajo de AA sin `--aceptar-contraste`, ni pisa un archivo que no generó el Lab sin `--sobrescribir`.
+  - `--solo` aplica solo algunos grupos. `--archivo` elige otro `.css` dentro de `experimental/`.
+- Las fichas de tokens enseñan en una columna «Experimental» los valores de `experimental/`.
+- Skill `montar-sistema`: apartado «Aplicar un preset del Lab». Los flujos «Desde una web o Figma» y «Desde cero» usan el Lab.
+- Metodología: «Nombres de los tokens» (shadcn en un sistema nuevo; los suyos en un producto que ya existe) y «Primitivos con el Lab».
+- La lectura de tokens del CSS pasa de `scripts/sync-production.mjs` a `lib/css-tokens.mjs`, que comparten el sync y la interfaz. El sync da el mismo resultado.
+- Migración: ninguna. `npm install @imandresochoa/ds@0.10.0` y, para tener la skill nueva, `npx ds skills`.
+
 ## 0.9.0 · 2026-10-30
 
 - Interfaz nueva con la estructura de ui.shadcn.com: cabecera con Inicio, Docs, Componentes, Bloques, Gráficos e Iniciativas; Docs a tres columnas con «En esta página»; índice de componentes alfabético con «Nuevos»; galerías de Bloques y Gráficos con visor (Vista y Código, escritorio, tablet y móvil); ⌘K y modo oscuro (⌘D). Tailwind 4 y primitivas de shadcn/ui (MIT) en `components/ui/`, solo para la interfaz.

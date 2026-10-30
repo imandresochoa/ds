@@ -44,6 +44,8 @@ export type Nav = {
   items: NavItem[];
   /** Prompts del botón «Nuevo». */
   acciones: { label: string; prompt: string }[];
+  /** El Lab de primitivos: la primera opción de «Nuevo». */
+  lab: string;
   /** «Abrir en Claude/ChatGPT» envía la URL de la página a un servicio externo: solo si el sistema lo activa. */
   abrirEnAgentes: boolean;
 };
@@ -167,6 +169,7 @@ export function buildNav(systemId: string): Nav {
       ...visible.map((s) => ({ label: s.accion.label, prompt: s.accion.prompt.replaceAll('{sistema}', system.id) })),
       { label: 'Pedir un cambio', prompt: CAMBIO_PROMPT.replaceAll('{sistema}', system.id) },
     ],
+    lab: `${base}/lab`,
     abrirEnAgentes: system.abrirEnAgentes === true,
   };
 }

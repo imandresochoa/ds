@@ -77,7 +77,7 @@ export function CommandMenu({ nav }: { nav: Nav }) {
           <CommandList className="no-scrollbar min-h-80 scroll-pt-2 scroll-pb-1.5">
             <CommandEmpty className="py-12 text-center text-sm text-muted-foreground">No hay resultados.</CommandEmpty>
             <CommandGroup heading="Páginas" className={group}>
-              {[...nav.top, ...nav.sections.filter((s) => !nav.top.some((t) => t.href === s.href))].map((item) => (
+              {[...nav.top, ...nav.sections.filter((s) => !nav.top.some((t) => t.href === s.href)), { href: nav.lab, label: 'Lab de primitivos' }].map((item) => (
                 <MenuItem key={item.href} value={`pagina ${item.label}`} onSelect={() => run(() => router.push(item.href))}>
                   <ArrowRightIcon />
                   {item.label}

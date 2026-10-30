@@ -7,7 +7,7 @@ La interfaz copia la estructura y el estilo de ui.shadcn.com: neutra, sin decora
 
 ## Estructura
 
-- **Cabecera** (fija). A la izquierda, la marca del sistema (un selector si hay varios) y la navegación: Inicio, Docs, Componentes, Bloques, Gráficos e Iniciativas. A la derecha, buscar, el repo de código (si `produccion.codigo` existe), modo claro u oscuro y **Nuevo**, con el prompt de cada sección y «Pedir un cambio».
+- **Cabecera** (fija). A la izquierda, la marca del sistema (un selector si hay varios) y la navegación: Inicio, Docs, Componentes, Bloques, Gráficos e Iniciativas. A la derecha, buscar, el repo de código (si `produccion.codigo` existe), modo claro u oscuro y **Nuevo**, con el Lab de primitivos, el prompt de cada sección y «Pedir un cambio».
 - **Home** (`/<sistema>`). Un aviso con la última ficha creada, el nombre y la descripción del sistema, «Empezar» y «Ver componentes». Debajo, un escaparate con los ejemplos en vivo de las fichas marcadas con `destacado: true`. Si no hay ninguna, usa las que tienen ejemplo, primero las de producción, hasta nueve. Sin ejemplos, muestra una tarjeta por sección.
 - **Docs.** Tres columnas, como en shadcn:
   - **Barra lateral**: «Secciones» (Introducción y una entrada por sección), «Empezar» (las páginas propias de `content/docs/`, más Producción y Para agentes, que pone el kit), un grupo por sección con sus fichas y, si el sistema la activa, Metodología.
@@ -20,6 +20,13 @@ La interfaz copia la estructura y el estilo de ui.shadcn.com: neutra, sin decora
   - Los gráficos van en tarjetas, en rejilla.
   - Iniciativas muestra tarjetas «En curso» y «Publicadas».
   - Una sección vacía explica qué va en ella y da el prompt para pedírselo al agente.
+- **Lab de primitivos** (`/<sistema>/lab`). Es el equivalente al Create de shadcn, pero solo con primitivos. Tiene dos pestañas:
+  - **Generar** crea los tokens, con los nombres de shadcn, desde unos pocos primitivos: neutro, marca y error; familias, tamaño base, escala e interlineado; unidad de espaciado; radio base; y opacidad y difuminado de las sombras.
+  - **Ajustar tokens** cambia los que el sistema ya tiene, de cada superficie de producción o de `experimental/`.
+  - Enseña claro y oscuro uno al lado del otro, sin componentes: pares de color con su contraste, escala de neutros, escala tipográfica, espacios, radios y sombras.
+  - Cada par por debajo de AA sale arriba con «Ajustar», que lo lleva al valor más cercano que llega.
+  - No escribe nada. El estado va en la URL (`?preset=`), y «Copiar para tu agente» la pasa con el prompt para aplicarla (`npx ds preset aplicar`, ver «Crear un sistema nuevo»).
+  - No descarga fuentes ni hace peticiones: las muestras usan las fuentes instaladas en el equipo.
 - **Pie**: enlaces a `design.md` y `llms.txt`. En Docs no aparece.
 
 ## Estado de una ficha

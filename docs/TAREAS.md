@@ -32,7 +32,7 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 
 ## Fases pendientes
 
-El rediseño al modelo de shadcn/ui se acordó en cinco fases. La 1 (interfaz) y la 2 (instalación y `montar-sistema`) están hechas y salieron en la 0.9.0; lo decidido está en `DECISIONES.md`, entradas del 2026-10-30. Cada fase empieza con una propuesta y preguntas, no con código (ver «Cómo trabajamos» en `AGENTS.md`). Lo que pone «Por decidir» no está decidido: se pregunta.
+El rediseño al modelo de shadcn/ui se acordó en cinco fases. La 1 (interfaz) y la 2 (instalación y `montar-sistema`) están hechas y salieron en la 0.9.0. La 3 (Lab de primitivos) sale en la 0.10.0. Lo decidido está en `DECISIONES.md`, entradas del 2026-10-30. Cada fase empieza con una propuesta y preguntas, no con código (ver «Cómo trabajamos» en `AGENTS.md`). Lo que pone «Por decidir» no está decidido: se pregunta.
 
 ### Fase 3 · Lab de primitivos
 
@@ -45,15 +45,18 @@ Acordado:
 - **Con un producto que ya existe**, el Lab se abre con los primitivos de producción cargados y lo que se cambie pasa a ser una iniciativa. Nunca toca producción.
 - «Nuevo», en la cabecera, llevará al Lab.
 
-Por decidir:
-- Dónde vive: una página del sitio de cada sistema o una herramienta aparte.
-- El formato del preset.
-- Qué skill aplica el preset (`montar-sistema` u otra) y si `ds` necesita un comando para ello.
-- Qué hace el Lab cuando un par no llega a AA.
+Decidido (ver «Lab de primitivos» en `DECISIONES.md`):
+- Vive en cada sistema: `/<sistema>/lab`, en `ds dev` y en el sitio publicado.
+- Un sistema nuevo usa los nombres de shadcn. Un producto que ya existe conserva los suyos.
+- El preset lleva valores libres en la URL (`?preset=`).
+- La skill `montar-sistema` lo aplica con `npx ds preset aplicar`.
+- Un par por debajo de AA se avisa con el valor más cercano que llega, y solo se escribe si la persona lo acepta.
 
 Tareas:
-- [ ] Propuesta y preguntas.
-- [ ] Lab, preset y skill que lo aplica.
+- [x] Propuesta y preguntas.
+- [x] Lab, preset (`ds preset`) y skill que lo aplica.
+- [ ] Movimiento (duraciones y curvas) en el Lab.
+- [ ] Publicar la 0.10.0 en npm: etiqueta `v0.10.0` en `main` y workflow «Publicar en npm» (ver «Publicar una versión» en `AGENTS.md`).
 
 ### Fase 4 · Registry propio y Directorio
 
