@@ -2,7 +2,7 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
-## Sin publicar
+## 0.10.0 · 2026-10-30
 
 - **Lab de primitivos** (`/<sistema>/lab`), primera opción de «Nuevo» y en ⌘K:
   - «Generar» crea los tokens con los nombres de shadcn a partir de neutro, marca y error, texto, espaciado, radio y sombras.
@@ -18,7 +18,7 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
 - Skill `montar-sistema`: apartado «Aplicar un preset del Lab». Los flujos «Desde una web o Figma» y «Desde cero» usan el Lab.
 - Metodología: «Nombres de los tokens» (shadcn en un sistema nuevo; los suyos en un producto que ya existe) y «Primitivos con el Lab».
 - La lectura de tokens del CSS pasa de `scripts/sync-production.mjs` a `lib/css-tokens.mjs`, que comparten el sync y la interfaz. El sync da el mismo resultado.
-- Migración: ninguna. Para tener la skill nueva, ejecuta `npx ds skills`.
+- Migración: ninguna. `npm install @imandresochoa/ds@0.10.0` y, para tener la skill nueva, `npx ds skills`.
 
 ## 0.9.0 · 2026-10-30
 

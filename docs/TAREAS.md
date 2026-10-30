@@ -32,7 +32,7 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 
 ## Fases pendientes
 
-El rediseño al modelo de shadcn/ui se acordó en cinco fases. La 1 (interfaz) y la 2 (instalación y `montar-sistema`) están hechas y salieron en la 0.9.0. La 3 (Lab de primitivos) está hecha y espera versión («Sin publicar» en `CHANGELOG.md`). Lo decidido está en `DECISIONES.md`, entradas del 2026-10-30. Cada fase empieza con una propuesta y preguntas, no con código (ver «Cómo trabajamos» en `AGENTS.md`). Lo que pone «Por decidir» no está decidido: se pregunta.
+El rediseño al modelo de shadcn/ui se acordó en cinco fases. La 1 (interfaz) y la 2 (instalación y `montar-sistema`) están hechas y salieron en la 0.9.0. La 3 (Lab de primitivos) sale en la 0.10.0. Lo decidido está en `DECISIONES.md`, entradas del 2026-10-30. Cada fase empieza con una propuesta y preguntas, no con código (ver «Cómo trabajamos» en `AGENTS.md`). Lo que pone «Por decidir» no está decidido: se pregunta.
 
 ### Fase 3 · Lab de primitivos
 
@@ -56,7 +56,7 @@ Tareas:
 - [x] Propuesta y preguntas.
 - [x] Lab, preset (`ds preset`) y skill que lo aplica.
 - [ ] Movimiento (duraciones y curvas) en el Lab.
-- [ ] Publicar la versión con el Lab (ver «Publicar una versión» en `AGENTS.md`).
+- [ ] Publicar la 0.10.0 en npm: etiqueta `v0.10.0` en `main` y workflow «Publicar en npm» (ver «Publicar una versión» en `AGENTS.md`).
 
 ### Fase 4 · Registry propio y Directorio
 
