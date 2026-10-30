@@ -26,7 +26,7 @@ Instala la skill `montar-sistema` para Claude Code y Codex en tu carpeta de usua
 4. Lo llena según el origen:
    - **Repo**: superficies, primer sync, `DESIGN.md`, fichas de tokens y plan de fichas.
    - **Web o Figma**: primitivos sacados de lo publicado, en exploración.
-   - **Nada**: `DESIGN.md` con lo que cuentes y unos primitivos de partida.
+   - **Nada**: `DESIGN.md` con lo que cuentes y unos primitivos de partida, que ajustas en el Lab de primitivos.
 
 ## Sin agente
 
@@ -42,6 +42,22 @@ npx @imandresochoa/ds@latest init
 4. **Rellena por capas**, siguiendo la cobertura: fundamentos, tokens (los valores salen solos), componentes, bloques y gráficos. Cada ficha sigue «Anatomía de una ficha».
 5. **Revisa y acepta huellas**: `npx ds sync --accept <id>` por cada ficha revisada. `npx ds check` debe pasar.
 6. **Publica**: `npx ds build` deja el sitio estático en `out/`. Si va dentro de otro sitio, bajo una carpeta, declara antes la ruta en `publicacion.ruta` (ver «Git, GitHub y entornos»).
+
+## Primitivos con el Lab
+
+Si partes de una web, de Figma o de nada, ajusta los primitivos en el Lab: `npx ds dev` y, en la cabecera, «Nuevo» → «Lab de primitivos» (`/<sistema>/lab`).
+
+1. En «Generar», elige neutro, marca y error, las familias y la escala de texto, la unidad de espaciado, el radio base y las sombras. Cada par de color enseña su contraste en claro y oscuro.
+2. Si un par no llega a AA (4,5:1 en texto, 3:1 en el anillo de foco), el Lab lo dice y «Ajustar» lo lleva al valor más cercano que llega.
+3. «Copiar para tu agente» le pasa el preset y la skill `montar-sistema` lo aplica. Sin agente: «Copiar enlace» y `npx ds preset aplicar "<enlace>"`.
+   - El preset se escribe en `experimental/tokens.css`, nunca en producción.
+   - Si un par que cambia el preset no llega a AA, no se escribe nada, salvo con `--aceptar-contraste`. Ese paso lo decide una persona.
+   - Un archivo que no generó el Lab no se pisa, salvo con `--sobrescribir`.
+4. Crea las fichas de tokens en `content/tokens/`, con estado `exploracion`, `nombre` y `rol`. Los valores los leen de `experimental/`.
+
+`npx ds preset resolver` devuelve el enlace para volver a abrir en el Lab lo que hay en `experimental/tokens.css`.
+
+Con un producto que ya existe, el Lab abre sus tokens en «Ajustar tokens». Lo que cambies va a `experimental/` dentro de una iniciativa. Producción no cambia hasta que una persona lleve el cambio con un PR.
 
 ## Qué no se toca en un repo de sistema
 

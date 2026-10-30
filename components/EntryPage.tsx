@@ -1,6 +1,6 @@
 import { ArrowUpRightIcon } from 'lucide-react';
 import Link from 'next/link';
-import { loadEntries, loadProductionTokens, loadSyncReport, modeLabel, PLATFORM_SECTIONS, PLATFORMS, resolvedTokenValue, SECTIONS, STATUSES, SYNC_STATES, tokenModes, tokenValue } from '@/lib/core.mjs';
+import { loadEntries, loadExperimentalTokens, loadProductionTokens, loadSyncReport, modeLabel, PLATFORM_SECTIONS, PLATFORMS, resolvedTokenValue, SECTIONS, STATUSES, SYNC_STATES, tokenModes, tokenValue } from '@/lib/core.mjs';
 import { createSlugger, prepareMarkdown, type TocItem } from '@/lib/markdown';
 import type { Entry, Nav, System } from '@/lib/nav';
 import { sitePath } from '@/lib/site';
@@ -14,6 +14,8 @@ import { Markdown } from './Markdown';
 const isColor = (value: string) => /^(#|rgba?\(|hsla?\(|hwb\(|(ok)?(lab|lch)\(|color\()/i.test(value.trim());
 
 type TokenRow = { nombre: string; rol?: string };
+/** Columna de los tokens de experimental/ en la tabla de una ficha de tokens. */
+const EXPERIMENTAL = 'experimental';
 type TokenValues = Record<string, string | Record<string, string>>;
 type Source = { clave: string; plataforma: string; superficie: string; fuente: string; clases: string[]; estado: string; motivo?: string; huella?: string; commitRevisado?: string | null };
 
@@ -48,12 +50,17 @@ function Heading({ id, children }: { id: string; children: React.ReactNode }) {
 export function EntryPage({ system, entry, platform, nav }: { system: System; entry: Entry; platform: string; nav: Nav }) {
   const report = loadSyncReport(system);
   const sync = report?.entradas?.[entry.id];
-  const tokens = loadProductionTokens(system) as Record<string, TokenValues>;
+  const tokenRows: TokenRow[] = (entry.data.tokens ?? []).map((t: string | TokenRow) => (typeof t === 'string' ? { nombre: t } : t));
+  // Lo que aún no está en producción (experimental/, también lo que escribe el Lab) va en su propia columna.
+  const experimental = loadExperimentalTokens(system);
+  const withExperimental = experimental !== null && tokenRows.some((t) => experimental.values[t.nombre] !== undefined);
+  const production = loadProductionTokens(system) as Record<string, TokenValues>;
+  const tokens: Record<string, TokenValues> = withExperimental ? { ...production, [EXPERIMENTAL]: experimental.values as TokenValues } : production;
   const surfaces = previewSurfaces(system);
-  const surfaceNames = Object.fromEntries(Object.entries(system.produccion?.superficies ?? {}).map(([id, s]) => [id, (s as { nombre: string }).nombre]));
+  const surfaceNames: Record<string, string> = { ...Object.fromEntries(Object.entries(system.produccion?.superficies ?? {}).map(([id, s]) => [id, (s as { nombre: string }).nombre])), [EXPERIMENTAL]: 'Experimental' };
   const surfaceIds = Object.keys(tokens);
   // Modos de cada superficie (claro, oscuro…) y los selectores que los activan, según el último sync.
-  const modeSelectors = (id: string) => (report?.tokens?.[id]?.modos ?? null) as Record<string, string[]> | null;
+  const modeSelectors = (id: string) => (id === EXPERIMENTAL ? experimental?.info.modos ?? null : report?.tokens?.[id]?.modos ?? null) as Record<string, string[]> | null;
   const modes = Object.fromEntries(surfaceIds.map((id) => [id, tokenModes(tokens[id], modeSelectors(id))]));
   const modeColumns = surfaceIds.flatMap((id) => (modes[id].length ? modes[id] : [null]).map((mode) => ({ id, mode })));
   const showPlatforms = PLATFORM_SECTIONS.includes(entry.section);
@@ -62,7 +69,6 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   const current = entry.platforms[platform as keyof typeof entry.platforms];
   const all = loadEntries(system);
   const related = ((entry.data.relacionados ?? []) as string[]).map((id) => all.find((e) => e.id === id)).filter(Boolean) as Entry[];
-  const tokenRows: TokenRow[] = (entry.data.tokens ?? []).map((t: string | TokenRow) => (typeof t === 'string' ? { nombre: t } : t));
   const item = nav.items.find((i) => i.href === entry.href)!;
   const sources = ((sync?.fuentes ?? []) as Source[]).filter((f) => f.superficie !== 'tokens');
   const startPrompt = `Implementa «${entry.titulo}» para ${PLATFORMS[platform as keyof typeof PLATFORMS]} en el sistema ${system.id}. Lee ${sitePath(entry.href)}.md y docs/metodologia/06-plataformas.md. Crea ${entry.file.replace(/index\.md$|\.md$/, '')}/${platform}.md con estado exploracion y no toques producción.`;
@@ -132,7 +138,7 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
       {entry.section === 'tokens' && tokenRows.length > 0 && (
         <div className="ds-prose">
           <p className="text-sm text-muted-foreground">
-            Valores leídos del código de producción en el último sync. Cómo se usan, en su fundamento.
+            {!withExperimental ? 'Valores leídos del código de producción en el último sync.' : surfaceIds.length > 1 ? 'Valores leídos del código de producción en el último sync. La columna Experimental sale de experimental/: todavía no está en producción.' : 'Valores de experimental/: todavía no están en producción.'} Cómo se usan, en su fundamento.
             {surfaceIds.filter((id) => modes[id].length).map((id) => (
               <span key={id}> {surfaceIds.length > 1 ? `${surfaceNames[id] ?? id}: ` : 'Un valor por modo: '}{modes[id].map((m) => `${modeLabel(m)}${modeSelectors(id)?.[m] ? ` (${modeSelectors(id)?.[m].join(', ')})` : ''}`).join(' · ')}.</span>
             ))}

@@ -14,7 +14,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import postcss from 'postcss';
-import { PLATFORM_SECTIONS, listSystems, loadEntries, loadLock, previewClasses, resolveVars, tokenValue } from '../lib/core.mjs';
+import { PLATFORM_SECTIONS, listSystems, loadEntries, loadLock, previewClasses } from '../lib/core.mjs';
+import { buildTokens, readModeTokens, readThemeTokens } from '../lib/css-tokens.mjs';
 
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
@@ -90,97 +91,6 @@ function copyPackageAssets(css, from, ctx) {
     fs.copyFileSync(asset, path.join(ctx.assetsDir, target));
     return `url(${quote}assets/${target.split(path.sep).join('/')}${quote})`;
   });
-}
-
-// Selectores de modo: [data-theme="dark"] (también data-mode, data-color-scheme, data-scheme), .dark y .light,
-// solos o sobre :root, html o body.
-const MODE_SELECTOR = /^(?::root|html|body)?(?:\[data-(?:theme|mode|color-scheme|scheme)\s*=\s*(["']?)([\w-]+)\1\s*\]|\.(dark|light))$/;
-
-/**
- * Modo de la @media (prefers-color-scheme: …) que envuelve la regla, '' si no hay ninguna, o null si la regla
- * no cuenta: anidada en otra regla o bajo otra condición (@media de ancho, @container), porque entonces no es
- * el valor del token. @layer y @supports no cambian nada.
- */
-function mediaMode(rule) {
-  let mode = '';
-  for (let node = rule.parent; node && node.type !== 'root'; node = node.parent) {
-    if (node.type === 'rule') return null;
-    if (node.type !== 'atrule' || node.name === 'layer' || node.name === 'supports') continue;
-    const scheme = node.name === 'media' && /^\(\s*prefers-color-scheme\s*:\s*([\w-]+)\s*\)$/.exec(node.params.trim());
-    if (!scheme) return null;
-    mode = scheme[1];
-  }
-  return mode;
-}
-
-/** Propiedades personalizadas de :root ('' = modo base) y de cada modo, con los selectores que lo activan. */
-function readModeTokens(root, found) {
-  root.walkRules((rule) => {
-    const media = mediaMode(rule);
-    if (media === null) return;
-    for (const selector of rule.selectors) {
-      const plain = selector.trim().replace(/:not\([^)]*\)/g, '');
-      const match = plain === ':root' ? null : MODE_SELECTOR.exec(plain);
-      if (plain !== ':root' && !match) continue;
-      if (match?.[3]) found.modeClasses.add(match[3]);
-      const mode = match ? match[2] ?? match[3] : media;
-      if (!found.modes.has(mode)) found.modes.set(mode, { valores: {}, selectores: new Set() });
-      const target = found.modes.get(mode);
-      target.selectores.add(media ? `@media (prefers-color-scheme: ${media}) ${selector.trim()}` : selector.trim());
-      rule.each((node) => {
-        if (node.type === 'decl' && node.prop.startsWith('--')) target.valores[node.prop.slice(2)] = node.value;
-      });
-    }
-  });
-}
-
-/** Variables de @theme y @theme inline (Tailwind 4): radios, sombras, fuentes, tamaños de texto… */
-function readThemeTokens(root, theme) {
-  root.walkAtRules('theme', (at) => at.each((node) => {
-    if (node.type === 'decl' && node.prop.startsWith('--') && !node.prop.includes('*')) theme[node.prop.slice(2)] = node.value;
-  }));
-}
-
-/**
- * Junta los tokens de una superficie. El modo base (:root) se llama «light» si hay modo oscuro, «dark» si solo
- * hay claro y «base» en otro caso. Un token vale un texto si es igual en todos los modos (un modo hereda el
- * valor base que no redefine) y { modo: valor } si cambia. Las variables de @theme que :root no tiene se añaden
- * con sus var() resueltas en cada modo.
- */
-function buildTokens({ modes, theme }) {
-  const named = [...modes.keys()].filter(Boolean);
-  const base = named.includes('dark') ? 'light' : named.includes('light') ? 'dark' : 'base';
-  const byMode = new Map();
-  const selectors = new Map();
-  for (const [mode, { valores, selectores }] of modes) {
-    const id = mode || base;
-    byMode.set(id, { ...byMode.get(id), ...valores });
-    selectors.set(id, [...(selectors.get(id) ?? []), ...selectores]);
-  }
-  const order = [base, ...byMode.keys()].filter((m, i, all) => byMode.has(m) && all.indexOf(m) === i);
-  const collapse = (perMode) => {
-    const list = Object.values(perMode);
-    return list.length === order.length && list.every((v) => v === list[0]) ? list[0] : perMode;
-  };
-
-  const values = {};
-  for (const name of new Set(order.flatMap((m) => Object.keys(byMode.get(m))))) {
-    const perMode = {};
-    for (const mode of order) {
-      const value = byMode.get(mode)[name] ?? byMode.get(base)?.[name];
-      if (value !== undefined) perMode[mode] = value;
-    }
-    values[name] = collapse(perMode);
-  }
-
-  const lookup = (name, mode) => tokenValue(values[name], mode) ?? theme[name];
-  const themeUsed = {};
-  for (const [name, raw] of Object.entries(theme)) {
-    if (name in values) continue;
-    themeUsed[name] = raw;
-    values[name] = order.length < 2 ? resolveVars(raw, lookup, order[0]) : collapse(Object.fromEntries(order.map((mode) => [mode, resolveVars(raw, lookup, mode)])));
-  }
-  return { values, info: { modos: Object.fromEntries(order.map((m) => [m, selectors.get(m)])), theme: themeUsed } };
 }
 
 /** Archivos de componentes (.tsx, .jsx, .vue, .svelte, .astro) bajo las carpetas dadas, sin tests ni stories. */

@@ -1,6 +1,6 @@
 ---
 name: montar-sistema
-description: Monta el sistema de diseño de un producto a partir de su repo, de su web o Figma, o desde cero, haciendo las preguntas con los componentes nativos del agente. Úsala cuando pidan «monta el sistema de diseño», «crea el sistema de diseño de este producto», «empieza un design system» o cuando system.json conserve valores de la plantilla.
+description: Monta el sistema de diseño de un producto a partir de su repo, de su web o Figma, o desde cero, haciendo las preguntas con los componentes nativos del agente, y aplica los presets del Lab de primitivos. Úsala cuando pidan «monta el sistema de diseño», «crea el sistema de diseño de este producto», «empieza un design system», «aplica este preset del Lab» (`npx ds preset aplicar`), o cuando system.json conserve valores de la plantilla.
 ---
 
 # Montar un sistema de diseño
@@ -77,17 +77,46 @@ npx ESPEC_DEL_KIT init "<Nombre>" --carpeta <carpeta> --desde <repo|web|figma|ce
    - Figma: las variables y los estilos, con el MCP de Figma si está conectado.
    - Si no puedes acceder, dilo y pide una exportación. No adivines valores.
 2. Escribe los primitivos como propiedades personalizadas en `experimental/tokens.css`:
-   - Color, en pares de texto y fondo con contraste AA.
+   - Color, en pares de texto y fondo, en `:root` y, si hay modo oscuro, en `.dark`.
    - Tipografía, espaciado, radios y sombras.
-   - Los valores van tal cual los encontraste. Marca lo dudoso.
+   - Los valores van tal cual los encontraste, con los nombres del producto. Marca lo dudoso.
 3. Crea las fichas de tokens en `exploracion`, con `nombre` y `rol`.
-4. Escribe `DESIGN.md` con lo que se ve. Lo demás, «Pendiente».
-5. Si hay repo, enlázalo: completa `produccion` en `system.json` y sigue «Desde un repo» desde el paso 2.
+4. **Contraste.** Abre el Lab de primitivos (`npx ds dev` → `/<id>/lab`, pestaña «Ajustar tokens»): enseña el contraste de cada par. Si alguno no llega a AA, o si la persona quiere afinar un valor, lo ajusta ahí. Aplica lo que te pase con «Aplicar un preset del Lab».
+5. Escribe `DESIGN.md` con lo que se ve. Lo demás, «Pendiente».
+6. Si hay repo, enlázalo: completa `produccion` en `system.json` y sigue «Desde un repo» desde el paso 2.
 
 ### Desde cero
 
 1. Escribe `DESIGN.md` con lo que te contaron: contexto, para quién, tono y prioridades.
-2. Propón unos primitivos de partida, pocos y con nombre de rol (color en pares AA, tipografía, espaciado, radios y sombras). Pide confirmación antes de escribirlos en `experimental/tokens.css` y en las fichas de tokens en `exploracion`.
+2. **Primitivos de partida, con el Lab.** Pregunta (cabecera «Primitivos»):
+   1. **Los ajusto en el Lab** (recomendada): arranca `npx ds dev` y pásale `http://localhost:4100/<id>/lab`. Ajusta color, texto, espaciado, radios y sombras, y copia el enlace o «Copiar para tu agente».
+   2. **Propónmelos tú**: escribe un preset en JSON con lo que te contaron (solo lo que cambia; el resto toma los valores por defecto), por ejemplo `{"color":{"marca":"#…","neutro":"#…"},"radio":6}`. Enséñalo con `npx ds preset ver '<json>'`, que también da el enlace para abrirlo en el Lab, y espera su visto bueno.
+3. En los dos casos, sigue «Aplicar un preset del Lab». Los tokens llevan los nombres de shadcn.
+
+## Aplicar un preset del Lab
+
+El Lab de primitivos (`/<id>/lab` con `npx ds dev`, o «Nuevo» → «Lab de primitivos») ajusta color, texto, espaciado, radios y sombras, y los enseña en claro y oscuro con el contraste de cada par. No escribe nada. El estado va en el enlace (`?preset=`), y «Copiar para tu agente» te lo pasa con un prompt. «Generar» crea los tokens desde unos pocos primitivos. «Ajustar tokens» cambia los que el sistema ya tiene, de producción o de `experimental/`.
+
+1. **Léelo antes de escribir.** Ejecuta `npx ds preset ver "<enlace>"` y resume a la persona los valores, los ajustes a mano y el contraste. Si avisa de valores descartados, díselo: venían en el enlace y no eran válidos.
+2. **Contraste.** El mínimo es 4,5:1 en los pares de texto y 3:1 en `--ring` sobre `--background`. Si un par que cambia el preset no llega:
+   - El comando lo dice y propone el valor más cercano que llega.
+   - **Pregunta** (cabecera «Contraste»): ajustarlo en el Lab con el botón «Ajustar» y copiar el enlace otra vez (recomendada), o aceptarlo tal cual.
+   - Usa `--aceptar-contraste` solo si la persona lo acepta, y anótalo en la ficha de tokens.
+   - Si un par ya estaba así y el preset no lo cambia, avísalo sin bloquear.
+3. **Aplica** con `npx ds preset aplicar "<enlace>"`:
+   - Escribe en `experimental/tokens.css`. Con «Ajustar tokens» sobre tokens de `experimental/`, cambia cada valor en la hoja que lo declara.
+   - Nunca escribe en producción.
+   - `--solo color,radios` aplica solo esos grupos sobre el preset que ya hay en el archivo.
+   - No pisa un archivo que no generó el Lab. Pregunta antes de usar `--sobrescribir` o `--archivo <otro>.css`. `--archivo` siempre apunta dentro de `experimental/`.
+4. **Fichas de tokens**, según el sistema:
+   - **Sin producción** (desde una web, Figma o nada): una ficha por grupo en `content/tokens/` (color, tipografía, espaciado, radios, sombras), con estado `exploracion`, y `nombre` y `rol` de cada token.
+     - Un preset de «Generar» usa los nombres de shadcn: `background`, `foreground`, `primary`, `primary-foreground`, `muted`, `muted-foreground`, `border`, `ring`, `radius`, `spacing`, `text-base`, `shadow-md`…
+     - Los valores no se copian a la ficha: la ficha los lee de `experimental/` y los enseña en la columna «Experimental».
+   - **Con producción**: el cambio es una **iniciativa**. Créala (o usa la que ya hay) con la skill `nueva-ficha`, añade `iniciativa: <slug>` a las fichas de tokens que cambian y anota en su «Exploración» qué cambia y por qué.
+     - Los nombres son los del producto, nunca los de shadcn.
+     - No toques el repo de producción ni cambies el estado de las fichas que ya están en `produccion`.
+5. **Comprueba.** Con `npx ds dev`, abre las fichas de tokens. `npx ds preset resolver` da el enlace para volver a abrir en el Lab lo que hay en `experimental/tokens.css`.
+6. **Llevarlo a producción no es parte de esta skill.** Lo hace una persona con un PR en el repo del producto (ver «Cómo sube una pieza a producción» en `03-estados.md`). Con Tailwind 4, los tokens con nombres de shadcn necesitan además su puente `@theme inline` (`--color-background: var(--background);`…) para que existan utilidades como `bg-background`.
 
 ## 5. Cierra
 
@@ -98,5 +127,6 @@ npx ESPEC_DEL_KIT init "<Nombre>" --carpeta <carpeta> --desde <repo|web|figma|ce
 
 - Escribir en el repo de producción, ni crear el sistema dentro de él.
 - Aceptar huellas (`--accept`) de fichas que no has revisado.
+- Usar `--aceptar-contraste`, `--sobrescribir` o `--archivo` sin preguntar.
 - Inventar textos, valores o reglas, ni reescribir los textos del producto en los ejemplos.
 - Instalar nada en la carpeta de usuario sin que te lo pidan.

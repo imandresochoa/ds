@@ -13,7 +13,7 @@ resumen: Qué lee un agente, en qué orden, y cómo se mejora la guía con evalu
 | `/<sistema>/llms-full.txt` | Todas las fichas en un solo archivo. |
 | `<ruta de la ficha>.md` | Cada página en Markdown, en la misma ruta. |
 
-En la interfaz, «Copiar página» copia cada página en Markdown y la tarjeta «¿Trabajas con un agente?» copia un contexto listo para pegar. Desde la terminal, `npx ds info --json` y `npx ds search <texto>` dan lo mismo a un agente sin abrir la web.
+En la interfaz, «Copiar página» copia cada página en Markdown y la tarjeta «¿Trabajas con un agente?» copia un contexto listo para pegar. Desde la terminal, `npx ds info --json` y `npx ds search <texto>` dan lo mismo a un agente sin abrir la web. El Lab de primitivos pasa sus cambios con un enlace: `npx ds preset ver` lo lee y `npx ds preset aplicar` lo escribe en `experimental/`.
 
 ## Orden de lectura para un agente
 
@@ -44,7 +44,7 @@ El kit instala skills en cada sistema (`ds init` y `ds skills`): en `.claude/ski
 
 | Skill | Cuándo |
 | --- | --- |
-| `montar-sistema` | Montar un sistema desde el repo, la web o Figma de un producto, o desde cero. Es la de entrada: `ds instalar` la deja en la carpeta de usuario para usarla antes de que exista el sistema. |
+| `montar-sistema` | Montar un sistema desde el repo, la web o Figma de un producto, o desde cero, y aplicar un preset del Lab. Es la de entrada: `ds instalar` la deja en la carpeta de usuario para usarla antes de que exista el sistema. |
 | `inventariar-produccion` | Planificar qué documentar, con prioridades y tandas. |
 | `nueva-ficha` | Documentar un componente, bloque, gráfico, fundamento, token o iniciativa. |
 | `auditar-sistema` | Comprobar que todo cuadra con producción y arreglarlo. Antes de publicar, tras cada merge en producción y como rutina diaria programada (apartado «Rutina diaria» de `AGENTS.md`). |

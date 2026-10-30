@@ -1,6 +1,6 @@
 'use client';
 
-import { CodeIcon, PlusIcon } from 'lucide-react';
+import { CodeIcon, FlaskConicalIcon, PlusIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type { Nav } from '@/lib/nav';
@@ -113,7 +113,7 @@ function RepoLink({ href }: { href: string }) {
   );
 }
 
-/** «Nuevo»: copia un prompt para que un agente cree la pieza siguiendo la metodología. */
+/** «Nuevo»: el Lab de primitivos y los prompts para que un agente cree cada pieza siguiendo la metodología. */
 function NewMenu({ nav }: { nav: Nav }) {
   const { copy } = useCopy();
   return (
@@ -125,6 +125,13 @@ function NewMenu({ nav }: { nav: Nav }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuItem asChild>
+          <Link href={nav.lab}>
+            <FlaskConicalIcon />
+            Lab de primitivos
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Copia un prompt para tu agente</DropdownMenuLabel>
         {nav.acciones.slice(0, -1).map((a) => (
           <DropdownMenuItem key={a.label} onSelect={() => void copy(a.prompt, 'Prompt copiado para tu agente')}>{a.label}</DropdownMenuItem>

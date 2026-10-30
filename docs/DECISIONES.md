@@ -126,3 +126,32 @@ Empezar un sistema pasa a ser un comando y una frase al agente: `npx @imandresoc
 - **Qué.** La 0.9.0 es la primera versión en npm. La publica Andrés a mano, con su cuenta y 2FA, porque npm no deja configurar el trusted publisher de un paquete que aún no existe.
 - **Después.** Se configura el trusted publisher (`imandresochoa/ds`, `publicar.yml`) y se prohíbe publicar con tokens. Las versiones siguientes salen del workflow, con procedencia.
 - **Descartado.** Publicar la primera versión desde Actions con un token de npm guardado como secreto: sería un token de escritura de larga duración que habría que acordarse de revocar.
+
+## 2026-10-30 · Lab de primitivos
+
+Un sistema que parte de una web, de Figma o de nada ajusta sus primitivos en el Lab, sin escribir los tokens a mano. Es el Create de shadcn, pero solo con primitivos, porque el kit no lleva componentes.
+
+- **Dónde.** Es una página de cada sistema, `/<sistema>/lab`, en `ds dev` y en el sitio publicado, y la primera opción de «Nuevo». Así ve los tokens del sistema. Una herramienta aparte no los vería.
+- **Qué ajusta.**
+  - «Generar»: neutro, marca y error; texto (familias, tamaño base, escala, interlineado); espaciado; radio y sombras.
+  - «Ajustar tokens»: los que el sistema ya tiene, de producción o de `experimental/`.
+  - El movimiento queda para más adelante.
+- **Nombres.** Un sistema nuevo usa los de shadcn y los de Tailwind 4. Un producto que ya existe conserva los suyos.
+- **Preset.**
+  - Lleva valores libres en la URL (`?preset=`, JSON en base64url).
+  - Se valida al leerlo: se descartan con aviso los valores que podrían meter CSS (`;`, `{}`, `url(`, `@`…).
+  - El archivo que se escribe guarda el preset en un comentario, para volver a abrirlo con `ds preset resolver`.
+- **Quién escribe.**
+  - El Lab no escribe nada.
+  - `npx ds preset aplicar` escribe en `experimental/`, nunca en producción, y no pisa un archivo que no generó el Lab.
+  - La skill `montar-sistema` lo aplica y crea las fichas de tokens en exploración. Si hay producción, lo hace dentro de una iniciativa.
+- **Contraste.**
+  - El Lab avisa de cada par por debajo de AA (4,5:1 en texto y 3:1 en el anillo de foco) y propone el valor más cercano que llega.
+  - `ds preset aplicar` no escribe un par por debajo de AA que cambie el preset, salvo con `--aceptar-contraste`. Ese paso lo decide la persona, no el agente.
+  - Los pares que ya fallaban, y que el preset no toca, se avisan sin bloquear.
+- **Privacidad.** El Lab no hace peticiones de red ni carga fuentes de un servicio externo: las muestras usan las fuentes instaladas en el equipo.
+
+**Descartado:**
+- Un código corto con un catálogo cerrado de opciones, como el de shadcn: los primitivos de un producto son libres.
+- Las fuentes de Google Fonts: enviarían a un tercero la IP de quien abre el Lab.
+- Bloquear el preset entero si cualquier par baja de AA: un producto puede arrastrar pares que el preset no toca.

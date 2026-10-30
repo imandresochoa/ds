@@ -44,6 +44,7 @@ Con ella, páginas, assets, enlaces, `.md`, `llms.txt` y ejemplos en vivo llevan
 | `npx ds dev` | Servidor de desarrollo en http://localhost:4100. |
 | `npx ds sync [--accept <id>]` | Lee producción: instantánea CSS, tokens, huellas, cobertura. |
 | `npx ds check` | Falla si algo está desajustado, ausente o inventado. |
+| `npx ds preset ver\|aplicar\|resolver` | Lee un preset del Lab de primitivos (`/<sistema>/lab`) y lo escribe en `experimental/`, nunca en producción. |
 | `npx ds build` | Exporta el sitio estático a `out/`, para la raíz de un dominio o para la ruta de `publicacion.ruta` (`DS_RUTA` la cambia). |
 | `npx ds skills` | Copia o actualiza las skills del kit en `.claude/skills/` (Claude Code) y `.agents/skills/` (Codex). |
 | `npx ds doctor` | Comprueba la configuración. |

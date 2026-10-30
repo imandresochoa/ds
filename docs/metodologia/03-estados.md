@@ -42,7 +42,7 @@ Una sola pastilla. El texto es el estado; el color, la combinación de estado y 
 
 ## Cómo sube una pieza a producción
 
-1. **Exploración.** Ficha nueva con `estado: exploracion`. Si tiene estilos, van en `experimental/*.css`; los ejemplos en vivo ya los cargan.
+1. **Exploración.** Ficha nueva con `estado: exploracion`. Si tiene estilos, van en `experimental/*.css`; los ejemplos en vivo ya los cargan. Los tokens pueden salir del Lab de primitivos (`npx ds preset aplicar`). En un producto que ya existe, ese cambio va en una iniciativa.
 2. **En desarrollo.** El diseño está cerrado. Se construye en el sistema y se revisa.
 3. **Producción.** Se lleva el código al repo del producto. En la ficha se declaran las fuentes (`superficies`), se borra el CSS experimental y se cambia el estado. `npx ds sync --accept <id>` guarda la huella.
 4. **Obsoleto.** Cuando algo se va a retirar, se marca así y se enlaza su sustituto en `relacionados`.

@@ -35,6 +35,7 @@ npx ds build         # exporta el sitio estático a out/ (bajo publicacion.ruta,
 npx ds doctor        # comprueba la configuración
 npx ds info --json   # sistema, secciones, producción, skills y rutas del kit
 npx ds search boton  # busca fichas antes de crear una
+npx ds preset ver "<enlace del Lab>"   # lee un preset del Lab de primitivos; aplicar lo escribe en experimental/
 npx ds skills        # actualiza las skills del kit
 ```
 
@@ -52,7 +53,7 @@ Si pone «sin programar», prográmala siguiendo el apartado «Rutina diaria» d
 
 ## Skills
 
-- `montar-sistema`: monta el sistema desde el repo, la web o Figma del producto, o desde cero (superficies, tokens, primeras fichas).
+- `montar-sistema`: monta el sistema desde el repo, la web o Figma del producto, o desde cero (superficies, tokens, primeras fichas), y aplica los presets del Lab de primitivos.
 - `nueva-ficha`: documenta un componente, bloque, gráfico, fundamento o token.
 - `auditar-sistema`: revisa que todo el sistema cuadre con producción y arregla lo que no. Antes de publicar y tras cada merge en producción.
 - `revisar-sync`: interpreta el informe de sync y propone qué actualizar o aceptar.

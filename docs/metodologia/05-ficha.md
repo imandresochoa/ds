@@ -55,7 +55,7 @@ Las páginas que no son fichas (introducción, instalación, guías) van en `con
 ## Fundamento y tokens: sin solaparse
 
 - **El fundamento** explica cómo y cuándo se usa algo (reglas, antipatrones) y enlaza a sus tokens.
-- **La ficha de tokens** solo tiene la tabla: nombre, rol y valor de producción. Las reglas de uso no van ahí.
+- **La ficha de tokens** solo tiene la tabla: nombre, rol y valor de producción. Si un token está también en `experimental/` (por ejemplo, porque salió del Lab de primitivos), la tabla enseña ese valor en la columna «Experimental». Las reglas de uso no van ahí.
 - Se enlazan entre sí con `relacionados`.
 
 ## Escribir para agentes
