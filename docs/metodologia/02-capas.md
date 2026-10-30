@@ -40,7 +40,7 @@ Reglas de la herencia:
 
 - Los tokens se redefinen por nombre. Un hijo no inventa un nombre nuevo para un rol que ya existe en el padre.
 - Las fichas del padre aparecen en el hijo salvo que el hijo las sustituya con el mismo `id`.
-- La metodología es común e interna: vive en `docs/metodologia/`, no se duplica por sistema y solo se muestra en los sistemas que la activan (`"metodologia": true`).
+- La metodología es común: vive en el kit (`docs/metodologia/`), no se duplica por sistema y el sitio de un sistema solo la muestra si la activa (`"metodologia": true`).
 
 El sistema `base` y la resolución de herencia están pendientes (ver `docs/TAREAS.md`).
 

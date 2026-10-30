@@ -5,7 +5,7 @@ description: Crea o completa una ficha del sistema de diseño (componente, bloqu
 
 # Crear una ficha
 
-Lee primero `node_modules/design-system-agentic-first-kit/docs/metodologia/05-ficha.md` (anatomía) y `03-estados.md` (estados).
+Lee primero la metodología del kit (ruta en `npx ds info --json` → `kit.metodologia`): `05-ficha.md` (anatomía) y `03-estados.md` (estados). Antes de crear una ficha, comprueba con `npx ds search <nombre>` que no existe ya.
 
 ## 1. Decide sección y forma
 

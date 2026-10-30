@@ -7,7 +7,7 @@ resumen: Qué vive en el kit, qué vive en cada sistema y cómo se mantienen sin
 
 | Repo | Contiene | Ejemplo |
 | --- | --- | --- |
-| **Kit** (`design-system-agentic-first-kit`) | El motor: interfaz, CLI `ds`, scripts de sync y publicación, plantilla, skills y esta metodología. No nombra ningún producto. | Uno solo, compartido. |
+| **Kit** (paquete `@imandresochoa/ds`, repo `imandresochoa/ds`) | El motor: interfaz, CLI `ds`, scripts de sync y publicación, plantilla, skills y esta metodología. No nombra ningún producto. | Uno solo, compartido. |
 | **Sistema** (`<producto>-design-system`) | El contenido de un producto: `system.json`, `DESIGN.md`, fichas, CSS experimental, instantánea de producción y huellas. | Uno por producto. |
 | **Producción** | El código real del producto. El sistema lo lee; no lo modifica. | El repo de cada producto. |
 
@@ -33,7 +33,7 @@ La interfaz se pule mejor con contenido real. Para eso se enlaza el kit en local
 
 ```bash
 cd producto-design-system
-npx ds enlazar ../design-system-agentic-first-kit   # el kit necesita su propio npm install
+npx ds enlazar ../ds   # el kit necesita su propio npm install
 npx ds dev
 npx ds desenlazar                                   # vuelve a la versión fijada en package.json
 ```
@@ -47,8 +47,8 @@ Sin enlazar, `ds` copia el motor a `.ds/kit` (ignorado por git) y lo ejecuta des
 ## Actualizar un sistema
 
 ```bash
-npm install github:USUARIO/design-system-agentic-first-kit#vX.Y.Z
-npx ds skills     # actualiza las skills
+npm install @imandresochoa/ds@X.Y.Z
+npx ds skills     # actualiza las skills de Claude Code y Codex
 npx ds sync && npx ds check
 ```
 
