@@ -7,6 +7,8 @@ description: Recorre el repo de producción y entrega un inventario priorizado d
 
 Solo lectura. El resultado es un plan, no fichas.
 
+Si la persona dio una lista de piezas o hay componentes con nombre en Figma, son el inventario de partida: mandan sobre lo que deduzcas del CSS y dan los nombres de las fichas.
+
 1. `npx ds sync` y lee `sync-report.json` → `cobertura` (clases o componentes, y tokens sin documentar, por superficie).
 2. Recorre producción por superficie:
    - **Componentes**: carpeta de componentes (por ejemplo `src/components/`; en superficies Tailwind, `cobertura` ya lista los archivos sin ficha) y familias de clases del CSS (prefijos comunes: `btn-*`, `card-*`).

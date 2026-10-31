@@ -221,3 +221,11 @@ Al montar un sistema, el agente lee producción entera y ve lo que hace a mano: 
 - **No es un fallo.** `ds check` no mira los hallazgos: no dicen que el sistema mienta, sino que producción podría usarlo mejor.
 - **Solo valores distintivos.** Se comparan colores y valores compuestos (sombras, pilas de fuentes, curvas). Los valores simples (`8px`, `0`, `1`) darían demasiadas coincidencias casuales. Los radios y espacios casi iguales los busca la skill.
 
+## 2026-10-31 · `montar-sistema` pregunta antes y encadena tandas
+
+Sale del informe de un agente que montó un sistema real. Se paró después del plan, se le escaparon piezas que vivían repartidas en varias hojas con prefijos distintos, no miró los componentes de Figma y dejó partes de `DESIGN.md` en «Pendiente» que la persona sabía. Cinco fichas llevaron buena parte de la sesión y quedaban unas veinticinco.
+
+- **Alcance al principio**, en la misma llamada que el origen. «Todo, tanda tras tanda» es la recomendada: montar un sistema sin sus fichas deja el trabajo a medias.
+- **Lo que dice la persona y Figma manda sobre lo deducido.** Agrupar clases por prefijo no ve una pieza con cuatro prefijos. Una lista con nombres o los componentes de Figma sí.
+- **Decisiones abiertas antes de escribir `DESIGN.md`**, no al final, para que no se queden en «Pendiente» cosas que la persona sabe.
+- **Encadenar no rebaja el listón.** Cada ficha se comprueba y cada huella se revisa. Un commit por tanda, solo en el repo del sistema, e `INVENTARIO.md` al día para retomar en otra sesión. Se descartó un modo que creara fichas sin comprobar el ejemplo: es rápido, pero lo que llega al registry tiene que ser verdad.

@@ -9,6 +9,7 @@ Repo del sistema de diseño de NOMBRE_DEL_SISTEMA. Aquí solo vive el **contenid
 | `system.json` | Configuración: id, nombre, repo de producción, superficies y plataformas. |
 | `DESIGN.md` | Criterio para agentes, escrito a mano. Se publica como `/<id>/design.md` con un apéndice generado. |
 | `content/<sección>/` | Fichas en Markdown con frontmatter YAML: `fundamentos`, `tokens`, `componentes`, `bloques`, `graficos`, `iniciativas`. Las páginas de Docs, en `content/docs/`. |
+| `docs/INVENTARIO.md` | Plan de fichas por tandas: lo hecho, lo que falta y las dudas. Lo crea la skill `inventariar-produccion`. |
 | `experimental/` | CSS de piezas en exploración o desarrollo (aún no están en producción). |
 | `produccion/`, `tokens.produccion.json`, `sync-report.json` | Generados por `ds sync`. No se editan. |
 | `produccion.lock.json` | Huellas revisadas. Solo cambia con `ds sync --accept`. |

@@ -20,13 +20,14 @@ npx @imandresochoa/ds@latest instalar
 
 Instala la skill `montar-sistema` para Claude Code y Codex en tu carpeta de usuario. Después, abre el agente en el repo del producto (o en una carpeta vacía) y escribe «monta el sistema de diseño». La skill:
 
-1. Pregunta **de dónde partís**: de un repo con código, de una web o de Figma, o de nada todavía. Lo hace con los componentes de preguntas del agente (ver «Capa para agentes»).
-2. Pide lo que falte según la respuesta (la ruta, la URL o qué es el producto), el nombre y la carpeta. Por defecto, `../<producto>-design-system`.
+1. Pregunta **de dónde partís** (de un repo con código, de una web o de Figma, o de nada todavía) y **el alcance**: todo, tanda tras tanda; el plan y la primera tanda; o solo el plan (`DESIGN.md`, tokens e inventario). Lo hace con los componentes de preguntas del agente (ver «Capa para agentes»).
+2. Pide lo que falte según la respuesta (la ruta, la URL o qué es el producto), el nombre y la carpeta. Por defecto, `../<producto>-design-system`. Pregunta también si tienes una **lista de piezas** con sus nombres y si hay **archivo de Figma**: los dos mandan sobre lo que se deduce del CSS.
 3. Crea el repo del sistema con `ds init`, que se niega a hacerlo dentro de producción.
 4. Lo llena según el origen:
-   - **Repo**: superficies, primer sync, `DESIGN.md`, fichas de tokens y plan de fichas.
+   - **Repo**: superficies, primer sync, las decisiones abiertas (para quién y voz, superficies sin tokens, hojas que no se cargan), `DESIGN.md`, fichas de tokens y plan de fichas.
    - **Web o Figma**: primitivos sacados de lo publicado, en exploración.
    - **Nada**: `DESIGN.md` con lo que cuentes y unos primitivos de partida, que ajustas en el Lab de primitivos.
+5. Crea las fichas por tandas, según el alcance. En «todo» no se para entre tandas salvo por dudas que bloqueen, pero revisa cada ficha y cada huella. Hace un commit por tanda en el repo del sistema y deja `docs/INVENTARIO.md` al día para retomarlo.
 
 ## Sin agente
 
