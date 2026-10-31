@@ -2,7 +2,9 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
-## Sin publicar
+## 1.2.0 · 2026-10-31
+
+Una función nueva que sale del primer feedback real con `ds feedback`, y un arreglo del propio feedback. Migración: ninguna; `npm install @imandresochoa/ds@1.2.0`.
 
 - **Selector de superficie en la cabecera.** Con dos superficies o más en `system.json`, junto a la marca del sistema aparece un selector (Todas, o una superficie). Filtra la barra lateral, ⌘K, los índices, las galerías, la home y la página de Producción. La elección va en la URL (`?superficie=<id>`) y el navegador la recuerda. Las fichas sin superficie se ven siempre. Viene del feedback de un sistema con dos interfaces muy distintas (imandresochoa/ds#28). Migración: ninguna.
 - **`ds feedback` ya no borra palabras sueltas.** La anonimización tomaba como nombre del producto la primera palabra de la carpeta o del repo y la quitaba de todo el texto: con una carpeta `feedback-prueba`, cada «feedback» salía como `<producto>`. Ahora quita el nombre entero en todas sus formas y sin los sufijos habituales de un repo (`-design-system`, `-web`, `-app`, `-site`, `-frontend`, `-landing`…). El vocabulario del kit (feedback, tokens, fichas, sync…) nunca se trata como nombre.
