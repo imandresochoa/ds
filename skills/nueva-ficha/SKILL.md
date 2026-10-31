@@ -5,7 +5,7 @@ description: Crea o completa una ficha del sistema de diseño (componente, bloqu
 
 # Crear una ficha
 
-Lee primero la metodología del kit (ruta en `npx ds info --json` → `kit.metodologia`): `05-ficha.md` (anatomía) y `03-estados.md` (estados). Antes de crear una ficha, comprueba con `npx ds search <nombre>` que no existe ya. `npx ds ver <pieza>` te da lo que usa una pieza y quién la usa.
+Lee primero la metodología del kit (ruta en `npx ds info --json` → `kit.metodologia`): `05-ficha.md` (anatomía) y `03-estados.md` (estados). Antes de crear una ficha, comprueba con `npx ds search <nombre>` que no existe ya. Si `docs/INVENTARIO.md` le da nombre (de la lista de la persona o de Figma), usa ese. `npx ds ver <pieza>` te da lo que usa una pieza y quién la usa.
 
 `usa` es lo que la pieza compone (el grafo del registry); `relacionados`, «ver también». No los mezcles.
 

@@ -4,7 +4,9 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
 
 ## Sin publicar
 
-- **Recomendaciones para producción.** El sync añade `hallazgos` a `sync-report.json`: colores y valores compuestos escritos a mano que ya son tokens, copias de tokens fuera de `:root` y de los modos, tokens que nada usa y hojas que ninguna superficie carga, con archivo y línea. No cambian `ds check`. La skill nueva `recomendar-produccion` los revisa y escribe `docs/RECOMENDACIONES.md` en el sistema. `montar-sistema` la usa en el paso 6 y `auditar-sistema` la mantiene al día. Para tenerla: `npx ds skills`.
+- **Recomendaciones para producción.** El sync añade `hallazgos` a `sync-report.json`: colores y valores compuestos escritos a mano que ya son tokens, copias de tokens fuera de `:root` y de los modos, tokens que nada usa y hojas que ninguna superficie carga, con archivo y línea. No cambian `ds check`. La skill nueva `recomendar-produccion` los revisa y escribe `docs/RECOMENDACIONES.md` en el sistema. `montar-sistema` la usa con el plan de fichas y `auditar-sistema` la mantiene al día. Para tenerla: `npx ds skills`.
+- **`montar-sistema` pregunta al principio lo que luego echaba en falta.** Junto al origen, el **alcance** (todo, tanda tras tanda; plan y primera tanda; o solo el plan). Pide la **lista de piezas** de la persona y el **archivo de Figma**, cuyos componentes con nombre mandan sobre lo que se deduce del CSS. Pregunta las **decisiones abiertas** antes de escribir `DESIGN.md`. Un apartado nuevo, «Tandas», encadena las fichas: sin pararse, pero revisando cada una, con un commit por tanda y `docs/INVENTARIO.md` al día para retomar. `inventariar-produccion` y `nueva-ficha` usan esos nombres.
+- Migración: ninguna. `npx ds skills` para tener las skills al día.
 
 ## 1.0.0 · 2026-10-30
 

@@ -17,16 +17,21 @@ Objetivo: un repo de sistema propio, creado junto al producto y nunca dentro de 
 
 ## 1. Mira dónde estás
 
-- Si la carpeta ya tiene `system.json`, el sistema existe: ve directamente al paso 4 con su `origen` (`npx ds info --json`).
+- Si la carpeta ya tiene `system.json`, el sistema existe: ve directamente al paso 4 con su `origen` (`npx ds info --json`). Pregunta antes el «Alcance» (paso 2) si no lo sabes.
 - Si es un repo con código de producto (`package.json`, `src/`, `app/`, hojas de estilo), es la candidata a producción.
 
 ## 2. ¿De dónde partimos?
 
-Pregunta (cabecera «Origen»):
+Pregunta en una sola llamada (cabeceras «Origen» y «Alcance»):
 
-1. **De este repo** o **De un repo con código**: la recomendada si estás en uno. El sistema se enlaza con el código y se verifica con el sync.
-2. **De una web o de Figma**: se extraen los primitivos de lo publicado. Sin repo no hay enlace con el código, de momento.
-3. **De nada todavía**: se empieza por el criterio y unos primitivos de partida.
+- **Origen**:
+  1. **De este repo** o **De un repo con código**: la recomendada si estás en uno. El sistema se enlaza con el código y se verifica con el sync.
+  2. **De una web o de Figma**: se extraen los primitivos de lo publicado. Sin repo no hay enlace con el código, de momento.
+  3. **De nada todavía**: se empieza por el criterio y unos primitivos de partida.
+- **Alcance**. No lo preguntes si la persona ya lo dijo («documéntalo todo»):
+  1. **Todo, tanda tras tanda** (recomendada): el plan y todas las fichas, sin pararte entre tandas (ver «Tandas»).
+  2. **Plan y primera tanda**: el plan y las primeras 4 a 6 fichas.
+  3. **Solo el plan**: `DESIGN.md`, tokens e inventario.
 
 Después, en una sola tanda:
 
@@ -36,6 +41,8 @@ Después, en una sola tanda:
 - **Siempre**:
   - El nombre del sistema. Propón el del producto.
   - La carpeta: `../<id>-design-system` (recomendada) u otra. Nunca dentro del repo del producto.
+  - Si tiene una **lista de piezas** con sus nombres (tarjeta, ventana, dock…). Si la da, manda sobre lo que deduzcas del CSS y nombra las fichas.
+  - Si hay un **archivo de Figma**, aunque el origen sea otro. Sus componentes con nombre son el inventario de verdad.
 
 ## 3. Crea el repo del sistema
 
@@ -56,6 +63,7 @@ npx ESPEC_DEL_KIT init "<Nombre>" --carpeta <carpeta> --desde <repo|web|figma|ce
    - Las hojas de estilo globales y dónde viven los tokens (`:root`, modos como `.dark` o `[data-theme="dark"]`, `@theme` de Tailwind, archivos de variables).
    - Las partes con código propio que deban ser **superficies** distintas (por ejemplo, la web pública y el área de cliente).
    - La carpeta de componentes y, si existe, la guía de voz.
+   - Si hay archivo de Figma: sus componentes con nombre, no solo las variables (con el MCP de Figma si está conectado).
 2. **Completa `system.json`**:
    - `descripcion`: una frase, con las palabras del producto.
    - `iniciales` y `color`: la marca del sistema en la cabecera.
@@ -65,16 +73,17 @@ npx ESPEC_DEL_KIT init "<Nombre>" --carpeta <carpeta> --desde <repo|web|figma|ce
    - `"cobertura": true` en cada superficie: cuenta las clases sin documentar o, si es Tailwind, los componentes (añade `componentes` si no viven en `src/components`).
    - Si el sistema se va a publicar dentro de otro sitio, bajo una carpeta: `"publicacion": { "ruta": "/ds" }` (ver «Git, GitHub y entornos»).
 3. `npx ds doctor` sin errores. Después, `npx ds sync`. Anota la cobertura (clases o componentes, y tokens sin documentar) y los modos que encontró (`modos de <superficie>` en la salida). Si el producto tiene modo oscuro y el sync no lo ve, revisa con qué selector lo activa y avisa.
-4. Escribe `DESIGN.md` con las secciones de la plantilla, solo con lo que puedas comprobar. Los antipatrones van como borrador para que la persona los revise.
-5. **Fichas de tokens**: una por grupo (color, tipografía, espaciado, radios, sombras, movimiento), con `nombre` y `rol`. Los valores los pone el sync, uno por modo si el producto tiene varios. El `rol` es el mismo en todos los modos.
-6. **Plan de fichas** con la skill `inventariar-produccion`. No crees todas las fichas sin acordarlo. Con el mismo sync, escribe `docs/RECOMENDACIONES.md` con la skill `recomendar-produccion`: lo que producción podría mejorar con su propio sistema.
-7. **Auditoría diaria**: prográmala con la skill `auditar-sistema` (apartado «Rutina diaria») y anótalo en `AGENTS.md`.
+4. **Decisiones abiertas.** Antes de escribir `DESIGN.md`, junta las dudas que lo bloquean y pregúntalas juntas: para quién es y qué voz tiene, superficies sin tokens (¿tokens o valores fijos?), hojas que ya no se cargan, piezas duplicadas. Lo que la persona no sepa queda «Pendiente».
+5. Escribe `DESIGN.md` con las secciones de la plantilla, solo con lo que puedas comprobar. Los antipatrones van como borrador para que la persona los revise.
+6. **Fichas de tokens**: una por grupo (color, tipografía, espaciado, radios, sombras, movimiento), con `nombre` y `rol`. Los valores los pone el sync, uno por modo si el producto tiene varios. El `rol` es el mismo en todos los modos.
+7. **Plan de fichas** con la skill `inventariar-produccion`. Pásale la lista de piezas de la persona y los componentes de Figma. Con el mismo sync, escribe `docs/RECOMENDACIONES.md` con la skill `recomendar-produccion`: lo que producción podría mejorar con su propio sistema. Después, sigue «Tandas» según el alcance.
+8. **Auditoría diaria**: prográmala con la skill `auditar-sistema` (apartado «Rutina diaria») y anótalo en `AGENTS.md`.
 
 ### Desde una web o Figma
 
 1. **Saca los primitivos de lo publicado**:
    - Web: las hojas de estilo enlazadas, `:root` y las variables CSS.
-   - Figma: las variables y los estilos, con el MCP de Figma si está conectado.
+   - Figma: las variables, los estilos y los componentes con nombre, con el MCP de Figma si está conectado. Los componentes van a `docs/INVENTARIO.md` como plan de fichas.
    - Si no puedes acceder, dilo y pide una exportación. No adivines valores.
 2. Escribe los primitivos como propiedades personalizadas en `experimental/tokens.css`:
    - Color, en pares de texto y fondo, en `:root` y, si hay modo oscuro, en `.dark`.
@@ -82,7 +91,7 @@ npx ESPEC_DEL_KIT init "<Nombre>" --carpeta <carpeta> --desde <repo|web|figma|ce
    - Los valores van tal cual los encontraste, con los nombres del producto. Marca lo dudoso.
 3. Crea las fichas de tokens en `exploracion`, con `nombre` y `rol`.
 4. **Contraste.** Abre el Lab de primitivos (`npx ds dev` → `/<id>/lab`, pestaña «Ajustar tokens»): enseña el contraste de cada par. Si alguno no llega a AA, o si la persona quiere afinar un valor, lo ajusta ahí. Aplica lo que te pase con «Aplicar un preset del Lab».
-5. Escribe `DESIGN.md` con lo que se ve. Lo demás, «Pendiente».
+5. Pregunta las decisiones abiertas (como en «Desde un repo», paso 4) y escribe `DESIGN.md` con lo que se ve. Lo demás, «Pendiente».
 6. Si hay repo, enlázalo: completa `produccion` en `system.json` y sigue «Desde un repo» desde el paso 2.
 
 ### Desde cero
@@ -92,6 +101,15 @@ npx ESPEC_DEL_KIT init "<Nombre>" --carpeta <carpeta> --desde <repo|web|figma|ce
    1. **Los ajusto en el Lab** (recomendada): arranca `npx ds dev` y pásale `http://localhost:4100/<id>/lab`. Ajusta color, texto, espaciado, radios, sombras y movimiento, y copia el enlace o «Copiar para tu agente».
    2. **Propónmelos tú**: escribe un preset en JSON con lo que te contaron (solo lo que cambia; el resto toma los valores por defecto), por ejemplo `{"color":{"marca":"#…","neutro":"#…"},"radio":6}`. Enséñalo con `npx ds preset ver '<json>'`, que también da el enlace para abrirlo en el Lab, y espera su visto bueno.
 3. En los dos casos, sigue «Aplicar un preset del Lab». Los tokens llevan los nombres de shadcn.
+
+## Tandas
+
+Con alcance «Plan y primera tanda» o «Todo», crea las fichas por tandas, en el orden de `docs/INVENTARIO.md`, con la skill `nueva-ficha`.
+
+- Cada ficha, completa: lee el código, copia los textos reales, comprueba el ejemplo con `npx ds dev` y revisa la huella antes de `npx ds sync --accept`. Encadenar no es saltarse pasos.
+- **Todo**: no te pares entre tandas. Pregunta solo lo que bloquee una ficha; lo demás, «Pendiente», y sigue.
+- Al cerrar cada tanda: `npx ds check`, marca en `docs/INVENTARIO.md` lo hecho y haz un commit en el repo del sistema (`feat(ds): tanda N …`). Nunca en producción.
+- Si la sesión se alarga o se corta, deja `docs/INVENTARIO.md` al día con lo hecho, lo que falta y las dudas, para retomarlo desde ahí.
 
 ## Aplicar un preset del Lab
 
