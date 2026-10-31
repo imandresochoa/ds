@@ -64,7 +64,19 @@ npx ds sync                              # actualiza instantánea, tokens, huell
 npx ds sync --accept componentes/boton   # tras revisar la ficha, guarda su huella
 npx ds check                             # falla si algo cambió sin revisar o no existe, si falta una hoja
                                          # de estilos o si los colores de una ficha no cuadran
+npx ds patrones [--json]                 # clases de hojas y prefijos distintos con la misma forma
 ```
+
+## Patrones compartidos
+
+La cobertura cuenta clases sueltas, y el inventario por prefijos (`btn-*`, `card-*`) solo ve las piezas que el producto nombra igual en todas partes. Sin una carpeta de componentes compartidos, la misma pieza aparece escrita varias veces: una tarjeta en cuatro hojas con cuatro prefijos. `npx ds patrones` la encuentra por su forma.
+
+- Lee la instantánea de `produccion/` (una hoja por archivo de `estilos`), así que va después de `ds sync`. Una hoja que importa otras cuenta como una sola.
+- Para cada regla de una clase (`.tarjeta`, `.lista .item`; sin pseudoclases, fuera de `@media`) toma sus rasgos de forma: `border-radius`, `box-shadow`, `background` y `background-color` (son el mismo rasgo), `border` y `padding`, con sus valores, y los `var(--token)` que usan. Los valores que quitan en vez de dar forma (`0`, `none`, `transparent`) no cuentan, porque son el reset de cualquier botón.
+- Agrupa las clases que comparten una firma: los rasgos que tienen en común. Basta un rasgo (el mismo radio o el mismo token de fondo en varias hojas); `--min-rasgos 2` pide formas más completas. Una firma solo de relleno no vale.
+- Sale lo que cruza al menos dos hojas (`--min-hojas`) y dos prefijos (`--todos` incluye los grupos de un solo prefijo), ordenado por hojas, luego por rasgos y luego por prefijos. Un grupo que repite la firma de otro con más rasgos y menos clases sale como «variante» suya.
+
+Cada grupo es una candidata. Decide la persona, o el agente con la skill `inventariar-produccion`, si es una pieza, variantes de una o una coincidencia.
 
 ## Declarar fuentes en una ficha
 

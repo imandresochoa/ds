@@ -32,6 +32,7 @@ Repo del sistema de diseño de NOMBRE_DEL_SISTEMA. Aquí solo vive el **contenid
 npx ds dev           # http://localhost:4100
 npx ds sync          # lee producción: instantánea CSS, tokens, huellas e informe
 npx ds check         # falla si hay fichas desajustadas, ausentes o con clases inventadas
+npx ds patrones      # clases de hojas y prefijos distintos con la misma forma (piezas candidatas)
 npx ds build         # exporta el sitio estático a out/ (bajo publicacion.ruta, si la hay)
 npx ds doctor        # comprueba la configuración
 npx ds info --json   # sistema, secciones, producción, skills y rutas del kit
