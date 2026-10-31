@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { useT } from '@/components/site/I18nProvider';
 import { CopyButton } from './CodeBlock';
 import { Preview, type PreviewSurface } from './Preview';
 
@@ -30,14 +31,15 @@ export function BlockViewer({ id, title, href, md, html, code, codeHtml, surface
   const [view, setView] = useState('vista');
   const [width, setWidth] = useState('100');
   const { copy, copied } = useCopy();
+  const t = useT();
 
   return (
     <div id={id} data-view={view} className="group/block-view-wrapper flex min-w-0 scroll-mt-24 flex-col-reverse items-stretch gap-4 overflow-hidden md:flex-col">
       <div className="flex w-full items-center gap-2 pl-2 md:pr-6">
         <Tabs value={view} onValueChange={setView} className="hidden lg:flex">
           <TabsList className="h-7 items-center rounded-md p-0 px-[calc(--spacing(1)_-_2px)] py-(--spacing(1))">
-            <TabsTrigger value="vista" className="h-[1.45rem] rounded-sm px-2 text-xs">Vista</TabsTrigger>
-            <TabsTrigger value="codigo" className="h-[1.45rem] rounded-sm px-2 text-xs">Código</TabsTrigger>
+            <TabsTrigger value="vista" className="h-[1.45rem] rounded-sm px-2 text-xs">{t.gallery.view}</TabsTrigger>
+            <TabsTrigger value="codigo" className="h-[1.45rem] rounded-sm px-2 text-xs">{t.gallery.code}</TabsTrigger>
           </TabsList>
         </Tabs>
         <Separator orientation="vertical" className="mx-2 hidden h-4! lg:flex" />
@@ -45,9 +47,9 @@ export function BlockViewer({ id, title, href, md, html, code, codeHtml, surface
         <div className="ml-auto flex items-center gap-2">
           <div className="hidden h-8 items-center gap-1.5 rounded-md border p-[2px] shadow-none lg:flex">
             <ToggleGroup type="single" value={width} onValueChange={(value) => value && setWidth(value)} className="gap-1 *:data-[slot=toggle-group-item]:size-6! *:data-[slot=toggle-group-item]:rounded-sm!">
-              <ToggleGroupItem value="100" title="Escritorio"><MonitorIcon /></ToggleGroupItem>
-              <ToggleGroupItem value="60" title="Tablet"><TabletIcon /></ToggleGroupItem>
-              <ToggleGroupItem value="30" title="Móvil"><SmartphoneIcon /></ToggleGroupItem>
+              <ToggleGroupItem value="100" title={t.gallery.desktop}><MonitorIcon /></ToggleGroupItem>
+              <ToggleGroupItem value="60" title={t.gallery.tablet}><TabletIcon /></ToggleGroupItem>
+              <ToggleGroupItem value="30" title={t.gallery.mobile}><SmartphoneIcon /></ToggleGroupItem>
             </ToggleGroup>
           </div>
           <Separator orientation="vertical" className="mx-1 hidden h-4! lg:flex" />
@@ -55,11 +57,11 @@ export function BlockViewer({ id, title, href, md, html, code, codeHtml, surface
             variant="outline"
             size="sm"
             className="w-fit gap-1 px-2 shadow-none"
-            title="Copia el prompt para que un agente use este bloque"
-            onClick={() => copy(`Usa el bloque «${title}» del sistema de diseño. Lee ${sitePath(md)} antes de componerlo y respeta sus reglas.`, 'Prompt copiado')}
+            title={t.gallery.blockPromptTitle}
+            onClick={() => copy(t.gallery.blockPrompt(title, sitePath(md)), t.gallery.promptCopied)}
           >
             {copied ? <CheckIcon /> : <FileTextIcon />}
-            <span className="font-mono text-xs">{md.replace(/^\/[^/]+\//, '')}</span>
+            <span className="font-mono text-xs">{md.replace(/^(\/en)?\/[^/]+\//, '')}</span>
           </Button>
         </div>
       </div>

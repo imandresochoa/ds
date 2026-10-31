@@ -94,6 +94,8 @@ Tareas:
 
 ## Método y herramientas
 
+- [x] Sistemas en dos idiomas: `idiomas` en `system.json`, rutas `/en/`, traducciones en archivos hermanos y `ds traducciones` (ver «Sistemas en dos idiomas» en `DECISIONES.md`).
+- [ ] La CLI, la plantilla y las skills en inglés (hoy, solo en español).
 - [ ] Sistema `base` con los tokens neutros del shell y herencia (`extiende`).
 - [ ] `ds check` en el CI del repo de producción (cuando haya staging; ver «Entornos»).
 - [ ] Evaluaciones de `design.md` con escenarios fijos (`evals/`).

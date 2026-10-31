@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { DEFAULT_PRESET, MODOS, baseByMode, checkContrast, decodePreset, deriveTokens, encodePreset, presetCss, type Preset } from '@/lib/lab.mjs';
 import { modeLabel } from '@/lib/tokens.mjs';
+import { useLang, useT } from '@/components/site/I18nProvider';
 import { useCopy } from '@/lib/use-copy';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -34,6 +35,9 @@ function withAdjustment(preset: Preset, mode: string, name: string, value: strin
  */
 export function Lab({ systemId, bases, saved, production }: { systemId: string; bases: LabBase[]; saved: string | null; production: boolean }) {
   const { copy } = useCopy();
+  const messages = useT();
+  const t = messages.lab;
+  const lang = useLang();
   const [tab, setTab] = useState<Tab>(() => (bases.length && !saved ? 'ajustar' : 'generar'));
   const [gen, setGen] = useState<Preset>(() => {
     if (!saved) return fresh();
@@ -53,18 +57,18 @@ export function Lab({ systemId, bases, saved, production }: { systemId: string; 
     try {
       const { preset, avisos } = decodePreset(code);
       if (preset.modo === 'ajustar') {
-        if (!bases.length) return void toast.error('El enlace ajusta tokens, pero este sistema aún no tiene ninguno.');
+        if (!bases.length) return void toast.error(t.linkNoTokens);
         setAdj({ ...preset, base: bases.some((b) => b.id === preset.base) ? preset.base : bases[0].id });
         setTab('ajustar');
       } else {
         setGen(preset);
         setTab('generar');
       }
-      if (avisos.length) toast.warning(`Se han descartado valores del enlace: ${avisos.join('; ')}.`);
+      if (avisos.length) toast.warning(t.linkDiscarded(avisos.join('; ')));
     } catch {
-      toast.error('El preset del enlace no se puede leer.');
+      toast.error(t.linkUnreadable);
     }
-  }, [bases]);
+  }, [bases, t]);
 
   const current = tab === 'generar' ? gen : adj;
   const code = useMemo(() => encodePreset(current), [current]);
@@ -86,30 +90,28 @@ export function Lab({ systemId, bases, saved, production }: { systemId: string; 
 
   const adjust = useCallback((mode: string, name: string, value: string | null) => (tab === 'generar' ? setGen : setAdj)((p) => withAdjustment(p, mode, name, value)), [tab]);
   const link = () => `${window.location.origin}${window.location.pathname}?preset=${code}`;
-  const prompt = () =>
-    `Aplica este preset del Lab al sistema ${systemId}${production ? ' dentro de una iniciativa, sin tocar producción' : ''}: npx ds preset aplicar "${link()}". ` +
-    'Sigue la skill montar-sistema, apartado «Aplicar un preset del Lab». Si avisa de pares por debajo de AA, pregúntame antes de aceptarlos.';
+  const prompt = () => t.prompt(systemId, production, link());
 
   return (
     <>
       <div className="container-wrapper">
         <div className="container flex flex-wrap items-center justify-between gap-3 py-4">
           <ToggleGroup type="single" variant="outline" size="sm" value={tab} onValueChange={(v) => v && setTab(v as Tab)}>
-            <ToggleGroupItem value="generar" className="px-3">Generar</ToggleGroupItem>
-            <ToggleGroupItem value="ajustar" className="px-3" disabled={!bases.length} title={bases.length ? undefined : 'El sistema aún no tiene tokens'}>Ajustar tokens</ToggleGroupItem>
+            <ToggleGroupItem value="generar" className="px-3">{t.generate}</ToggleGroupItem>
+            <ToggleGroupItem value="ajustar" className="px-3" disabled={!bases.length} title={bases.length ? undefined : t.noTokens}>{t.adjust}</ToggleGroupItem>
           </ToggleGroup>
           <div className="flex flex-wrap items-center gap-2 **:data-[slot=button]:shadow-none">
             <Button size="sm" variant="ghost" onClick={() => (tab === 'generar' ? setGen(fresh()) : setAdj((p) => ({ ...p, ajustes: {} })))}>
               <RotateCcwIcon />
-              Restablecer
+              {t.reset}
             </Button>
-            <Button size="sm" variant="outline" onClick={() => copy(link(), 'Enlace copiado')}>
+            <Button size="sm" variant="outline" onClick={() => copy(link(), t.linkCopied)}>
               <LinkIcon />
-              Copiar enlace
+              {t.copyLink}
             </Button>
-            <Button size="sm" onClick={() => copy(prompt(), 'Prompt copiado. Pégalo en tu agente.')}>
+            <Button size="sm" onClick={() => copy(prompt(), messages.code.promptCopied)}>
               <SparklesIcon />
-              Copiar para tu agente
+              {t.copyForAgent}
             </Button>
           </div>
         </div>
@@ -119,9 +121,7 @@ export function Lab({ systemId, bases, saved, production }: { systemId: string; 
         <div className="container flex flex-col gap-6">
           <p className="flex gap-2 text-sm text-muted-foreground">
             <InfoIcon className="mt-0.5 size-4 shrink-0" />
-            {production
-              ? 'Este sistema ya tiene producción. Lo que cambies aquí no la toca: el agente lo deja en una iniciativa, con el CSS en experimental/.'
-              : 'El Lab no escribe nada. Copia el preset para tu agente: lo aplica en experimental/ y crea las fichas de tokens en exploración.'}
+            {production ? t.hasProduction : t.noWrite}
           </p>
           <ContrastReport results={results} adjusted={tab === 'ajustar' ? adj.ajustes : undefined} onFix={(mode, token, value) => adjust(mode, token, value)} />
 
@@ -146,7 +146,7 @@ export function Lab({ systemId, bases, saved, production }: { systemId: string; 
               <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
                 {baseModes.map((mode) => (
                   <div key={mode} className="flex flex-col gap-3 rounded-xl border bg-background p-5">
-                    <h3 className="text-sm font-medium">{modeLabel(mode)}</h3>
+                    <h3 className="text-sm font-medium">{modeLabel(mode, lang)}</h3>
                     <PairsGrid mode={mode} values={adjusted[mode] ?? {}} results={results} />
                   </div>
                 ))}
@@ -157,7 +157,7 @@ export function Lab({ systemId, bases, saved, production }: { systemId: string; 
 
           <details className="rounded-xl border bg-background">
             <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
-              {tab === 'ajustar' && base?.id === 'experimental' ? 'Cambios que npx ds preset aplicar hará en el CSS de experimental/, en la hoja que declara cada token' : 'CSS que escribirá npx ds preset aplicar en experimental/tokens.css'}
+              {tab === 'ajustar' && base?.id === 'experimental' ? t.cssExperimental : t.cssNew}
             </summary>
             <pre className="overflow-x-auto border-t p-4 font-mono text-xs leading-relaxed">{css}</pre>
           </details>

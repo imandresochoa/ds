@@ -65,7 +65,7 @@ Con un producto que ya existe, el Lab abre sus tokens en «Ajustar tokens». Lo 
 - Los archivos generados por el sync (`produccion/`, `tokens.produccion.json`, `sync-report.json`).
 - Las skills (`.claude/skills/` y `.agents/skills/`): se actualizan con `npx ds skills`.
 
-El resto de `system.json`: `iniciales` y `color` son la marca del sistema en la cabecera; `metodologia: true` muestra esta metodología en el sitio; `abrirEnAgentes: true` añade «Abrir en Claude» y «Abrir en ChatGPT» a «Copiar página», que envían la URL de la página a ese servicio.
+El resto de `system.json`: `iniciales` y `color` son la marca del sistema en la cabecera; `metodologia: true` muestra esta metodología en el sitio; `abrirEnAgentes: true` añade «Abrir en Claude» y «Abrir en ChatGPT» a «Copiar página», que envían la URL de la página a ese servicio; `idiomas` (por defecto `["es"]`) añade una traducción al inglés bajo `/en/` (ver «Idiomas y traducciones» en `05-ficha.md`).
 
 ## Orden recomendado de relleno
 

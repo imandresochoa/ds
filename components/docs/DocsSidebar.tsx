@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLayoutEffect, useRef } from 'react';
 import type { Nav, NavItem } from '@/lib/nav';
+import { useT } from '@/components/site/I18nProvider';
 import { StatusDot } from './StatusBadge';
 
 const BUTTON = 'relative flex h-[30px] w-fit items-center gap-2 overflow-visible rounded-md border border-transparent p-2 text-left text-[0.8rem] font-medium outline-hidden ring-ring transition-[width,height,padding] after:absolute after:inset-x-0 after:-inset-y-1 after:z-0 after:rounded-md hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-foreground';
@@ -13,6 +14,7 @@ const LABEL = 'flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-mediu
 export function DocsSidebar({ nav }: { nav: Nav }) {
   const pathname = usePathname().replace(/\/$/, '');
   const ref = useRef<HTMLDivElement>(null);
+  const t = useT();
 
   // Al cambiar de página, la activa queda a la vista.
   useLayoutEffect(() => {
@@ -31,7 +33,7 @@ export function DocsSidebar({ nav }: { nav: Nav }) {
       <div className="absolute top-12 right-2 bottom-0 hidden h-full w-px bg-[linear-gradient(to_bottom,transparent_0%,var(--border)_10%,var(--border)_90%,transparent_100%)] lg:flex" />
       <div ref={ref} className="no-scrollbar flex min-h-0 w-(--sidebar-menu-width) flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto pl-2.5">
         <div className="relative flex w-full min-w-0 flex-col p-2 pt-12">
-          <div className={LABEL}>Secciones</div>
+          <div className={LABEL}>{t.header.sections}</div>
           <ul className="flex w-full min-w-0 flex-col gap-1">
             {nav.sections.map((s) => (
               <li key={s.href}>
@@ -58,13 +60,14 @@ export function DocsSidebar({ nav }: { nav: Nav }) {
 
 /** Una página. Punto azul si es nueva; punto de su color si no está en producción o el sync avisa. */
 function SidebarItem({ item, active }: { item: NavItem; active: boolean }) {
+  const t = useT();
   const flagged = item.estado !== 'produccion' || (item.sync !== null && item.sync !== 'ok');
   return (
     <li>
       <Link href={item.href} data-active={active} data-page className={BUTTON}>
         <span className="absolute inset-0 flex w-(--sidebar-menu-width) bg-transparent" />
         {item.titulo}
-        {item.nuevo && <span className="flex size-2 rounded-full bg-nuevo" title="Nuevo" />}
+        {item.nuevo && <span className="flex size-2 rounded-full bg-nuevo" title={t.header.isNew} />}
         {!item.nuevo && flagged && item.seccion !== 'docs' && item.seccion !== 'metodologia' && <StatusDot item={item} className="size-1.5" />}
       </Link>
     </li>

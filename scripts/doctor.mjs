@@ -2,7 +2,7 @@
 // Comprueba la configuración de cada sistema: system.json, repo de producción, superficies y contenido.
 import fs from 'node:fs';
 import path from 'node:path';
-import { CONTENT_SECTIONS, listSystems, loadEntries, normalizeRoute } from '../lib/core.mjs';
+import { CONTENT_SECTIONS, listSystems, listTranslations, loadEntries, normalizeRoute, systemLanguages } from '../lib/core.mjs';
 
 let errors = 0;
 const ok = (msg) => console.log(`  ✓ ${msg}`);
@@ -16,6 +16,14 @@ for (const system of listSystems()) {
   try {
     const ruta = normalizeRoute(system.publicacion?.ruta);
     ok(`publicación: ${ruta ? `bajo ${ruta}` : 'en la raíz del dominio'}`);
+  } catch (error) {
+    bad(`system.json: ${error.message}`);
+  }
+  let idiomas = null;
+  try {
+    idiomas = systemLanguages(system);
+    ok(`idiomas: ${idiomas.todos.join(', ')}${idiomas.traducciones.length ? ` (traducciones bajo ${idiomas.traducciones.map((l) => `/${l}`).join(', ')})` : ''}`);
+    for (const lang of idiomas.traducciones) if (!system[lang]?.nombre) warn(`system.json: sin "${lang}": { "nombre", "descripcion" }, el sistema se llama igual en ${lang}`);
   } catch (error) {
     bad(`system.json: ${error.message}`);
   }
@@ -38,10 +46,19 @@ for (const system of listSystems()) {
   const design = path.join(system.dir, 'DESIGN.md');
   if (!fs.existsSync(design)) bad('falta DESIGN.md');
   else if (/NOMBRE_DEL_SISTEMA/.test(fs.readFileSync(design, 'utf8'))) bad('DESIGN.md conserva textos de la plantilla');
+  if (!idiomas) {
+    console.log('');
+    continue;
+  }
   const entries = loadEntries(system);
   for (const section of CONTENT_SECTIONS) {
     const n = entries.filter((e) => e.section === section.id).length;
     (n ? ok : warn)(`${section.label}: ${n} fichas`);
+  }
+  if (idiomas.traducciones.length) {
+    const list = listTranslations(system);
+    const pending = list.filter((t) => t.estado !== 'ok').length;
+    (pending ? warn : ok)(`traducciones: ${list.length - pending} de ${list.length} al día${pending ? ' (npx ds traducciones)' : ''}`);
   }
   console.log('');
 }

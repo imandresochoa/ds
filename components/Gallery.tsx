@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { SECTIONS, loadEntries, loadSystem } from '@/lib/core.mjs';
-import { buildNav, groupLabel, sortGroups, type Entry } from '@/lib/nav';
+import { SECTIONS, loadEntries } from '@/lib/core.mjs';
+import { messages, type Messages } from '@/lib/i18n';
+import { buildNav, groupLabel, pageLocale, sortGroups, type Entry } from '@/lib/nav';
 import { entryPreviews } from '@/lib/previews';
 import { previewSurfaces } from '@/lib/surfaces';
 import { Button } from '@/components/ui/button';
@@ -18,18 +19,19 @@ type Section = (typeof SECTIONS)[number];
 const anchor = (label: string) => label.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-');
 
 /** Fichas de una sección agrupadas por categoría, en el orden de `categorias`. */
-function byCategory(section: Section, entries: Entry[]) {
-  const labels = [...new Set(entries.map((e) => groupLabel(section, e)))];
-  return sortGroups(section, labels.map((label) => ({ label, entries: entries.filter((e) => groupLabel(section, e) === label).sort((a, b) => a.titulo.localeCompare(b.titulo, 'es')) })));
+function byCategory(section: Section, entries: Entry[], lang: string) {
+  const labels = [...new Set(entries.map((e) => groupLabel(section, e, lang)))];
+  return sortGroups(section, labels.map((label) => ({ label, entries: entries.filter((e) => groupLabel(section, e, lang) === label).sort((a, b) => a.titulo.localeCompare(b.titulo, lang)) })), lang);
 }
 
 /** Cabecera de las páginas anchas: lo último que ha llegado, el titular de la sección y sus acciones. */
-function GalleryHeader({ systemId, section, entries, browse }: { systemId: string; section: Section; entries: Entry[]; browse: string }) {
-  const nav = buildNav(systemId);
+function GalleryHeader({ systemId, traduccion, section, entries, browse }: { systemId: string; traduccion: string | null; section: Section; entries: Entry[]; browse: string }) {
+  const nav = buildNav(systemId, traduccion);
+  const t = messages(nav.lang);
   const latest = nav.items.filter((i) => i.seccion === section.id && i.creado).sort((a, b) => (b.creado ?? '').localeCompare(a.creado ?? ''))[0];
   return (
     <PageHeader>
-      {latest && <Announcement href={latest.href}>{latest.nuevo ? 'Nuevo: ' : ''}{latest.titulo}</Announcement>}
+      {latest && <Announcement href={latest.href}>{latest.nuevo ? t.home.newPrefix : ''}{latest.titulo}</Announcement>}
       <PageHeaderHeading>{section.titular ?? section.label}</PageHeaderHeading>
       <PageHeaderDescription>{section.descripcion}</PageHeaderDescription>
       <PageActions>
@@ -45,20 +47,18 @@ function GalleryHeader({ systemId, section, entries, browse }: { systemId: strin
 }
 
 /** Una sección vacía es estructura por llenar: se explica qué va aquí y cómo pedírselo al agente. */
-function EmptyGallery({ systemId, section }: { systemId: string; section: Section }) {
+function EmptyGallery({ systemId, section, t }: { systemId: string; section: Section; t: Messages }) {
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-3 rounded-xl border border-dashed bg-background p-8 text-center md:p-12">
-      <h2 className="text-lg font-semibold">Todavía no hay {section.label.toLowerCase()}</h2>
-      <p className="text-sm text-balance text-muted-foreground">
-        Esta sección es estructura: se llena con lo que ya existe en tu producto o con lo que diseñéis desde cero. Copia el prompt y pídeselo a tu agente.
-      </p>
+      <h2 className="text-lg font-semibold">{t.gallery.emptyTitle(section.label)}</h2>
+      <p className="text-sm text-balance text-muted-foreground">{t.gallery.emptyText}</p>
       <CodeBlock code={section.accion.prompt.replaceAll('{sistema}', systemId)} lang="prompt" className="mx-0 mt-2 w-full text-left" />
     </div>
   );
 }
 
 /** Ficha sin ejemplo en vivo: se enlaza igualmente, con su estado. */
-function EntryCard({ entry }: { entry: Entry }) {
+function EntryCard({ entry, t }: { entry: Entry; t: Messages }) {
   return (
     <Link href={entry.href} data-slot="card" className="flex flex-col gap-1 rounded-xl border bg-background p-6 text-sm transition-colors hover:bg-accent/50">
       <span className="flex items-center gap-2 font-medium">
@@ -66,18 +66,18 @@ function EntryCard({ entry }: { entry: Entry }) {
         {entry.estado !== 'produccion' && <StatusDot item={{ estado: entry.estado, sync: null }} className="size-1.5" />}
       </span>
       <span className="text-muted-foreground">{entry.resumen}</span>
-      <span className="mt-2 text-xs text-muted-foreground">Sin ejemplo en vivo todavía.</span>
+      <span className="mt-2 text-xs text-muted-foreground">{t.gallery.noLive}</span>
     </Link>
   );
 }
 
 /** Página ancha de Bloques o Gráficos, con la forma de Blocks y Charts en ui.shadcn.com. */
-export async function GalleryPage({ systemId, sectionId }: { systemId: string; sectionId: 'bloques' | 'graficos' }) {
-  const system = loadSystem(systemId);
-  const section = SECTIONS.find((s) => s.id === sectionId)!;
-  const entries = loadEntries(system).filter((e) => e.section === sectionId);
+export async function GalleryPage({ systemId, sectionId, traduccion = null }: { systemId: string; sectionId: 'bloques' | 'graficos'; traduccion?: string | null }) {
+  const { lang, t, meta, system } = pageLocale(systemId, traduccion);
+  const section = meta.SECTIONS.find((s) => s.id === sectionId)!;
+  const entries = loadEntries(system, lang).filter((e) => e.section === sectionId);
   const surfaces = previewSurfaces(system);
-  const groups = byCategory(section, entries);
+  const groups = byCategory(section, entries, lang);
   const blocks = sectionId === 'bloques';
 
   const shown = await Promise.all(
@@ -91,7 +91,7 @@ export async function GalleryPage({ systemId, sectionId }: { systemId: string; s
 
   return (
     <div className="flex flex-1 flex-col">
-      <GalleryHeader systemId={systemId} section={section} entries={entries} browse={blocks ? 'Ver bloques' : 'Ver gráficos'} />
+      <GalleryHeader systemId={systemId} traduccion={traduccion} section={section} entries={entries} browse={blocks ? t.gallery.seeBlocks : t.gallery.seeCharts} />
       {groups.length > 0 && (
         <PageNav id="galeria">
           <CategoryNav items={groups.map((g) => ({ href: `#${anchor(g.label)}`, label: g.label }))} />
@@ -99,7 +99,7 @@ export async function GalleryPage({ systemId, sectionId }: { systemId: string; s
       )}
       <div className="container-wrapper section-soft flex-1 pb-12 md:py-12">
         <div className="container">
-          {!entries.length && <EmptyGallery systemId={systemId} section={section} />}
+          {!entries.length && <EmptyGallery systemId={systemId} section={section} t={t} />}
           <div className="flex flex-col gap-12 md:gap-24">
             {groups.map((group) => (
               <section key={group.label} id={anchor(group.label)} className="flex scroll-mt-24 flex-col gap-6">
@@ -108,7 +108,7 @@ export async function GalleryPage({ systemId, sectionId }: { systemId: string; s
                   <div className="flex flex-col gap-12 md:gap-24">
                     {group.entries.map((entry) => {
                       const item = live[entry.id];
-                      if (!item) return <EntryCard key={entry.id} entry={entry} />;
+                      if (!item) return <EntryCard key={entry.id} entry={entry} t={t} />;
                       return (
                         <BlockViewer
                           key={entry.id}
@@ -129,7 +129,7 @@ export async function GalleryPage({ systemId, sectionId }: { systemId: string; s
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {group.entries.map((entry) => {
                       const item = live[entry.id];
-                      if (!item) return <EntryCard key={entry.id} entry={entry} />;
+                      if (!item) return <EntryCard key={entry.id} entry={entry} t={t} />;
                       return (
                         <div key={entry.id} id={entry.slug} data-slot="chart" className="relative flex scroll-mt-24 flex-col overflow-hidden rounded-xl border bg-background">
                           <div className="flex items-center gap-2 border-b py-2 pr-12 pl-4">

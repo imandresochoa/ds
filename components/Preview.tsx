@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useMemo, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { useLang, useT } from '@/components/site/I18nProvider';
 
 export type PreviewSurface = {
   stylesheets: string[];
@@ -12,13 +13,13 @@ export type PreviewSurface = {
 };
 
 /** Documento del iframe: las hojas de estilo de producción y el HTML del ejemplo tal cual. */
-export function previewDocument({ html, surface, background, align = 'center', id = '', padding = 32 }: { html: string; surface: PreviewSurface; background?: string; align?: 'center' | 'start'; id?: string; padding?: number }) {
+export function previewDocument({ html, surface, background, align = 'center', id = '', padding = 32, lang = 'es' }: { html: string; surface: PreviewSurface; background?: string; align?: 'center' | 'start'; id?: string; padding?: number; lang?: string }) {
   const links = surface.stylesheets.map((href) => `<link rel="stylesheet" href="${href}">`).join('');
   const tailwind = surface.tailwind
     ? `<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@${surface.tailwind}"></script><style type="text/tailwindcss">${surface.tailwindCss}</style>`
     : '';
   const bg = background ? `var(--${background})` : surface.background;
-  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${links}${tailwind}
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">${links}${tailwind}
 <style>${surface.extraCss} html,body{margin:0;min-height:0;background:${bg}} body{padding:${padding}px;display:flex;flex-wrap:wrap;align-items:center;justify-content:${align === 'center' ? 'center' : 'flex-start'};gap:12px} body>section,body>header,body>footer,body>main,body>nav,body>article{flex:1 1 100%;min-width:0}</style></head>
 <body>${html}<script>
 document.addEventListener('click', function (e) { if (e.target.closest('a,form button[type=submit]')) e.preventDefault(); });
@@ -36,7 +37,9 @@ new ResizeObserver(send).observe(document.documentElement); window.addEventListe
 export function Preview({ html, surface, background, align = 'center', className, minHeight }: { html: string; surface: PreviewSurface; background?: string; align?: 'center' | 'start'; className?: string; minHeight?: number }) {
   const id = useId();
   const ref = useRef<HTMLIFrameElement>(null);
-  const doc = useMemo(() => previewDocument({ html, surface, background, align, id }), [html, surface, background, align, id]);
+  const lang = useLang();
+  const t = useT();
+  const doc = useMemo(() => previewDocument({ html, surface, background, align, id, lang }), [html, surface, background, align, id, lang]);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
@@ -53,7 +56,7 @@ export function Preview({ html, surface, background, align = 'center', className
     <div data-slot="preview" className={cn('flex w-full items-center', className)} style={{ minHeight, background: background ? undefined : surface.background }}>
       <iframe
         ref={ref}
-        title="Ejemplo en vivo"
+        title={t.code.livePreview}
         srcDoc={doc}
         sandbox="allow-scripts allow-same-origin"
         loading="lazy"

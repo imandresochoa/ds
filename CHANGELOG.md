@@ -2,6 +2,14 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+- **Sistemas en dos idiomas.** `system.json` acepta `"idiomas": ["es", "en"]` y `"en": { "nombre", "descripcion" }`. La traducción se sirve bajo `/en/` (interfaz, fichas, Docs, metodología, `design.md`, `llms.txt` y los `.md`), con un botón ES/EN en la cabecera. Las traducciones son archivos hermanos (`boton.en.md`) con `titulo`, `resumen`, `grupo` y el cuerpo; lo demás sale del original. Si falta una, se lee el original con un aviso. El registry sigue solo en el idioma principal.
+- **`ds traducciones`** lista las traducciones que faltan o están desfasadas; `--aceptar <ruta>` escribe en su `origen` la huella del original, tras revisarla. `ds check` y `ds doctor` avisan de las pendientes, sin fallar.
+- El sistema de ejemplo y la metodología, también en inglés.
+- La plantilla declara `"idiomas": ["es"]`; `nueva-ficha` y `auditar-sistema` cuidan las traducciones.
+- Migración: ninguna. Sin `idiomas`, un sistema genera lo mismo que con la 1.0.0.
+
 ## 1.0.0 · 2026-10-30
 
 Cierra el rediseño al modelo de shadcn/ui en cinco fases: interfaz (0.9.0), instalación con `montar-sistema` (0.9.0), Lab de primitivos (0.10.1), registry propio y Directorio, y metodología al día. Desde aquí, la versión mayor solo cambia si hay que tocar fichas, `system.json` o lo que se publica para agentes (ver «Versiones del kit» en la metodología).

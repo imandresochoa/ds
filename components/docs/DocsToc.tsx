@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { TocItem } from '@/lib/markdown';
 import { cn } from '@/lib/utils';
+import { useT } from '@/components/site/I18nProvider';
 
 function useActiveItem(ids: string[]) {
   const [active, setActive] = useState<string | null>(null);
@@ -24,10 +25,11 @@ function useActiveItem(ids: string[]) {
 export function DocsToc({ toc, className }: { toc: TocItem[]; className?: string }) {
   const ids = useMemo(() => toc.map((t) => t.id), [toc]);
   const active = useActiveItem(ids);
+  const t = useT();
   if (!toc.length) return null;
   return (
     <div className={cn('flex flex-col gap-2 p-4 pt-0 text-sm', className)}>
-      <p className="h-6 bg-background text-xs font-medium text-muted-foreground">En esta página</p>
+      <p className="h-6 bg-background text-xs font-medium text-muted-foreground">{t.docs.onThisPage}</p>
       {toc.map((item) => (
         <a
           key={item.id}

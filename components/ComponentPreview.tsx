@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useT } from '@/components/site/I18nProvider';
 import { CopyButton } from './CodeBlock';
 import { Preview, type PreviewSurface } from './Preview';
 
@@ -22,6 +23,7 @@ export function ComponentPreview({ html, surface, surfaceLabel, background, alig
 }) {
   // El código corto se ve entero; el largo se pliega con «Ver código».
   const [open, setOpen] = useState(code.trim().split('\n').length <= 8);
+  const t = useT();
   return (
     <div data-slot="component-preview" className={cn('group relative mt-4 mb-12 flex flex-col overflow-hidden rounded-xl border', priority && 'mt-6')}>
       <Preview html={html} surface={surface} background={background} align={align} minHeight={288} />
@@ -35,7 +37,7 @@ export function ComponentPreview({ html, surface, surfaceLabel, background, alig
           <div className="absolute inset-0 flex items-end justify-center pb-4">
             <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, var(--color-code), color-mix(in oklab, var(--color-code) 60%, transparent), transparent)' }} />
             <Button type="button" size="sm" variant="outline" className="relative z-10 rounded-lg bg-background text-foreground shadow-none hover:bg-muted" onClick={() => setOpen(true)}>
-              Ver código
+              {t.code.showCode}
             </Button>
           </div>
         )}

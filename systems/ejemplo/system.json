@@ -6,6 +6,11 @@
   "descripcion": "Sistema de ejemplo del kit. Contenido provisional para desarrollar la interfaz sin depender de ningún producto.",
   "extiende": null,
   "metodologia": true,
+  "idiomas": ["es", "en"],
+  "en": {
+    "nombre": "Example system",
+    "descripcion": "The kit’s example system. Placeholder content to build the interface without depending on any product."
+  },
   "plataformas": ["web", "ios", "android"],
   "produccion": null
 }

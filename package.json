@@ -48,6 +48,7 @@
     "build": "next build",
     "sync": "node scripts/sync-production.mjs",
     "check:sync": "node scripts/sync-production.mjs --check",
+    "traducciones": "node scripts/traducciones.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

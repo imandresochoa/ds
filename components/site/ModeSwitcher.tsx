@@ -3,10 +3,12 @@
 import { useTheme } from 'next-themes';
 import { useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { useT } from './I18nProvider';
 
 /** Cambia entre claro y oscuro. ⌘D o «d» también lo cambian, como en shadcn. */
 export function ModeSwitcher() {
   const { setTheme, resolvedTheme } = useTheme();
+  const t = useT();
   const toggle = useCallback(() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark'), [resolvedTheme, setTheme]);
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export function ModeSwitcher() {
         <path d="M12 14.3l7.37 -7.37" />
         <path d="M12 19.6l8.85 -8.85" />
       </svg>
-      <span className="sr-only">Cambiar tema</span>
+      <span className="sr-only">{t.header.theme}</span>
     </Button>
   );
 }
