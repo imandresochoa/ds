@@ -274,3 +274,12 @@ La landing del kit (`ds.aochoa.fyi`, en el repo del digital garden) enseña la i
 - **Por qué en el kit.** El ejemplo cambia con el kit. Cada fusión en `main` actualiza la demo, y la landing no necesita saber nada del build.
 - **Por qué no en npm.** `vercel.json` no está en `files`, así que no llega a los sistemas.
 - **Descartado:** un subdominio propio para el ejemplo. Con todo en un solo dominio, el iframe es del mismo origen y no hay que abrir cabeceras de framing.
+
+## 2026-10-31 · El feedback no quita palabras sueltas
+
+El primer envío real de `ds feedback` llegó con «feedback» cambiado por `<producto>`: la anonimización tomaba la primera palabra del nombre de la carpeta como nombre del producto. Con un repo como `mi-jardin`, se habría borrado cada «mi» de las sugerencias.
+
+- Se quita el nombre entero en todas sus formas (slug, junto, CamelCase…) y, además, sin los sufijos habituales de un repo (`-design-system`, `-ds`, `-web`, `-app`, `-site`, `-frontend`, `-landing`…), que es como suele aparecer el producto a secas.
+- Se descartó mantener la primera palabra con más palabras comunes excluidas: la lista nunca acaba, y una sugerencia estropeada es peor que un nombre compuesto poco habitual.
+- El precio: si un repo se llama `acme-plataforma` y alguien escribe solo «acme», no se quita. La persona ve el JSON antes de enviarlo y puede corregirlo.
+
