@@ -258,3 +258,12 @@ Para saber qué le habría venido bien a la gente al instalar el kit y montar un
 - **Anonimizado en el equipo.** El CLI quita rutas, URLs, dominios, correos, usuarios, claves, commits y colores, y con `system.json` y el último sync, los nombres del sistema y del producto y sus tokens, clases y componentes. Enseña el JSON exacto antes de enviar. Es la regla 1 llevada al feedback: nada del producto sale del equipo.
 - **Solo con un sí.** Por defecto en seco. En una terminal pregunta; un agente usa `--enviar` solo tras la respuesta de la persona. No se guarda nada en local.
 - **Endpoint propio que abre un issue.** `api/feedback.mjs`, en el proyecto de Vercel que despliega el kit, valida la forma, limita tamaño y ritmo (en memoria, sin IPs) y crea un issue público con la etiqueta `feedback` usando un token de grano fino que vive en Vercel. Las sugerencias van en un bloque de código para que no haya menciones ni enlaces. Descartado: un servicio de analítica (más datos de los necesarios) y que el CLI cree el issue directamente (necesitaría un token o una cuenta de GitHub de quien envía).
+
+## 2026-10-31 · Colores de las fichas, también en el código
+
+`ds check` exige que los colores escritos en una ficha existan en producción, para que una ficha no enseñe valores viejos. Solo miraba las hojas de estilo. En un sistema real fallaban 16 fichas cuyos ejemplos reproducen dibujos: iconos en SVG dentro de componentes y paletas en archivos de datos. Esos colores son de producción aunque no estén en el CSS.
+
+- Se buscan también en el código y los datos (`.tsx`, `.ts`, `.js`, `.vue`, `.svelte`, `.astro`, `.html`, `.json`), sin tests, que pueden traer colores de prueba, ni Markdown, que es documentación y no producción.
+- Se descartó quitar los dibujos de los ejemplos o rebajar el aviso: el ejemplo debe parecerse a producción, y el aviso sigue sirviendo para los colores viejos.
+- El precio: un color que solo aparece en un comentario del código cuenta como de producción. Es raro y no compensa analizar el código.
+

@@ -2,6 +2,10 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+- **Los colores de las fichas se buscan también en el código.** `ds check` comprobaba que cada color escrito en una ficha existiera en las hojas de producción, y fallaba con los ejemplos que copian un SVG dibujado en un `.tsx` o una paleta de `src/data/`. Ahora busca también en el código y los datos de producción (`.tsx`, `.ts`, `.js`, `.vue`, `.svelte`, `.astro`, `.html` y `.json`), sin tests ni Markdown. Migración: ninguna.
+
 ## 1.1.0 · 2026-10-31
 
 Sale de la primera instalación real con `montar-sistema`: lo que el agente echó en falta al montar un sistema y lo que vio en producción. Todo es nuevo y opcional, así que la versión es menor: ninguna ficha ni ningún `system.json` cambia.

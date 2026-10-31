@@ -16,7 +16,7 @@ import path from 'node:path';
 import postcss from 'postcss';
 import { PLATFORM_SECTIONS, listSystems, loadEntries, loadLock, previewClasses } from '../lib/core.mjs';
 import { buildTokens, readModeTokens, readThemeTokens } from '../lib/css-tokens.mjs';
-import { findHallazgos } from '../lib/hallazgos.mjs';
+import { codeTexts, findHallazgos } from '../lib/hallazgos.mjs';
 
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
@@ -229,8 +229,12 @@ for (const system of listSystems()) {
   const report = { generado: new Date().toISOString(), origen: ref, commit, fechaCommit: commitDate, sinCommit, estilosAusentes, paquetesAusentes, tokens: tokenInfo, entradas: {}, cobertura: {} };
   // Archivos que alguna ficha declara como fuente (para la cobertura por componentes).
   const declaredSources = new Set();
-  // Todos los colores escritos en las hojas de producción.
-  const prodHexes = new Set(Object.values(surfaceCss).flatMap((sheets) => sheets.flatMap(({ root }) => hexes(root.toString()))));
+  // Todos los colores escritos en producción: en las hojas y en el código y los datos (un SVG en un .tsx, una paleta
+  // en src/data/). Sin tests ni Markdown.
+  const prodHexes = new Set([
+    ...Object.values(surfaceCss).flatMap((sheets) => sheets.flatMap(({ root }) => hexes(root.toString()))),
+    ...codeTexts(src).flatMap(hexes),
+  ]);
   const documented = Object.fromEntries(Object.keys(prod.superficies).map((id) => [id, new Set()]));
 
   for (const entry of entries) {
