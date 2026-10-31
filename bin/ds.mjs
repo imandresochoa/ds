@@ -16,7 +16,8 @@
 //        [--sobrescribir] [--aceptar-contraste]   escribe el preset en experimental/, nunca en producción
 //   ds preset resolver        el preset de experimental/tokens.css y el enlace para abrirlo en el Lab (--port si ds dev usa otro)
 //   ds sync [--accept <id>]   lee producción: instantánea CSS, tokens, huellas e informe
-//   ds check                  falla si algo está desajustado, ausente o inventado
+//   ds check                  falla si algo está desajustado, ausente o inventado (y avisa de las traducciones desfasadas)
+//   ds traducciones [--aceptar <ruta>|all] [--json]   estado de las traducciones (idiomas en system.json); --aceptar, tras revisarla
 //   ds skills                 copia (o actualiza) las skills del kit en .claude/skills/ y .agents/skills/
 //   ds doctor                 comprueba la configuración del sistema
 //   ds version                versión del kit instalada
@@ -437,6 +438,9 @@ const commands = {
     fs.rmSync(path.join(SITE, 'out'), { recursive: true, force: true });
     // Con output: 'export', Next 16 deja el sitio exportado en distDir (.next-build).
     fs.cpSync(path.join(dir, '.next-build'), path.join(SITE, 'out'), { recursive: true });
+    // Sin ningún sistema traducido (build-public no escribió /en/llms.txt), /en solo tiene la ruta de relleno que
+    // pide output: 'export' para una lista vacía: se quita.
+    if (!fs.existsSync(path.join(dir, 'public', 'en', 'llms.txt'))) for (const name of ['en', 'en.html', 'en.txt']) fs.rmSync(path.join(SITE, 'out', name), { recursive: true, force: true });
     console.log('Sitio exportado en ./out');
   },
   async preset() {
@@ -577,7 +581,14 @@ const commands = {
   },
   async check() {
     requireSystem();
-    process.exit(await node(runtimeDir(), 'scripts/sync-production.mjs', ['--check']));
+    const dir = runtimeDir();
+    const code = await node(dir, 'scripts/sync-production.mjs', ['--check']);
+    await node(dir, 'scripts/traducciones.mjs', ['--aviso']);
+    process.exit(code);
+  },
+  async traducciones() {
+    requireSystem();
+    process.exit(await node(runtimeDir(), 'scripts/traducciones.mjs', args));
   },
   async skills() {
     installSkills();

@@ -1,10 +1,11 @@
 'use client';
 
-import { PLATFORMS, STATUSES, SYNC_STATES } from '@/lib/meta.mjs';
+import { localeMeta } from '@/lib/meta.mjs';
 import type { NavItem } from '@/lib/nav';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { useLang, useT } from '@/components/site/I18nProvider';
 
 type Toned = Pick<NavItem, 'estado' | 'sync'>;
 
@@ -37,6 +38,8 @@ const label = (map: Record<string, { label: string }>, key: string | null) => (k
 
 /** Insignia de estado junto a la descripción. Al pasar el ratón, el detalle: estado, sync, plataformas y fuentes. */
 export function StatusBadge({ item }: { item: Pick<NavItem, 'estado' | 'sync' | 'plataformas' | 'fuentes'> }) {
+  const { PLATFORMS, STATUSES, SYNC_STATES } = localeMeta(useLang());
+  const t = useT().status;
   const status = STATUSES[item.estado as keyof typeof STATUSES];
   const sync = item.sync ? SYNC_STATES[item.sync as keyof typeof SYNC_STATES] : null;
   const platforms = Object.entries(item.plataformas).filter(([, s]) => s !== 'sin-iniciar');
@@ -52,26 +55,26 @@ export function StatusBadge({ item }: { item: Pick<NavItem, 'estado' | 'sync' | 
       <HoverCardContent align="start" className="w-80 text-sm">
         <dl className="grid gap-3">
           <div>
-            <dt className="text-xs font-medium text-muted-foreground">Estado</dt>
+            <dt className="text-xs font-medium text-muted-foreground">{t.status}</dt>
             <dd className="mt-0.5 font-medium">{status?.label}</dd>
             <dd className="text-muted-foreground">{status?.descripcion}</dd>
           </div>
           {sync && (
             <div>
-              <dt className="text-xs font-medium text-muted-foreground">Producción</dt>
+              <dt className="text-xs font-medium text-muted-foreground">{t.production}</dt>
               <dd className="mt-0.5 font-medium">{sync.label}</dd>
               <dd className="text-muted-foreground">{sync.descripcion}</dd>
             </div>
           )}
           {platforms.length > 0 && (
             <div>
-              <dt className="text-xs font-medium text-muted-foreground">Plataformas</dt>
+              <dt className="text-xs font-medium text-muted-foreground">{t.platforms}</dt>
               <dd className="mt-0.5">{platforms.map(([p, s]) => `${PLATFORMS[p as keyof typeof PLATFORMS]}: ${label(STATUSES, s)}`).join(' · ')}</dd>
             </div>
           )}
           {item.fuentes.length > 0 && (
             <div>
-              <dt className="text-xs font-medium text-muted-foreground">Fuentes</dt>
+              <dt className="text-xs font-medium text-muted-foreground">{t.sources}</dt>
               {item.fuentes.map((f) => (
                 <dd key={f.clave} className="mt-1 flex items-start gap-2">
                   <StatusDot item={{ estado: 'produccion', sync: f.estado }} className="mt-1.5 size-1.5" />

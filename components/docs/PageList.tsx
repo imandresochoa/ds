@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { messages } from '@/lib/i18n';
 import type { NavItem } from '@/lib/nav';
 import { StatusDot } from './StatusBadge';
 
 /** Rejilla de enlaces del índice de componentes de shadcn, con el punto de «Nuevo» y el de estado. */
-export function PageList({ items }: { items: NavItem[] }) {
+export function PageList({ items, lang = 'es' }: { items: NavItem[]; lang?: string }) {
   if (!items.length) return null;
   return (
     <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-x-8 lg:gap-x-16 lg:gap-y-6 xl:gap-x-20">
@@ -12,7 +13,7 @@ export function PageList({ items }: { items: NavItem[] }) {
           {item.titulo}
           {item.nuevo && (
             <>
-              <span className="sr-only">Nuevo</span>
+              <span className="sr-only">{messages(lang).header.isNew}</span>
               <span aria-hidden="true" className="flex size-2 rounded-full bg-nuevo" />
             </>
           )}

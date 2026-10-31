@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
   output: 'export',
   images: { unoptimized: true },
   devIndicators: false,
+  // Hay dos layouts raíz, uno por idioma (app/(principal) y app/(en)): la 404 tiene el suyo, app/global-not-found.tsx.
+  experimental: { globalNotFound: true },
   // Sin el bloque de reglas que next dev añade a AGENTS.md cuando detecta un agente: este AGENTS.md es del kit.
   agentRules: false,
   // dev y build no comparten carpeta: se puede exportar sin romper el servidor de desarrollo.

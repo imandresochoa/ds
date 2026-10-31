@@ -1,9 +1,10 @@
 'use client';
 
-import { CodeIcon, FlaskConicalIcon, PlusIcon } from 'lucide-react';
+import { CodeIcon, FlaskConicalIcon, LanguagesIcon, PlusIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type { Nav } from '@/lib/nav';
+import { sitePath } from '@/lib/site';
 import { cn } from '@/lib/utils';
 import { useCopy } from '@/lib/use-copy';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CommandMenu } from './CommandMenu';
+import { useT } from './I18nProvider';
 import { GitHubIcon, SystemMark } from './icons';
 import { MobileNav } from './MobileNav';
 import { ModeSwitcher } from './ModeSwitcher';
@@ -35,6 +37,7 @@ export function SiteHeader({ nav }: { nav: Nav }) {
                 <Separator orientation="vertical" />
               </>
             )}
+            <LanguageSwitcher nav={nav} />
             <ModeSwitcher />
             <Separator orientation="vertical" />
             <NewMenu nav={nav} />
@@ -60,16 +63,44 @@ function MainNav({ items, className }: { items: Nav['top']; className?: string }
   );
 }
 
+/**
+ * ES / EN: la misma página en el otro idioma. Solo en los sistemas con traducción. Es un enlace normal, no un <Link>:
+ * cada idioma tiene su propio layout raíz, así que el cambio recarga la página.
+ */
+function LanguageSwitcher({ nav }: { nav: Nav }) {
+  const pathname = usePathname();
+  const t = useT();
+  const other = nav.idiomas.find((l) => l.lang !== nav.lang);
+  if (!other) return null;
+  const rest = nav.prefix && pathname.startsWith(nav.prefix) ? pathname.slice(nav.prefix.length) || '/' : pathname;
+  const target = other.prefix ? `${other.prefix}${rest === '/' ? '' : rest}` : rest;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button asChild variant="ghost" size="sm" className="h-8 gap-1.5 px-2 font-mono text-xs shadow-none">
+          <a href={sitePath(target)} hrefLang={other.lang} lang={other.lang}>
+            <LanguagesIcon />
+            {other.corto}
+            <span className="sr-only">{t.language.label}: {other.nombre}</span>
+          </a>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent lang={other.lang}>{other.nombre}</TooltipContent>
+    </Tooltip>
+  );
+}
+
 /** Marca del sistema. Con más de un sistema, abre la lista para cambiar. */
 function SystemSwitcher({ nav, className }: { nav: Nav; className?: string }) {
   const router = useRouter();
+  const t = useT();
   const mark = <SystemMark system={nav.system} />;
   if (nav.systems.length < 2) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
           <Button asChild variant="ghost" size="icon" className={cn('size-8', className)}>
-            <Link href={`/${nav.system.id}`}>
+            <Link href={`${nav.prefix}/${nav.system.id}`}>
               {mark}
               <span className="sr-only">{nav.system.nombre}</span>
             </Link>
@@ -84,16 +115,16 @@ function SystemSwitcher({ nav, className }: { nav: Nav; className?: string }) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className={cn('size-8', className)}>
           {mark}
-          <span className="sr-only">Cambiar de sistema</span>
+          <span className="sr-only">{t.header.switchSystem}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel>Sistemas</DropdownMenuLabel>
+        <DropdownMenuLabel>{t.header.systems}</DropdownMenuLabel>
         {nav.systems.map((s) => (
-          <DropdownMenuItem key={s.id} onSelect={() => router.push(`/${s.id}`)}>
+          <DropdownMenuItem key={s.id} onSelect={() => router.push(`${nav.prefix}/${s.id}`)}>
             <SystemMark system={s} />
             {s.nombre}
-            {s.id === nav.system.id && <span className="ml-auto text-xs text-muted-foreground">Actual</span>}
+            {s.id === nav.system.id && <span className="ml-auto text-xs text-muted-foreground">{t.header.current}</span>}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
@@ -102,12 +133,13 @@ function SystemSwitcher({ nav, className }: { nav: Nav; className?: string }) {
 }
 
 function RepoLink({ href }: { href: string }) {
+  const t = useT();
   const github = href.includes('github.com');
   return (
     <Button asChild size="sm" variant="ghost" className="h-8 shadow-none">
       <a href={href} target="_blank" rel="noreferrer">
         {github ? <GitHubIcon /> : <CodeIcon />}
-        <span className="sr-only">Código en producción</span>
+        <span className="sr-only">{t.header.productionCode}</span>
       </a>
     </Button>
   );
@@ -116,29 +148,30 @@ function RepoLink({ href }: { href: string }) {
 /** «Nuevo»: el Lab de primitivos y los prompts para que un agente cree cada pieza siguiendo la metodología. */
 function NewMenu({ nav }: { nav: Nav }) {
   const { copy } = useCopy();
+  const t = useT();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size="sm" className="h-[31px] rounded-lg">
           <PlusIcon />
-          Nuevo
+          {t.header.new}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem asChild>
           <Link href={nav.lab}>
             <FlaskConicalIcon />
-            Lab de primitivos
+            {t.nav.lab}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Copia un prompt para tu agente</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">{t.header.copyPromptFor}</DropdownMenuLabel>
         {nav.acciones.slice(0, -1).map((a) => (
-          <DropdownMenuItem key={a.label} onSelect={() => void copy(a.prompt, 'Prompt copiado para tu agente')}>{a.label}</DropdownMenuItem>
+          <DropdownMenuItem key={a.label} onSelect={() => void copy(a.prompt, t.header.promptCopied)}>{a.label}</DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
         {nav.acciones.slice(-1).map((a) => (
-          <DropdownMenuItem key={a.label} onSelect={() => void copy(a.prompt, 'Prompt copiado para tu agente')}>{a.label}</DropdownMenuItem>
+          <DropdownMenuItem key={a.label} onSelect={() => void copy(a.prompt, t.header.promptCopied)}>{a.label}</DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>

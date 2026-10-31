@@ -10,6 +10,7 @@ Repo del sistema de diseño de NOMBRE_DEL_SISTEMA. Aquí solo vive el **contenid
 | `DESIGN.md` | Criterio para agentes, escrito a mano. Se publica como `/<id>/design.md` con un apéndice generado. |
 | `content/<sección>/` | Fichas en Markdown con frontmatter YAML: `fundamentos`, `tokens`, `componentes`, `bloques`, `graficos`, `iniciativas`. Las páginas de Docs, en `content/docs/`. |
 | `experimental/` | CSS de piezas en exploración o desarrollo (aún no están en producción). |
+| `*.en.md` | Traducciones, si `system.json` → `idiomas` tiene más de un idioma: junto a cada original, solo con `titulo`, `resumen`, `grupo` y el cuerpo. |
 | `produccion/`, `tokens.produccion.json`, `sync-report.json` | Generados por `ds sync`. No se editan. |
 | `produccion.lock.json` | Huellas revisadas. Solo cambia con `ds sync --accept`. |
 | `.claude/skills/`, `.agents/skills/` | Skills del kit para Claude Code y para Codex. Se actualizan con `npx ds skills`; no las edites aquí. |
@@ -39,6 +40,7 @@ npx ds ver boton     # una pieza en JSON: lo que usa, quién la usa y su sync
 npx ds preset ver "<enlace del Lab>"      # lee un preset del Lab de primitivos: valores y contraste
 npx ds preset aplicar "<enlace del Lab>"  # lo escribe en experimental/, nunca en producción
 npx ds preset resolver                    # el enlace para reabrir en el Lab lo que hay en experimental/
+npx ds traducciones  # traducciones que faltan o están desfasadas (si hay idiomas)
 npx ds skills        # actualiza las skills del kit
 ```
 

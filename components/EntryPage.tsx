@@ -1,7 +1,8 @@
 import { ArrowUpRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { loadEntries, loadExperimentalTokens, loadProductionTokens, loadSyncReport, modeLabel, PLATFORM_SECTIONS, PLATFORMS, resolvedTokenValue, SECTIONS, STATUSES, SYNC_STATES, tokenModes, tokenValue } from '@/lib/core.mjs';
+import { loadEntries, loadExperimentalTokens, loadProductionTokens, loadSyncReport, localeMeta, modeLabel as modeName, PLATFORM_SECTIONS, resolvedTokenValue, tokenModes, tokenValue } from '@/lib/core.mjs';
+import { messages } from '@/lib/i18n';
 import { createSlugger, prepareMarkdown, type TocItem } from '@/lib/markdown';
 import type { Entry, Nav, System } from '@/lib/nav';
 import { sitePath } from '@/lib/site';
@@ -49,6 +50,9 @@ function Heading({ id, children }: { id: string; children: React.ReactNode }) {
  * ejemplos en vivo con su código y, después, lo que el sistema añade (tokens, enlace con producción, relacionados).
  */
 export function EntryPage({ system, entry, platform, nav }: { system: System; entry: Entry; platform: string; nav: Nav }) {
+  const t = messages(nav.lang);
+  const { PLATFORMS, SECTIONS, STATUSES, SYNC_STATES } = localeMeta(nav.lang);
+  const modeLabel = (mode: string) => modeName(mode, nav.lang);
   const report = loadSyncReport(system);
   const sync = report?.entradas?.[entry.id];
   const tokenRows: TokenRow[] = (entry.data.tokens ?? []).map((t: string | TokenRow) => (typeof t === 'string' ? { nombre: t } : t));
@@ -58,7 +62,7 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   const production = loadProductionTokens(system) as Record<string, TokenValues>;
   const tokens: Record<string, TokenValues> = withExperimental ? { ...production, [EXPERIMENTAL]: experimental.values as TokenValues } : production;
   const surfaces = previewSurfaces(system);
-  const surfaceNames: Record<string, string> = { ...Object.fromEntries(Object.entries(system.produccion?.superficies ?? {}).map(([id, s]) => [id, (s as { nombre: string }).nombre])), [EXPERIMENTAL]: 'Experimental' };
+  const surfaceNames: Record<string, string> = { ...Object.fromEntries(Object.entries(system.produccion?.superficies ?? {}).map(([id, s]) => [id, (s as { nombre: string }).nombre])), [EXPERIMENTAL]: t.lab.experimental };
   const surfaceIds = Object.keys(tokens);
   // Modos de cada superficie (claro, oscuro…) y los selectores que los activan, según el último sync.
   const modeSelectors = (id: string) => (id === EXPERIMENTAL ? experimental?.info.modos ?? null : report?.tokens?.[id]?.modos ?? null) as Record<string, string[]> | null;
@@ -68,14 +72,14 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   // Solo se muestran las plataformas que existen; con una sola, no hay conmutador.
   const available = Object.entries(PLATFORMS).filter(([id]) => entry.platforms[id as keyof typeof entry.platforms].estado !== 'sin-iniciar' || id === platform);
   const current = entry.platforms[platform as keyof typeof entry.platforms];
-  const all = loadEntries(system);
+  const all = loadEntries(system, nav.lang);
   const byIds = (ids: string[] = []) => ids.map((id) => all.find((e) => e.id === id)).filter(Boolean) as Entry[];
   // `usa`: las piezas que compone (el grafo del registry). `relacionados`: ver también.
   const uses = byIds(entry.data.usa as string[]);
   const related = byIds(entry.data.relacionados as string[]).filter((r) => !uses.includes(r));
   const item = nav.items.find((i) => i.href === entry.href)!;
   const sources = ((sync?.fuentes ?? []) as Source[]).filter((f) => f.superficie !== 'tokens');
-  const startPrompt = `Implementa «${entry.titulo}» para ${PLATFORMS[platform as keyof typeof PLATFORMS]} en el sistema ${system.id}. Lee ${sitePath(entry.href)}.md y docs/metodologia/06-plataformas.md. Crea ${entry.file.replace(/index\.md$|\.md$/, '')}/${platform}.md con estado exploracion y no toques producción.`;
+  const startPrompt = t.entry.startPrompt(entry.titulo, PLATFORMS[platform as keyof typeof PLATFORMS], system.id, `${sitePath(entry.href)}.md`, `${entry.file.replace(/index\.md$|\.md$/, '')}/${platform}.md`);
 
   // Un solo generador de ids para toda la página: los títulos repetidos («Reglas» en web.md y en index.md) no chocan.
   const slug = createSlugger();
@@ -84,10 +88,10 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   const platformMd = showPlatforms && current.body ? prepareMarkdown(current.body, slug) : null;
   const commonMd = entry.body.trim() ? prepareMarkdown(entry.body, slug) : null;
   const extra = (title: string): TocItem => ({ id: slug(title), title, depth: 2 });
-  const tokensHeading = entry.section !== 'tokens' && tokenRows.length > 0 ? extra('Tokens que usa') : null;
-  const productionHeading = sources.length > 0 ? extra('Enlace con producción') : null;
-  const usesHeading = uses.length > 0 ? extra('Usa') : null;
-  const relatedHeading = related.length > 0 ? extra('Relacionados') : null;
+  const tokensHeading = entry.section !== 'tokens' && tokenRows.length > 0 ? extra(t.entry.tokensUsed) : null;
+  const productionHeading = sources.length > 0 ? extra(t.entry.productionLink) : null;
+  const usesHeading = uses.length > 0 ? extra(t.entry.uses) : null;
+  const relatedHeading = related.length > 0 ? extra(t.entry.related) : null;
   const pieceLists = [{ heading: usesHeading, list: uses }, { heading: relatedHeading, list: related }].filter((g): g is { heading: TocItem; list: Entry[] } => g.heading !== null);
   const toc = [...(platformMd?.toc ?? []), ...(commonMd?.toc ?? []), ...[tokensHeading, productionHeading, usesHeading, relatedHeading].filter((t): t is TocItem => t !== null)];
 
@@ -96,21 +100,21 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
       <StatusBadge item={item} />
       {item.fuente && (
         <Badge asChild variant="secondary" className="rounded-full">
-          <a href={item.fuente} target="_blank" rel="noreferrer">Código <ArrowUpRightIcon /></a>
+          <a href={item.fuente} target="_blank" rel="noreferrer">{t.entry.code} <ArrowUpRightIcon /></a>
         </Badge>
       )}
       {item.iniciativa && (
         <Badge asChild variant="secondary" className="rounded-full">
-          <Link href={item.iniciativa.href}>Iniciativa: {item.iniciativa.titulo}</Link>
+          <Link href={item.iniciativa.href}>{t.entry.initiative(item.iniciativa.titulo)}</Link>
         </Badge>
       )}
     </>
   );
 
   return (
-    <DocsArticle nav={nav} href={entry.href} title={entry.titulo} description={entry.resumen} md={`${entry.href}.md`} badges={badges} toc={toc}>
+    <DocsArticle nav={nav} href={entry.href} title={entry.titulo} description={entry.resumen} md={`${entry.href}.md`} badges={badges} toc={toc} traduccion={entry.traduccion}>
       {showPlatforms && available.length > 1 && (
-        <nav aria-label="Plataforma" className="mb-4 inline-flex w-full items-center gap-6">
+        <nav aria-label={t.entry.platform} className="mb-4 inline-flex w-full items-center gap-6">
           {available.map(([id, label]) => {
             const href = id === 'web' ? entry.href : `${entry.href}/${id}`;
             const info = entry.platforms[id as keyof typeof entry.platforms];
@@ -133,8 +137,8 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
 
       {showPlatforms && !hasPlatformBody && (
         <div className="mb-8 rounded-xl border p-6">
-          <h3 className="font-semibold">{STATUSES[current.estado as keyof typeof STATUSES]?.label ?? 'Sin iniciar'} en {PLATFORMS[platform as keyof typeof PLATFORMS]}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Esta ficha aún no tiene implementación para esta plataforma. Copia el prompt para que un agente prepare la primera versión en exploración.</p>
+          <h3 className="font-semibold">{t.entry.platformTitle(STATUSES[current.estado as keyof typeof STATUSES]?.label ?? t.status.notStarted, PLATFORMS[platform as keyof typeof PLATFORMS])}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{t.entry.platformMissing}</p>
           <CodeBlock code={startPrompt} lang="prompt" className="mx-0 mt-4" />
         </div>
       )}
@@ -144,17 +148,17 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
       {entry.section === 'tokens' && tokenRows.length > 0 && (
         <div className="ds-prose">
           <p className="text-sm text-muted-foreground">
-            {!withExperimental ? 'Valores leídos del código de producción en el último sync.' : surfaceIds.length > 1 ? 'Valores leídos del código de producción en el último sync. La columna Experimental sale de experimental/: todavía no está en producción.' : 'Valores de experimental/: todavía no están en producción.'} Cómo se usan, en su fundamento.
+            {!withExperimental ? t.entry.tokensFromProduction : surfaceIds.length > 1 ? t.entry.tokensWithExperimental : t.entry.tokensExperimental} {t.entry.tokensHowTo}
             {surfaceIds.filter((id) => modes[id].length).map((id) => (
-              <span key={id}> {surfaceIds.length > 1 ? `${surfaceNames[id] ?? id}: ` : 'Un valor por modo: '}{modes[id].map((m) => `${modeLabel(m)}${modeSelectors(id)?.[m] ? ` (${modeSelectors(id)?.[m].join(', ')})` : ''}`).join(' · ')}.</span>
+              <span key={id}> {surfaceIds.length > 1 ? `${surfaceNames[id] ?? id}: ` : t.entry.oneValuePerMode}{modes[id].map((m) => `${modeLabel(m)}${modeSelectors(id)?.[m] ? ` (${modeSelectors(id)?.[m].join(', ')})` : ''}`).join(' · ')}.</span>
             ))}
           </p>
           <div className="ds-table-scroll">
             <table>
               <thead>
                 <tr>
-                  <th>Token</th>
-                  <th>Rol</th>
+                  <th>{t.entry.token}</th>
+                  <th>{t.entry.role}</th>
                   {modeColumns.map(({ id, mode }) => <th key={`${id}:${mode}`}>{mode ? (surfaceIds.length > 1 ? `${surfaceNames[id] ?? id} · ${modeLabel(mode)}` : modeLabel(mode)) : surfaceNames[id] ?? id}</th>)}
                 </tr>
               </thead>
@@ -204,7 +208,7 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
             <div className="ds-table-scroll">
               <table>
                 <thead>
-                  <tr><th>Superficie</th><th>Fuente</th><th>Estado</th><th>Huella</th><th>Revisada en</th></tr>
+                  <tr><th>{t.entry.surface}</th><th>{t.entry.source}</th><th>{t.entry.state}</th><th>{t.entry.fingerprint}</th><th>{t.entry.reviewedAt}</th></tr>
                 </thead>
                 <tbody>
                   {sources.map((f) => (
@@ -229,10 +233,10 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
               </table>
             </div>
             <p className="text-sm text-muted-foreground">
-              Producción en el commit <code>{report.commit}</code> ({report.fechaCommit}). Sync del {report.generado.slice(0, 10)}.
-              {report.sinCommit?.length > 0 && ' La instantánea incluye cambios de producción aún sin commit.'}
+              {t.entry.productionAt(<code>{report.commit}</code>, report.fechaCommit, report.generado.slice(0, 10))}
+              {report.sinCommit?.length > 0 && t.entry.uncommitted}
             </p>
-            {sync.avisos.map((a: string) => <p key={a} className="text-sm text-muted-foreground">Aviso: {a}</p>)}
+            {sync.avisos.map((a: string) => <p key={a} className="text-sm text-muted-foreground">{t.entry.warning} {a}</p>)}
           </>
         )}
 
@@ -256,7 +260,7 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
 
         <p className="mt-16 text-xs text-muted-foreground">
           <code>{entry.id}</code>
-          {entry.data.actualizado && <> · Actualizado el {entry.data.actualizado}</>}
+          {entry.data.actualizado && <> · {t.entry.updated(entry.data.actualizado)}</>}
         </p>
       </div>
     </DocsArticle>

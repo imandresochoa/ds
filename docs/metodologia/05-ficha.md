@@ -67,6 +67,22 @@ Las páginas que no son fichas (introducción, instalación, guías) van en `con
 - **`relacionados`** es «ver también»: el fundamento de una ficha de tokens, o el sustituto de una pieza obsoleta. No es una dependencia.
 - Un id de `usa` que no existe se avisa en `ds build` y `ds dev`.
 
+## Idiomas y traducciones
+
+Un sistema se escribe en un idioma y puede traducirse a otro. Se activa en `system.json`:
+
+```json
+"idiomas": ["es", "en"],
+"en": { "nombre": "Example system", "descripcion": "…" }
+```
+
+- **El primero es el principal.** En él se escriben las fichas y se sirve en las URL de siempre. Sin `idiomas`, vale `["es"]`: nada cambia. Hoy la traducción puede ser al inglés, bajo `/en/` (`/en/<sistema>/componentes/boton`).
+- **Una traducción es un archivo hermano**: `boton.en.md` junto a `boton.md`, `index.en.md` y `web.en.md` dentro de una carpeta, `DESIGN.en.md` junto a `DESIGN.md`. Solo lleva lo que se lee: `titulo`, `resumen`, `grupo` y el cuerpo. El estado, las fuentes, las plataformas y lo demás salen del original, así que el sync sigue teniendo una sola fuente.
+- **Los enlaces no cambian.** Se escribe `/<sistema>/…` como en el original; la traducción les pone `/en` delante.
+- **Si falta, se lee el original.** La página existe en inglés, con un aviso y el contenido en su idioma. Si el original cambió después de traducirla, el aviso lo dice.
+- **`origen`** guarda la huella del original que se tradujo. `npx ds traducciones` lista las que faltan y las desfasadas; `npx ds traducciones --aceptar <ruta>` escribe la huella, solo después de revisar la traducción contra el original. `ds check` avisa de las desfasadas, pero no falla.
+- Los títulos `## Reglas` y `## Antipatrones` se leen del original: el registry y `ds ver` están solo en el idioma principal.
+
 ## Escribir para agentes
 
 - Frases cortas y comprobables. Nada de «elegante» o «limpio».

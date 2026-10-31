@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { SPACING_STEPS, TEXT_STEPS, findPairs, isSafeValue, parseColor } from '@/lib/lab.mjs';
 import { modeLabel, resolveVars } from '@/lib/tokens.mjs';
 import { cn } from '@/lib/utils';
+import { useLang, useT } from '@/components/site/I18nProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ColorInput } from './LabControls';
@@ -29,9 +30,10 @@ const resolver = (values: Values) => (name: string) => {
 };
 
 function Ratio({ result }: { result?: ContrastResult }) {
-  if (!result || result.ratio === null) return <span className="opacity-70">sin calcular</span>;
+  const t = useT().lab;
+  if (!result || result.ratio === null) return <span className="opacity-70">{t.notComputed}</span>;
   return (
-    <span className="inline-flex items-center gap-1 tabular-nums" title={`Mínimo ${decimal(result.minimo, 1)}:1`}>
+    <span className="inline-flex items-center gap-1 tabular-nums" title={t.minimum(decimal(result.minimo, 1))}>
       {result.ok ? <CheckIcon className="size-3" /> : <TriangleAlertIcon className="size-3" />}
       {decimal(result.ratio)}:1
     </span>
@@ -53,9 +55,10 @@ function PairTile({ fg, bg, label, result, border }: { fg?: string; bg?: string;
 
 /** Pares de un modo, en rejilla. Sirve para «Generar» y para «Ajustar» (con los nombres del sistema). */
 export function PairsGrid({ mode, values, results }: { mode: string; values: Values; results: ContrastResult[] }) {
+  const t = useT().lab;
   const resolve = resolver(values);
   const pairs = findPairs(Object.keys(values)).filter((p) => p.minimo >= 4.5 && !(p.texto === 'muted-foreground' && p.fondo === 'background'));
-  if (!pairs.length) return <p className="text-sm text-muted-foreground">No hay pares x / x-foreground en estos tokens.</p>;
+  if (!pairs.length) return <p className="text-sm text-muted-foreground">{t.noPairs}</p>;
   const border = resolve('border');
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -82,35 +85,37 @@ const pxOf = (rem?: string) => (rem?.endsWith('rem') ? parseFloat(rem) * 16 : nu
  * Solo primitivos: el kit no trae componentes.
  */
 export function ModePanel({ mode, values, comunes, neutral, results }: { mode: string; values: Values; comunes: Values; neutral: Values; results: ContrastResult[] }) {
+  const t = useT().lab;
+  const lang = useLang();
   const all = { ...comunes, ...values };
   const find = (texto: string, fondo: string) => results.find((r) => r.modo === mode && r.texto === texto && r.fondo === fondo);
   return (
     <div className="flex flex-col gap-8 rounded-xl border p-5 md:p-6" style={{ ...labVars(all), background: 'var(--lab-background)', color: 'var(--lab-foreground)', fontFamily: 'var(--lab-font-sans)', borderColor: 'var(--lab-border)' }}>
       <div className="flex items-center justify-between text-sm font-medium">
-        {modeLabel(mode)}
+        {modeLabel(mode, lang)}
         <span className="font-mono text-xs font-normal" style={{ color: 'var(--lab-muted-foreground)' }}>{mode === 'light' ? ':root' : '.dark'}</span>
       </div>
 
-      <Specimen title="Pares">
+      <Specimen title={t.pairs}>
         <PairsGrid mode={mode} values={values} results={results} />
         <div className="flex flex-col gap-1 text-sm">
-          <span className="flex justify-between gap-2">Texto principal <span className="text-xs"><Ratio result={find('foreground', 'background')} /></span></span>
-          <span className="flex justify-between gap-2" style={{ color: 'var(--lab-muted-foreground)' }}>Texto secundario <span className="text-xs"><Ratio result={find('muted-foreground', 'background')} /></span></span>
+          <span className="flex justify-between gap-2">{t.mainText} <span className="text-xs"><Ratio result={find('foreground', 'background')} /></span></span>
+          <span className="flex justify-between gap-2" style={{ color: 'var(--lab-muted-foreground)' }}>{t.secondaryText} <span className="text-xs"><Ratio result={find('muted-foreground', 'background')} /></span></span>
         </div>
         <div className="flex items-center gap-4 text-xs">
-          <span className="inline-flex h-9 items-center rounded-md px-3" style={{ outline: '2px solid var(--lab-ring)', outlineOffset: 2, border: '1px solid var(--lab-input)' }}>Foco</span>
-          <span className="flex-1">--ring sobre el fondo</span>
+          <span className="inline-flex h-9 items-center rounded-md px-3" style={{ outline: '2px solid var(--lab-ring)', outlineOffset: 2, border: '1px solid var(--lab-input)' }}>{t.focus}</span>
+          <span className="flex-1">{t.ringOnBackground}</span>
           <Ratio result={find('ring', 'background')} />
         </div>
       </Specimen>
 
-      <Specimen title="Escala neutra">
+      <Specimen title={t.neutralScale}>
         <div className="grid grid-cols-11 overflow-hidden rounded-md" style={{ boxShadow: 'inset 0 0 0 1px var(--lab-border)' }}>
           {Object.entries(neutral).map(([step, value]) => <span key={step} title={`${step} · ${value}`} className="h-8" style={{ background: value }} />)}
         </div>
       </Specimen>
 
-      <Specimen title="Texto">
+      <Specimen title={t.text}>
         <div className="flex flex-col gap-2">
           {Object.keys(TEXT_STEPS).reverse().map((step) => (
             <div key={step} className="flex items-baseline gap-3 overflow-hidden">
@@ -120,13 +125,13 @@ export function ModePanel({ mode, values, comunes, neutral, results }: { mode: s
           ))}
         </div>
         <p style={{ fontSize: 'var(--lab-text-base)', lineHeight: 'var(--lab-leading-normal)' }}>
-          Un sistema de diseño reúne las decisiones que hacen que cada pantalla hable igual. Este párrafo usa el tamaño base y el interlineado.
+          {t.paragraph}
         </p>
         {comunes['font-serif'] && <p style={{ fontFamily: 'var(--lab-font-serif)', fontSize: 'var(--lab-text-xl)', lineHeight: 'var(--lab-leading-tight)' }}>Serif: Aa Bb Cc 123</p>}
-        <p style={{ fontFamily: 'var(--lab-font-mono)', fontSize: 'var(--lab-text-sm)' }}>Mono: const espacio = 4;</p>
+        <p style={{ fontFamily: 'var(--lab-font-mono)', fontSize: 'var(--lab-text-sm)' }}>{t.monoSample}</p>
       </Specimen>
 
-      <Specimen title="Espaciado">
+      <Specimen title={t.spacing}>
         <div className="flex flex-col gap-1.5">
           {SPACING_STEPS.map((n) => (
             <div key={n} className="flex items-center gap-3">
@@ -137,7 +142,7 @@ export function ModePanel({ mode, values, comunes, neutral, results }: { mode: s
         </div>
       </Specimen>
 
-      <Specimen title="Radios">
+      <Specimen title={t.radii}>
         <div className="flex flex-wrap gap-4">
           {['sm', 'md', 'lg', 'xl'].map((r) => (
             <div key={r} className="flex flex-col items-center gap-1.5">
@@ -149,7 +154,7 @@ export function ModePanel({ mode, values, comunes, neutral, results }: { mode: s
       </Specimen>
 
       {comunes['duration-normal'] && (
-        <Specimen title="Movimiento">
+        <Specimen title={t.motion}>
           <div className="flex flex-col gap-3">
             {[
               ...['fast', 'normal', 'slow'].map((d) => ({ label: `duration-${d}`, duration: `var(--lab-duration-${d})`, ease: 'var(--lab-ease-out)' })),
@@ -171,7 +176,7 @@ export function ModePanel({ mode, values, comunes, neutral, results }: { mode: s
         </Specimen>
       )}
 
-      <Specimen title="Sombras">
+      <Specimen title={t.shadows}>
         <div className="flex flex-wrap gap-6 pb-2">
           {['sm', 'md', 'lg'].map((s) => (
             <div key={s} className="flex flex-col items-center gap-2">
@@ -187,36 +192,38 @@ export function ModePanel({ mode, values, comunes, neutral, results }: { mode: s
 
 /** Resumen del contraste: cuántos pares llegan y, de los que no, el ajuste más cercano que cumple. */
 export function ContrastReport({ results, adjusted, onFix }: { results: ContrastResult[]; adjusted?: Record<string, Record<string, string>>; onFix: (mode: string, token: string, value: string) => void }) {
+  const t = useT().lab;
+  const lang = useLang();
   const measured = results.filter((r) => r.ok !== null);
   const failing = results.filter((r) => r.ok === false);
   // Al ajustar tokens que ya existen, un par que el preset no toca «ya estaba así»: se avisa, pero no bloquea.
-  const previous = (r: ContrastResult) => adjusted !== undefined && ![r.texto, r.fondo].some((t) => adjusted[r.modo]?.[t] !== undefined);
+  const previous = (r: ContrastResult) => adjusted !== undefined && ![r.texto, r.fondo].some((token) => adjusted[r.modo]?.[token] !== undefined);
   if (!measured.length) return null;
   return (
     <div className={cn('flex flex-col gap-3 rounded-xl border p-4 text-sm', failing.length ? 'border-estado-aviso/50 bg-estado-aviso/5' : 'bg-background')}>
       <p className="flex items-center gap-2 font-medium">
         {failing.length ? <TriangleAlertIcon className="size-4 text-estado-aviso" /> : <CheckIcon className="size-4 text-estado-ok" />}
-        {failing.length ? `${failing.length} de ${measured.length} pares ${failing.length === 1 ? 'no llega' : 'no llegan'} a AA` : `Los ${measured.length} pares llegan a AA`}
+        {failing.length ? t.summaryFailing(failing.length, measured.length) : t.summaryOk(measured.length)}
       </p>
       {failing.length > 0 && (
         <>
           <ul className="flex flex-col gap-2">
             {failing.map((r) => (
               <li key={`${r.modo}:${r.texto}:${r.fondo}`} className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span className="font-mono text-xs">--{r.texto} sobre --{r.fondo}</span>
-                <span className="text-xs text-muted-foreground">{modeLabel(r.modo)} · {decimal(r.ratio ?? 0)}:1, mínimo {decimal(r.minimo, 1)}:1{previous(r) ? ' · ya estaba así' : ''}</span>
+                <span className="font-mono text-xs">{t.on(r.texto, r.fondo)}</span>
+                <span className="text-xs text-muted-foreground">{t.contrastLine(modeLabel(r.modo, lang), decimal(r.ratio ?? 0), decimal(r.minimo, 1), previous(r))}</span>
                 {r.sugerencia ? (
                   <Button size="sm" variant="outline" className="ml-auto h-7" onClick={() => onFix(r.modo, r.sugerencia!.token, r.sugerencia!.valor)}>
                     <WandSparklesIcon />
-                    <span className="inline-flex items-center gap-1.5">Ajustar --{r.sugerencia.token}<span className="size-3 rounded-sm border" style={{ background: r.sugerencia.valor }} /></span>
+                    <span className="inline-flex items-center gap-1.5">{t.adjustToken(r.sugerencia.token)}<span className="size-3 rounded-sm border" style={{ background: r.sugerencia.valor }} /></span>
                   </Button>
                 ) : (
-                  <span className="ml-auto text-xs text-muted-foreground">Sin ajuste posible: cambia el fondo.</span>
+                  <span className="ml-auto text-xs text-muted-foreground">{t.noFix}</span>
                 )}
               </li>
             ))}
           </ul>
-          <p className="text-xs text-muted-foreground">Puedes copiar el preset igualmente: el agente no aplicará un par por debajo de AA sin preguntarte.</p>
+          <p className="text-xs text-muted-foreground">{t.copyAnyway}</p>
         </>
       )}
     </div>
@@ -226,6 +233,8 @@ export function ContrastReport({ results, adjusted, onFix }: { results: Contrast
 /** Tabla de «Ajustar»: los tokens del sistema por modo, editables. Lo cambiado se marca y se puede deshacer. */
 export function AdjustTable({ modes, base, current, onChange }: { modes: string[]; base: Record<string, Values>; current: Record<string, Values>; onChange: (mode: string, name: string, value: string | null) => void }) {
   const [filter, setFilter] = useState('');
+  const t = useT().lab;
+  const lang = useLang();
   const first = modes[0];
   const rows = useMemo(() => {
     const resolve = resolver(base[first] ?? {});
@@ -235,13 +244,13 @@ export function AdjustTable({ modes, base, current, onChange }: { modes: string[
   }, [base, first, filter]);
   return (
     <div className="flex flex-col gap-3">
-      <Input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filtrar tokens…" className="max-w-xs bg-background" aria-label="Filtrar tokens" />
+      <Input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={t.filter} className="max-w-xs bg-background" aria-label={t.filterLabel} />
       <div className="overflow-x-auto rounded-xl border bg-background">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b text-left text-xs text-muted-foreground">
               <th className="px-4 py-2 font-medium">Token</th>
-              {modes.map((m) => <th key={m} className="px-4 py-2 font-medium">{modeLabel(m)}</th>)}
+              {modes.map((m) => <th key={m} className="px-4 py-2 font-medium">{modeLabel(m, lang)}</th>)}
               <th className="w-10" />
             </tr>
           </thead>
@@ -251,7 +260,7 @@ export function AdjustTable({ modes, base, current, onChange }: { modes: string[
               return (
                 <tr key={name} className="border-b last:border-b-0">
                   <td className="px-4 py-2 align-middle font-mono text-xs whitespace-nowrap">
-                    {changed && <span className="mr-1.5 inline-block size-1.5 rounded-full bg-nuevo align-middle" title="Cambiado" />}--{name}
+                    {changed && <span className="mr-1.5 inline-block size-1.5 rounded-full bg-nuevo align-middle" title={t.changed} />}--{name}
                   </td>
                   {modes.map((m) => {
                     const value = current[m]?.[name] ?? '';
@@ -260,16 +269,16 @@ export function AdjustTable({ modes, base, current, onChange }: { modes: string[
                       <td key={m} className="min-w-56 px-4 py-2">
                         {/* Un var(--x) se edita como texto: el selector de color lo convertiría en un valor fijo. */}
                         {color && parseColor(value) ? (
-                          <ColorInput label={`--${name} · ${modeLabel(m)}`} value={value} onChange={commit} />
+                          <ColorInput label={`--${name} · ${modeLabel(m, lang)}`} value={value} onChange={commit} />
                         ) : (
-                          <Input aria-label={`--${name} · ${modeLabel(m)}`} defaultValue={value} key={value} spellCheck={false} className="font-mono text-xs" onBlur={(e) => isSafeValue(e.target.value) && e.target.value !== value && commit(e.target.value)} />
+                          <Input aria-label={`--${name} · ${modeLabel(m, lang)}`} defaultValue={value} key={value} spellCheck={false} className="font-mono text-xs" onBlur={(e) => isSafeValue(e.target.value) && e.target.value !== value && commit(e.target.value)} />
                         )}
                       </td>
                     );
                   })}
                   <td className="pr-2">
                     {changed && (
-                      <Button size="icon" variant="ghost" className="size-7" aria-label={`Deshacer --${name}`} onClick={() => modes.forEach((m) => onChange(m, name, null))}>
+                      <Button size="icon" variant="ghost" className="size-7" aria-label={t.undo(name)} onClick={() => modes.forEach((m) => onChange(m, name, null))}>
                         <Undo2Icon />
                       </Button>
                     )}
@@ -279,7 +288,7 @@ export function AdjustTable({ modes, base, current, onChange }: { modes: string[
             })}
           </tbody>
         </table>
-        {!rows.length && <p className="p-4 text-sm text-muted-foreground">Ningún token coincide.</p>}
+        {!rows.length && <p className="p-4 text-sm text-muted-foreground">{t.noMatch}</p>}
       </div>
     </div>
   );

@@ -29,6 +29,7 @@ Lee `sync-report.json` y apunta cada problema. Si pasa limpio, ve al paso 3: el 
 | `N de M colores ya están en producción` | Una ficha en exploración seguramente se aplicó. | Compruébalo en la hoja de producción. Si se aplicó: estado `produccion`, `tokens` declarados, valores reales, CSS experimental retirado o reducido a la muestra, «Pendiente» actualizado. Si no, corrige los valores. |
 | Clases inventadas | Los ejemplos usan clases que producción ya no tiene. | Rehaz el ejemplo con las clases reales o mueve el estilo a `experimental/`. |
 | Estado sin fuentes, o fuentes con estado distinto de `produccion` | El estado no dice la verdad. | Corrige el estado. |
+| `traducción desfasada` o `que falta` (aviso de `ds check`) | El original cambió después de traducirlo, o no tiene traducción. | Actualiza la traducción (`<ficha>.en.md`) con el original delante y acéptala con `npx ds traducciones --aceptar <ruta>`. Si no puedes traducir bien, déjala y dilo en el resumen: el sitio enseña el original con un aviso. |
 
 Cada ficha que toques: `actualizado` con la fecha de hoy. No inventes copy: usa los textos de producción.
 

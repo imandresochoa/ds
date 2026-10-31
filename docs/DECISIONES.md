@@ -210,3 +210,16 @@ El Lab ajusta también el movimiento, el único primitivo que quedó fuera de la
 `AGENTS.md` decía que los PRs del kit los fusiona Andrés. Se quita: vale lo que dice «Git, GitHub y entornos». En el kit, un agente puede fusionar si tiene autorización expresa y el workflow «Comprobar» pasa. En producción sigue fusionando siempre una persona.
 
 Además, `next.config.ts` lleva `agentRules: false`. `next dev` añadía a `AGENTS.md` un bloque de reglas de Next cuando detectaba un agente, y ese bloque acabó en un commit. Con la opción apagada, Next lo quita y no lo vuelve a escribir.
+
+## 2026-10-31 · Sistemas en dos idiomas
+
+La landing del kit (`ds.aochoa.fyi`) está en español y en inglés y enseña el sistema de ejemplo en una ventana. Para que el ejemplo y la metodología se lean también en inglés, un sistema puede declarar sus idiomas en `system.json`: `"idiomas": ["es", "en"]` y un bloque `"en": { "nombre", "descripcion" }`.
+
+- **El idioma va en la ruta.** El principal (el primero de `idiomas`) se queda en las URL de siempre; la traducción va bajo `/en/` (`/en/<sistema>/…`, `/en/llms.txt`, `/en/metodologia/<guía>.md`). Es lo único que funciona en un sitio estático: cada página tiene su URL, se puede enlazar y el iframe de la landing solo cambia de `src`. Un botón ES/EN en la cabecera lleva a la misma página en el otro idioma. No hay redirección automática.
+- **Dos layouts raíz.** `app/(principal)` y `app/(en)` tienen cada uno el suyo, para que el HTML exportado ya diga `<html lang>`. Las páginas se escriben una vez, en `components/rutas/sistema.tsx`; cada archivo de ruta es una línea que dice el idioma. Con dos layouts raíz, la 404 necesita `app/global-not-found.tsx` (`experimental.globalNotFound`).
+- **Traducciones en archivos hermanos.** `boton.en.md` junto a `boton.md`, `DESIGN.en.md` junto a `DESIGN.md`, `docs/metodologia/05-ficha.en.md` junto a `05-ficha.md`. Solo llevan lo que se lee (`titulo`, `resumen`, `grupo` y el cuerpo); lo demás sale del original, así que el sync, las huellas y el registry tienen una sola fuente. Se descartó un árbol paralelo (`content/en/…`): separa cada traducción de su original y obliga a mover dos archivos.
+- **Sin traducción, el original.** La página existe en inglés con un aviso y el contenido marcado con su `lang`. `origen` guarda la huella del original traducido; si no coincide, el aviso dice que puede no estar al día. `ds traducciones` lista las que faltan y las desfasadas, y `--aceptar` escribe la huella tras revisarla. `ds check` avisa, pero no falla: una traducción atrasada no rompe nada.
+- **El registry, solo en el idioma principal.** Las piezas son datos (estado, fuentes, `usa`, sync) y las reglas se leen de `## Reglas` y `## Antipatrones` del original. Traducirlo duplicaría el JSON para un agente que ya lee los dos idiomas.
+- **Compatibilidad.** Sin `idiomas`, un sistema vale `["es"]` y genera lo mismo que antes, archivo por archivo. Los archivos `*.en.md` se ignoran como fichas. Es una versión menor.
+- **Fuera.** La CLI, la plantilla y las skills siguen en español. `TRADUCCIONES` en `lib/meta.mjs` dice qué idiomas pueden ser traducción; hoy solo `en`, porque cada uno necesita su carpeta de rutas.
+

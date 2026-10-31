@@ -4,9 +4,11 @@ import { CheckIcon, CopyIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCopy } from '@/lib/use-copy';
 import { Button } from '@/components/ui/button';
+import { useT } from '@/components/site/I18nProvider';
 
-export function CopyButton({ value, className, label = 'Copiar código' }: { value: string; className?: string; label?: string }) {
+export function CopyButton({ value, className, label }: { value: string; className?: string; label?: string }) {
   const { copy, copied } = useCopy();
+  const t = useT();
   return (
     <Button
       data-slot="copy-button"
@@ -15,7 +17,7 @@ export function CopyButton({ value, className, label = 'Copiar código' }: { val
       className={cn('absolute top-3 right-2 z-10 size-7 bg-code text-code-foreground opacity-70 hover:opacity-100 focus-visible:opacity-100', className)}
       onClick={() => copy(value)}
     >
-      <span className="sr-only">{label}</span>
+      <span className="sr-only">{label ?? t.code.copy}</span>
       {copied ? <CheckIcon /> : <CopyIcon />}
     </Button>
   );

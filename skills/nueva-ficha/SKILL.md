@@ -44,6 +44,10 @@ Si son tokens y la persona quiere elegir sus valores, que los ajuste en el Lab d
 - `## Antipatrones`: los errores habituales, con nombre en negrita. `## Reglas` y `## Antipatrones` pasan tal cual al JSON de la pieza: no les cambies el título.
 - Lo que no sepas: «Pendiente».
 
-## 5. Cierra
+## 5. Traducción
+
+Si `system.json` → `idiomas` tiene más de un idioma, escribe la traducción junto a la ficha (`boton.en.md`): solo `titulo`, `resumen`, `grupo` si lo hay y el cuerpo, con los mismos enlaces. Si cambiaste una ficha que ya estaba traducida, actualiza su traducción. Revísala contra el original y acéptala con `npx ds traducciones --aceptar <ruta de la traducción>`. Lo explica `05-ficha.md`, apartado «Idiomas y traducciones».
+
+## 6. Cierra
 
 Reinicia `npx ds dev` (las rutas son estáticas), revisa la página y ejecuta `npx ds check`.

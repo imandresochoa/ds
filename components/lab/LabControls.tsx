@@ -4,6 +4,7 @@ import { XIcon } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { CURVAS, DEFAULT_PRESET, ESCALAS, isSafeValue, parseColor, toHex, type Ajustes, type Preset } from '@/lib/lab.mjs';
 import { modeLabel } from '@/lib/tokens.mjs';
+import { useLang, useT } from '@/components/site/I18nProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -46,11 +47,12 @@ function DraftInput({ value, valid, onCommit, className, ...props }: { value: st
 /** Color con el selector del navegador y el valor escrito (hex, rgb(), hsl() u oklch()). */
 export function ColorInput({ value, onChange, label }: { value: string; onChange: (v: string) => void; label: string }) {
   const hex = toHex(value) ?? '#000000';
+  const t = useT();
   return (
     <div className="flex items-center gap-2">
       <input
         type="color"
-        aria-label={`${label}: selector`}
+        aria-label={`${label}: ${t.lab.selector}`}
         value={hex}
         onChange={(e) => onChange(e.target.value)}
         className="size-9 shrink-0 cursor-pointer rounded-md border bg-transparent p-1 [&::-moz-color-swatch]:rounded-sm [&::-moz-color-swatch]:border-0 [&::-webkit-color-swatch]:rounded-sm [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0"
@@ -98,65 +100,67 @@ export function GenerateControls({ preset, onChange, onRemoveAdjustment }: { pre
   const { color, texto, sombra } = preset;
   // Un preset anterior al movimiento no lo trae: los controles parten de los valores por defecto.
   const movimiento = preset.movimiento ?? DEFAULT_PRESET.movimiento!;
+  const t = useT().lab;
+  const lang = useLang();
   const adjustments = Object.entries(preset.ajustes as Ajustes).flatMap(([mode, values]) => Object.entries(values).map(([name, value]) => ({ mode, name, value })));
   return (
     <div className="flex flex-col gap-6">
-      <Group title="Color">
-        <ColorField label="Neutro" hint="Tiñe los grises: fondos, bordes y textos." value={color.neutro} onChange={(v) => set('color', { ...color, neutro: v })} />
-        <ColorField label="Marca" hint="--primary y --ring. En oscuro se aclara si no se ve." value={color.marca} onChange={(v) => set('color', { ...color, marca: v })} />
-        <ColorField label="Error" hint="--destructive." value={color.error} onChange={(v) => set('color', { ...color, error: v })} />
+      <Group title={t.color}>
+        <ColorField label={t.neutral} hint={t.neutralHint} value={color.neutro} onChange={(v) => set('color', { ...color, neutro: v })} />
+        <ColorField label={t.brand} hint={t.brandHint} value={color.marca} onChange={(v) => set('color', { ...color, marca: v })} />
+        <ColorField label={t.error} hint={t.errorHint} value={color.error} onChange={(v) => set('color', { ...color, error: v })} />
       </Group>
-      <Group title="Texto">
+      <Group title={t.text}>
         <FontField label="Sans" value={texto.sans} onChange={(v) => v && set('texto', { ...texto, sans: v })} />
-        <FontField label="Serif" value={texto.serif} placeholder="Opcional" onChange={(v) => set('texto', { ...texto, serif: v })} />
+        <FontField label="Serif" value={texto.serif} placeholder={t.optional} onChange={(v) => set('texto', { ...texto, serif: v })} />
         <FontField label="Mono" value={texto.mono} onChange={(v) => v && set('texto', { ...texto, mono: v })} />
-        <p className="text-xs text-muted-foreground">Las muestras usan las fuentes instaladas en tu equipo: el Lab no descarga fuentes de ningún servicio.</p>
-        <SliderField label="Tamaño base" value={texto.base} min={12} max={22} step={1} format={(n) => `${n} px`} onChange={(n) => set('texto', { ...texto, base: n })} />
+        <p className="text-xs text-muted-foreground">{t.fontsNote}</p>
+        <SliderField label={t.baseSize} value={texto.base} min={12} max={22} step={1} format={(n) => `${n} px`} onChange={(n) => set('texto', { ...texto, base: n })} />
         <div className="flex flex-col gap-3">
-          <Label>Escala</Label>
+          <Label>{t.scale}</Label>
           <ToggleGroup type="single" variant="outline" size="sm" value={String(texto.escala)} onValueChange={(v) => v && set('texto', { ...texto, escala: Number(v) })} className="w-full">
-            {Object.entries(ESCALAS).map(([ratio, name]) => (
+            {Object.keys(ESCALAS).map((ratio) => ({ ratio, name: t.scales[ratio] })).map(({ ratio, name }) => (
               <ToggleGroupItem key={ratio} value={ratio} title={name} className="flex-1 font-mono text-xs">{decimal(Number(ratio), 3)}</ToggleGroupItem>
             ))}
           </ToggleGroup>
-          <p className="text-xs text-muted-foreground">{(ESCALAS as Record<string, string>)[String(texto.escala)] ?? 'Proporción propia'}: cada paso multiplica el anterior por {decimal(texto.escala, 3)}.</p>
+          <p className="text-xs text-muted-foreground">{t.scales[String(texto.escala)] ?? t.ownRatio}{t.scaleNote(decimal(texto.escala, 3))}</p>
         </div>
-        <SliderField label="Interlineado" value={texto.interlineado} min={1} max={2} step={0.05} format={(n) => decimal(n)} onChange={(n) => set('texto', { ...texto, interlineado: n })} />
+        <SliderField label={t.lineHeight} value={texto.interlineado} min={1} max={2} step={0.05} format={(n) => decimal(n)} onChange={(n) => set('texto', { ...texto, interlineado: n })} />
       </Group>
-      <Group title="Espaciado">
-        <SliderField label="Unidad base" value={preset.espaciado} min={2} max={8} step={1} format={(n) => `${n} px`} onChange={(n) => set('espaciado', n)} />
+      <Group title={t.spacing}>
+        <SliderField label={t.baseUnit} value={preset.espaciado} min={2} max={8} step={1} format={(n) => `${n} px`} onChange={(n) => set('espaciado', n)} />
       </Group>
-      <Group title="Radios">
-        <SliderField label="Radio base" value={preset.radio} min={0} max={24} step={1} format={(n) => `${n} px`} onChange={(n) => set('radio', n)} />
+      <Group title={t.radii}>
+        <SliderField label={t.baseRadius} value={preset.radio} min={0} max={24} step={1} format={(n) => `${n} px`} onChange={(n) => set('radio', n)} />
       </Group>
-      <Group title="Sombras">
-        <SliderField label="Opacidad" value={sombra.opacidad} min={0} max={0.4} step={0.01} format={(n) => `${Math.round(n * 100)} %`} onChange={(n) => set('sombra', { ...sombra, opacidad: n })} />
-        <SliderField label="Difuminado" value={sombra.difuminado} min={0.25} max={3} step={0.05} format={(n) => `× ${decimal(n)}`} onChange={(n) => set('sombra', { ...sombra, difuminado: n })} />
+      <Group title={t.shadows}>
+        <SliderField label={t.opacity} value={sombra.opacidad} min={0} max={0.4} step={0.01} format={(n) => `${Math.round(n * 100)} %`} onChange={(n) => set('sombra', { ...sombra, opacidad: n })} />
+        <SliderField label={t.blur} value={sombra.difuminado} min={0.25} max={3} step={0.05} format={(n) => `× ${decimal(n)}`} onChange={(n) => set('sombra', { ...sombra, difuminado: n })} />
       </Group>
-      <Group title="Movimiento">
-        <SliderField label="Duración base" value={movimiento.duracion} min={80} max={500} step={10} format={(n) => `${n} ms`} onChange={(n) => set('movimiento', { ...movimiento, duracion: n })} />
-        <SliderField label="Escala" value={movimiento.escala} min={1.2} max={2} step={0.1} format={(n) => `× ${decimal(n)}`} onChange={(n) => set('movimiento', { ...movimiento, escala: n })} />
+      <Group title={t.motion}>
+        <SliderField label={t.baseDuration} value={movimiento.duracion} min={80} max={500} step={10} format={(n) => `${n} ms`} onChange={(n) => set('movimiento', { ...movimiento, duracion: n })} />
+        <SliderField label={t.scale} value={movimiento.escala} min={1.2} max={2} step={0.1} format={(n) => `× ${decimal(n)}`} onChange={(n) => set('movimiento', { ...movimiento, escala: n })} />
         <p className="text-xs text-muted-foreground">
-          --duration-fast, -normal y -slow: la base dividida y multiplicada por la escala ({Math.round(movimiento.duracion / movimiento.escala)}, {movimiento.duracion} y {Math.round(movimiento.duracion * movimiento.escala)} ms).
+          {t.durationNote(Math.round(movimiento.duracion / movimiento.escala), movimiento.duracion, Math.round(movimiento.duracion * movimiento.escala))}
         </p>
         <div className="flex flex-col gap-3">
-          <Label>Curvas</Label>
+          <Label>{t.curves}</Label>
           <ToggleGroup type="single" variant="outline" size="sm" value={movimiento.curva} onValueChange={(v) => v && set('movimiento', { ...movimiento, curva: v })} className="w-full">
             {Object.entries(CURVAS).map(([id, c]) => (
-              <ToggleGroupItem key={id} value={id} className="flex-1 text-xs">{c.label}</ToggleGroupItem>
+              <ToggleGroupItem key={id} value={id} className="flex-1 text-xs">{t.easings[id] ?? c.label}</ToggleGroupItem>
             ))}
           </ToggleGroup>
-          <p className="text-xs text-muted-foreground">--ease-in, --ease-out y --ease-in-out, con los nombres de Tailwind 4.</p>
+          <p className="text-xs text-muted-foreground">{t.easeNote}</p>
         </div>
       </Group>
       {adjustments.length > 0 && (
-        <Group title="Ajustes a mano">
+        <Group title={t.manual}>
           <ul className="flex flex-col gap-2">
             {adjustments.map((a) => (
               <li key={`${a.mode}:${a.name}`} className="flex items-center gap-2 text-xs">
                 <span className="size-3.5 shrink-0 rounded-sm border" style={{ background: parseColor(a.value) ? a.value : undefined }} />
-                <span className="min-w-0 flex-1 truncate font-mono" title={a.value}>--{a.name} · {modeLabel(a.mode)}</span>
-                <Button size="icon" variant="ghost" className="size-6" aria-label={`Quitar el ajuste de --${a.name} en ${modeLabel(a.mode)}`} onClick={() => onRemoveAdjustment(a.mode, a.name)}>
+                <span className="min-w-0 flex-1 truncate font-mono" title={a.value}>--{a.name} · {modeLabel(a.mode, lang)}</span>
+                <Button size="icon" variant="ghost" className="size-6" aria-label={t.removeAdjustment(a.name, modeLabel(a.mode, lang))} onClick={() => onRemoveAdjustment(a.mode, a.name)}>
                   <XIcon />
                 </Button>
               </li>
