@@ -12,7 +12,8 @@ El sistema vive en un repo distinto del producto. El enlace entre los dos lo hac
 3. **Huellas.** Para cada ficha con fuentes, reúne las reglas CSS de sus clases (o el archivo entero si es un componente de código) y calcula una huella. La compara con la última revisada en `produccion.lock.json`.
 4. **Clases inventadas.** Comprueba que cada clase usada en los ejemplos existe en producción o en el CSS experimental.
 5. **Cobertura.** Lista lo que producción tiene y ninguna ficha documenta: los tokens y, por superficie, las clases o los componentes. Es la lista de tareas pendientes del sistema. Ver «Cobertura».
-6. **Cambios sin commit.** El sync lee lo publicado (`origin/<rama>`). Si esa rama no existe, lee la copia local y avisa de los archivos que todavía no tienen commit. Sin `origin/<rama>`, `ds check` falla: el sistema no puede comparar con lo publicado.
+6. **Hallazgos.** Lo que producción podría hacer mejor con su propio sistema: colores y valores compuestos escritos a mano que ya son tokens, copias de tokens fuera de `:root`, tokens que nada usa y hojas que ninguna superficie carga. Son observaciones para producción, no fallos del sistema: `ds check` no las mira. Ver «Recomendaciones para producción».
+7. **Cambios sin commit.** El sync lee lo publicado (`origin/<rama>`). Si esa rama no existe, lee la copia local y avisa de los archivos que todavía no tienen commit. Sin `origin/<rama>`, `ds check` falla: el sistema no puede comparar con lo publicado.
 
 ## Modos y `@theme`
 
@@ -44,6 +45,17 @@ Las variables de `@theme` y `@theme inline` también son tokens: radios, sombras
 - **Tokens**, en todas: los de `tokens.produccion.json` que ninguna ficha de tokens nombra. Una variable de `@theme` que solo apunta a otro token (`--color-x: var(--x)`) cuenta como documentada si lo está su destino.
 
 `"cobertura": true` elige clases o componentes según la superficie; `"clases"` o `"componentes"` lo fuerzan.
+
+## Recomendaciones para producción
+
+El sistema lee producción entera, así que ve lo que producción hace a mano. El sync lo deja en `sync-report.json` → `hallazgos`:
+
+- `superficies.<id>.valoresSueltos`: un color, o un valor compuesto (sombra, pila de fuentes, curva), escrito en una regla cuando ya es el valor de un token. Dice el archivo, la línea, el selector y qué tokens valen eso, con el modo si solo lo valen en uno.
+- `superficies.<id>.copiasDeTokens`: una propiedad personalizada declarada fuera de `:root` y de los modos (por ejemplo, en `.home`) que repite el valor de un token.
+- `superficies.<id>.tokensSinUso`: tokens que nadie referencia, ni el CSS ni el código, sin contar los tests. Las variables de `@theme` no cuentan, porque se usan como utilidades.
+- `hojasSinCargar`: hojas del repo que ninguna superficie carga y que nada importa, o que solo importan los tests.
+
+La skill `recomendar-produccion` revisa esos hallazgos en el código, añade lo que pide criterio (foco, contraste, piezas casi duplicadas, valores casi iguales) y escribe `docs/RECOMENDACIONES.md` en el repo del sistema. Es un documento para personas: cada recomendación entra en producción con un PR que hace una persona, como todo.
 
 ## Comandos
 

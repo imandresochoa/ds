@@ -15,6 +15,7 @@ El kit contiene la interfaz (con la estructura de ui.shadcn.com), el CLI `ds`, l
 | `lib/meta.mjs` | Secciones, estados, grupos y prompts de acción. |
 | `lib/lab.mjs` | Lab de primitivos: preset, tokens derivados y contraste. Lo comparten la página `/<sistema>/lab` y `ds preset`. |
 | `lib/css-tokens.mjs` | Lee tokens y modos del CSS; lo comparten el sync y la interfaz. |
+| `lib/hallazgos.mjs` | Lo que producción hace a mano (valores que ya son tokens, copias, tokens sin uso, hojas sin cargar). Lo usa el sync; lo lee la skill `recomendar-produccion`. |
 | `lib/registry.mjs` | El registry: índice (`registry.json`) y un JSON por pieza (`r/`). Lo comparten `ds build` y el CLI. |
 | `app/`, `components/` | Interfaz. `app/globals.css` tiene los tokens; `components/ui/`, las primitivas de shadcn/ui (MIT), solo para la interfaz. |
 | `scripts/` | `sync-production.mjs`, `build-public.mjs`, `doctor.mjs`. |

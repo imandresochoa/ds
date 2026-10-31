@@ -45,6 +45,8 @@ El check no ve lo visual. Con `npx ds dev`, abre las fichas que cambiaron y las 
 
 `cobertura` en el informe lista lo que producción tiene y ninguna ficha documenta. No es un error, pero si creció mucho desde la última auditoría (un rediseño), propón una tanda de fichas nuevas con `inventariar-produccion`.
 
+`hallazgos` lista lo que producción hace a mano (valores que ya son tokens, copias de tokens, hojas que no se cargan). Tampoco es un error del sistema. Si cambió desde la última auditoría, actualiza `docs/RECOMENDACIONES.md` con `recomendar-produccion`: quita lo que producción ya arregló y añade lo nuevo.
+
 ## 5. Cerrar
 
 1. `npx ds check` pasa.

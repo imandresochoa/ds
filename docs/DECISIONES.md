@@ -210,3 +210,14 @@ El Lab ajusta también el movimiento, el único primitivo que quedó fuera de la
 `AGENTS.md` decía que los PRs del kit los fusiona Andrés. Se quita: vale lo que dice «Git, GitHub y entornos». En el kit, un agente puede fusionar si tiene autorización expresa y el workflow «Comprobar» pasa. En producción sigue fusionando siempre una persona.
 
 Además, `next.config.ts` lleva `agentRules: false`. `next dev` añadía a `AGENTS.md` un bloque de reglas de Next cuando detectaba un agente, y ese bloque acabó en un commit. Con la opción apagada, Next lo quita y no lo vuelve a escribir.
+
+## 2026-10-31 · Recomendaciones para producción
+
+Al montar un sistema, el agente lee producción entera y ve lo que hace a mano: un color de un token escrito tal cual, una copia local de un token, una hoja que ya no se carga. Eso se quedaba en el resumen de la sesión. Ahora tiene su sitio.
+
+- **El sync detecta y la skill redacta.** Lo mecánico (valores sueltos, copias de tokens, tokens sin uso, hojas sin cargar) lo calcula el sync y queda en `sync-report.json` → `hallazgos`, igual en cada ejecución. La skill `recomendar-produccion` lo revisa en el código, añade lo que pide criterio (foco, contraste, piezas casi duplicadas, valores casi iguales) y prioriza. Se descartó dejarlo todo al agente: dos sesiones darían listas distintas y la auditoría diaria no podría ver qué cambió.
+- **Un documento aparte del inventario.** `docs/INVENTARIO.md` dice qué falta documentar en el sistema; `docs/RECOMENDACIONES.md`, qué mejorar en producción. Mezclarlos confunde a quién va dirigida cada cosa.
+- **Sin escribir en producción.** Las recomendaciones son un documento: cada una entra en producción con un PR que hace una persona (regla 6).
+- **No es un fallo.** `ds check` no mira los hallazgos: no dicen que el sistema mienta, sino que producción podría usarlo mejor.
+- **Solo valores distintivos.** Se comparan colores y valores compuestos (sombras, pilas de fuentes, curvas). Los valores simples (`8px`, `0`, `1`) darían demasiadas coincidencias casuales. Los radios y espacios casi iguales los busca la skill.
+

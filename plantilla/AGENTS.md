@@ -61,5 +61,6 @@ Si pone «sin programar», prográmala siguiendo el apartado «Rutina diaria» d
 - `auditar-sistema`: revisa que todo el sistema cuadre con producción y arregla lo que no. Antes de publicar y tras cada merge en producción.
 - `revisar-sync`: interpreta el informe de sync y propone qué actualizar o aceptar.
 - `inventariar-produccion`: lista priorizada de lo que falta documentar.
+- `recomendar-produccion`: recomendaciones para mejorar producción con su propio sistema (`docs/RECOMENDACIONES.md`).
 - `actualizar-kit`: sube la versión del kit y revisa qué cambia.
 - `mejorar-kit`: lleva al kit una mejora de la interfaz o del método.
