@@ -28,6 +28,7 @@ Instala la skill `montar-sistema` para Claude Code y Codex en tu carpeta de usua
    - **Web o Figma**: primitivos sacados de lo publicado, en exploración.
    - **Nada**: `DESIGN.md` con lo que cuentes y unos primitivos de partida, que ajustas en el Lab de primitivos.
 5. Crea las fichas por tandas, según el alcance. En «todo» no se para entre tandas salvo por dudas que bloqueen, pero revisa cada ficha y cada huella. Hace un commit por tanda en el repo del sistema y deja `docs/INVENTARIO.md` al día para retomarlo.
+6. Al cerrar, ofrece enviar al kit sugerencias anónimas: qué le habría venido bien. Enseña lo que se enviaría y solo lo envía si dices que sí (ver «Feedback para el kit» en «Kit y sistemas»).
 
 ## Sin agente
 
