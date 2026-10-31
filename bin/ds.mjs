@@ -17,6 +17,8 @@
 //   ds preset resolver        el preset de experimental/tokens.css y el enlace para abrirlo en el Lab (--port si ds dev usa otro)
 //   ds sync [--accept <id>]   lee producción: instantánea CSS, tokens, huellas e informe
 //   ds check                  falla si algo está desajustado, ausente o inventado
+//   ds patrones [--min-hojas 2] [--min-rasgos 1] [--limite 20] [--todos] [--json]   clases de hojas y prefijos distintos con la misma forma
+//        (radio, sombra, fondo, borde, relleno y tokens), leídas de la instantánea de ds sync: piezas candidatas
 //   ds skills                 copia (o actualiza) las skills del kit en .claude/skills/ y .agents/skills/
 //   ds doctor                 comprueba la configuración del sistema
 //   ds version                versión del kit instalada
@@ -51,7 +53,7 @@ const DIRECTORY_FILE = 'directorio.json';
 const ORIGINS = ['repo', 'web', 'figma', 'cero'];
 
 // Opciones: `--clave valor` e interruptores (`--json`). El resto son argumentos posicionales.
-const VALUE_OPTIONS = new Set(['--sistemas', '--carpeta', '--desde', '--produccion', '--url', '--kit', '--seccion', '--limite', '--port', '--accept', '--solo', '--archivo']);
+const VALUE_OPTIONS = new Set(['--sistemas', '--carpeta', '--desde', '--produccion', '--url', '--kit', '--seccion', '--limite', '--port', '--accept', '--solo', '--archivo', '--min-hojas', '--min-rasgos']);
 const option = (name) => {
   const at = args.indexOf(name);
   return at >= 0 ? args[at + 1] : undefined;
@@ -578,6 +580,25 @@ const commands = {
   async check() {
     requireSystem();
     process.exit(await node(runtimeDir(), 'scripts/sync-production.mjs', ['--check']));
+  },
+  async patrones() {
+    requireSystem();
+    const { sharedPatterns } = await import('../lib/patrones.mjs');
+    const limite = Number(option('--limite') ?? 20);
+    const minHojas = Number(option('--min-hojas') ?? 2);
+    const minRasgos = Number(option('--min-rasgos') ?? 1);
+    // Con --todos también salen los grupos de un solo prefijo (los que ya encuentra el inventario por prefijos).
+    const result = sharedPatterns(SITE, { limite, minHojas, minRasgos, minPrefijos: flag('--todos') ? 1 : 2 });
+    if (!result) fail('no hay instantánea de producción en produccion/. Ejecuta antes ds sync.');
+    if (JSON_OUT) return console.log(JSON.stringify(result, null, 2));
+    console.log(`${result.reglas} reglas de clase con forma en ${result.hojas} hojas · ${result.grupos.length} grupos candidatos`);
+    if (!result.grupos.length) return console.log('Ninguna forma se repite entre hojas con prefijos distintos. Prueba con --min-hojas 1 o --todos.');
+    result.grupos.forEach((g, i) => {
+      const firma = [...Object.entries(g.firma.declaraciones).map(([k, v]) => `${k}: ${v}`), ...g.firma.tokens.filter((t) => !Object.values(g.firma.declaraciones).some((v) => v.includes(t))).map((t) => `var(${t})`)];
+      console.log(`\n${i + 1}. ${g.numHojas} hojas · ${g.numPrefijos} prefijos (${g.prefijos.join(', ')})${g.varianteDe ? ` · variante del ${g.varianteDe}` : ''}`);
+      console.log(`   firma: ${firma.join('; ')}`);
+      for (const c of g.clases) console.log(`   ${c.selector}  ${c.hoja}`);
+    });
   },
   async skills() {
     installSkills();

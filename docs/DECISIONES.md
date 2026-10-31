@@ -229,3 +229,14 @@ Sale del informe de un agente que montó un sistema real. Se paró después del 
 - **Lo que dice la persona y Figma manda sobre lo deducido.** Agrupar clases por prefijo no ve una pieza con cuatro prefijos. Una lista con nombres o los componentes de Figma sí.
 - **Decisiones abiertas antes de escribir `DESIGN.md`**, no al final, para que no se queden en «Pendiente» cosas que la persona sabe.
 - **Encadenar no rebaja el listón.** Cada ficha se comprueba y cada huella se revisa. Un commit por tanda, solo en el repo del sistema, e `INVENTARIO.md` al día para retomar en otra sesión. Se descartó un modo que creara fichas sin comprobar el ejemplo: es rápido, pero lo que llega al registry tiene que ser verdad.
+
+## 2026-10-31 · Patrones compartidos en el inventario
+
+En un producto sin carpeta de componentes compartidos, el inventario por prefijos de clase no vio las tarjetas: vivían en cuatro hojas con cuatro prefijos distintos. El agente que lo sufrió pidió detectar patrones compartidos, como un mismo token o un mismo radio en varias hojas.
+
+- **Un comando, no solo la skill.** `ds patrones` lee la instantánea de `produccion/` con postcss y devuelve grupos; la skill los interpreta. Comparar a ojo las reglas de veinte hojas es justo lo que se le escapa a un agente.
+- **Firma por rasgos, no por igualdad.** Dos tarjetas escritas por separado casi nunca tienen el mismo relleno. Por eso la firma es lo que comparten (cada pareja de clases da una candidata, que se cierra con todo lo que tienen en común las clases que la contienen) y no la regla entera. Un solo rasgo basta, porque la petición era «un mismo radio»; los grupos con más rasgos salen antes a igual número de hojas.
+- **Ruido fuera.** Los resets (`border: 0`, `background: transparent`) no cuentan: en un producto real llenaban los primeros puestos con botones sin estilo. Una firma solo de relleno tampoco. Los selectores con pseudoclases, los de dentro de `@media` y los que cuelgan de una clase de modo (`.dark .x`) quedan fuera porque son ajustes de otra pieza.
+- **Lo que nombra la persona va primero.** La lista de piezas que dé la persona y los componentes con nombre de Figma mandan sobre lo deducido del CSS. `ds patrones` sirve para encontrar dónde vive cada una y lo que falta.
+- **Se descartó** tocar el sync para guardar los patrones en `sync-report.json`: el informe crecería con algo que solo usa el inventario, y el comando se puede ejecutar cuando haga falta.
+
