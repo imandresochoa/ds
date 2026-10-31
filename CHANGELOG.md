@@ -2,7 +2,9 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
-## Sin publicar
+## 1.1.0 · 2026-10-31
+
+Sale de la primera instalación real con `montar-sistema`: lo que el agente echó en falta al montar un sistema y lo que vio en producción. Todo es nuevo y opcional, así que la versión es menor: ninguna ficha ni ningún `system.json` cambia.
 
 - **Recomendaciones para producción.** El sync añade `hallazgos` a `sync-report.json`: colores y valores compuestos escritos a mano que ya son tokens, copias de tokens fuera de `:root` y de los modos, tokens que nada usa y hojas que ninguna superficie carga, con archivo y línea. No cambian `ds check`. La skill nueva `recomendar-produccion` los revisa y escribe `docs/RECOMENDACIONES.md` en el sistema. `montar-sistema` la usa con el plan de fichas y `auditar-sistema` la mantiene al día. Para tenerla: `npx ds skills`.
 - **`montar-sistema` pregunta al principio lo que luego echaba en falta.** Junto al origen, el **alcance** (todo, tanda tras tanda; plan y primera tanda; o solo el plan). Pide la **lista de piezas** de la persona y el **archivo de Figma**, cuyos componentes con nombre mandan sobre lo que se deduce del CSS. Pregunta las **decisiones abiertas** antes de escribir `DESIGN.md`. Un apartado nuevo, «Tandas», encadena las fichas: sin pararse, pero revisando cada una, con un commit por tanda y `docs/INVENTARIO.md` al día para retomar. `inventariar-produccion` y `nueva-ficha` usan esos nombres.
@@ -11,7 +13,7 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
 - **Marco de los ejemplos en vivo que aguanta `100vh`.** El marco mide lo que ocupa el ejemplo aunque la hoja del producto fije `html, body { height: 100% }` (antes se quedaba en 150 px). Si el contenido depende del alto de la vista (`100vh`, `100dvh`), no crece sin fin: se queda en un alto de vista conocido y el contenido se desplaza dentro. Claves nuevas y opcionales: `vista` / `vista=<px>` en el bloque ` ```html preview ` y `altoVista` en cada superficie de `system.json` (640 por defecto). Los arreglos a mano (`cssExtra` con `height: auto`, `min-height` en línea) ya no hacen falta, pero no estorban.
 - **Ejemplos en cada modo.** Si una superficie tiene más de un modo en el último sync, el marco del ejemplo (en la ficha y en la galería de bloques) lleva un conmutador Claro/Oscuro que aplica el selector del informe (`tokens.<superficie>.modos`): atributo o clase en `html` o `body`, y los modos de `@media (prefers-color-scheme)` emulados. `modo=<id>` en el bloque elige el modo con el que se abre.
 - **`ds feedback`**: sugerencias anónimas para el kit, con campos fijos (kit, agente, SO, origen y stack) y un texto libre, anonimizado en local. Enseña el JSON exacto y solo lo envía con `--enviar` o con un sí en la terminal. `montar-sistema` lo ofrece al cerrar.
-- Migración: ninguna. `npx ds skills` para tener las skills al día.
+- Migración: ninguna. `npm install @imandresochoa/ds@1.1.0` y `npx ds skills`, para tener las skills al día.
 
 ## 1.0.0 · 2026-10-30
 
