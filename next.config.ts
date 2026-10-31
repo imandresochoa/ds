@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
   output: 'export',
   images: { unoptimized: true },
   devIndicators: false,
+  // Sin el bloque de reglas que next dev añade a AGENTS.md cuando detecta un agente: este AGENTS.md es del kit.
+  agentRules: false,
   // dev y build no comparten carpeta: se puede exportar sin romper el servidor de desarrollo.
   distDir: process.env.NODE_ENV === 'production' ? '.next-build' : '.next',
   turbopack: { root: turbopackRoot(process.cwd()) },
