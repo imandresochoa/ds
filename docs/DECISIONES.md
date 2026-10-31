@@ -283,3 +283,11 @@ El primer envío real de `ds feedback` llegó con «feedback» cambiado por `<pr
 - Se descartó mantener la primera palabra con más palabras comunes excluidas: la lista nunca acaba, y una sugerencia estropeada es peor que un nombre compuesto poco habitual.
 - El precio: si un repo se llama `acme-plataforma` y alguien escribe solo «acme», no se quita. La persona ve el JSON antes de enviarlo y puede corregirlo.
 
+## 2026-10-31 · Selector de superficie en la cabecera
+
+Un feedback de `ds feedback` (imandresochoa/ds#28) contaba un producto con dos interfaces muy distintas. En la web del sistema, la barra lateral, la galería y la búsqueda mezclaban las fichas de las dos, y solo el ejemplo decía de cuál era cada una.
+
+- **Un selector en la cabecera**, junto a la marca, como el de equipo o proyecto de Vercel: Todas o una superficie. Sale solo con dos superficies o más.
+- **De qué superficie es una ficha:** de las que declaran sus plataformas y de las que pintan sus ejemplos (`superficie=`). No hace falta un campo nuevo en la ficha. Sin ninguna, la ficha es común y se ve siempre: ocultar los tokens o los principios al elegir una superficie dejaría el sistema cojo.
+- **En el cliente, no en rutas.** El sitio se exporta estático: una ruta por superficie multiplicaría las páginas. La elección va en `?superficie=` (para enlazarla) y en el almacenamiento del navegador (para que siga al navegar, porque los enlaces internos no llevan el parámetro). Las piezas de servidor marcan lo suyo con `data-superficies` y una regla de CSS oculta lo demás. Un enlace con el parámetro manda sobre lo recordado.
+- **Descartado por ahora:** filtrar también la página de una ficha (sus columnas de tokens por superficie) y el registry. El selector ordena la navegación; no cambia lo que dice una ficha.

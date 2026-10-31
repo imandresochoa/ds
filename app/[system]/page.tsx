@@ -3,7 +3,7 @@ import { Preview } from '@/components/Preview';
 import { Announcement, CategoryNav, PageActions, PageHeader, PageHeaderDescription, PageHeaderHeading, PageNav } from '@/components/site/PageHeader';
 import { Button } from '@/components/ui/button';
 import { CONTENT_SECTIONS, SECTIONS, loadEntries, loadSystem } from '@/lib/core.mjs';
-import { buildNav } from '@/lib/nav';
+import { buildNav, entrySurfaces, surfacesAttr } from '@/lib/nav';
 import { entryPreviews } from '@/lib/previews';
 import { previewSurfaces } from '@/lib/surfaces';
 
@@ -65,7 +65,7 @@ export default async function Home({ params }: { params: Promise<{ system: strin
           {pool.length > 0 ? (
             <section className="columns-1 gap-6 pt-6 md:columns-2 md:pt-0 xl:columns-3 *:mb-6 *:break-inside-avoid">
               {pool.map(({ entry, preview, surface }) => (
-                <div key={entry.id} data-slot="card" className="flex flex-col overflow-hidden rounded-xl border bg-background">
+                <div key={entry.id} data-slot="card" data-superficies={surfacesAttr([entrySurfaces(entry)])} className="flex flex-col overflow-hidden rounded-xl border bg-background">
                   <Preview html={preview.html} surface={surface} background={preview.fondo ?? undefined} minHeight={160} vista={preview.vista} mode={preview.modo} />
                   <Link href={entry.href} className="flex items-center justify-between gap-2 border-t px-4 py-3 text-sm hover:bg-accent/50">
                     <span className="font-medium">{entry.titulo}</span>

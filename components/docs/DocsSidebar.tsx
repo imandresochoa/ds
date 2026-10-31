@@ -4,15 +4,17 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLayoutEffect, useRef } from 'react';
 import type { Nav, NavItem } from '@/lib/nav';
+import { useSurfaceGroups } from '@/components/site/SurfaceFilter';
 import { StatusDot } from './StatusBadge';
 
 const BUTTON = 'relative flex h-[30px] w-fit items-center gap-2 overflow-visible rounded-md border border-transparent p-2 text-left text-[0.8rem] font-medium outline-hidden ring-ring transition-[width,height,padding] after:absolute after:inset-x-0 after:-inset-y-1 after:z-0 after:rounded-md hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 data-[active=true]:border-accent data-[active=true]:bg-accent data-[active=true]:text-accent-foreground';
 const LABEL = 'flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-muted-foreground';
 
-/** Barra lateral de Docs de ui.shadcn.com: «Secciones» y un grupo por sección con sus páginas. */
+/** Barra lateral de Docs de ui.shadcn.com: «Secciones» y un grupo por sección con sus páginas (las de la superficie elegida). */
 export function DocsSidebar({ nav }: { nav: Nav }) {
   const pathname = usePathname().replace(/\/$/, '');
   const ref = useRef<HTMLDivElement>(null);
+  const groups = useSurfaceGroups(nav);
 
   // Al cambiar de página, la activa queda a la vista.
   useLayoutEffect(() => {
@@ -43,7 +45,7 @@ export function DocsSidebar({ nav }: { nav: Nav }) {
             ))}
           </ul>
         </div>
-        {nav.groups.filter((g) => g.items.length).map((g) => (
+        {groups.map((g) => (
           <div key={g.id} className="relative flex w-full min-w-0 flex-col p-2">
             <div className={LABEL}>{g.label}</div>
             <ul className="flex w-full min-w-0 flex-col gap-0.5">

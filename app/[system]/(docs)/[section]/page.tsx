@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { DocsArticle } from '@/components/docs/DocsArticle';
 import { PageList } from '@/components/docs/PageList';
 import { SECTIONS, loadSystem } from '@/lib/core.mjs';
-import { buildNav } from '@/lib/nav';
+import { buildNav, surfacesAttr } from '@/lib/nav';
 
 /** Bloques, Gráficos e Iniciativas tienen su propia página ancha (galería); aquí, el resto de secciones. */
 const DOCS_SECTIONS = SECTIONS.filter((s) => !s.galeria && s.id !== 'iniciativas');
@@ -32,18 +32,21 @@ export default async function SectionPage({ params }: { params: Promise<{ system
       <div className="ds-prose">
         {!items.length && <p className="text-muted-foreground">Todavía no hay fichas en esta sección. Usa «Nuevo › {section.accion.label}» para pedírsela a tu agente.</p>}
         {fresh.length > 0 && (
-          <>
+          <div data-superficies={surfacesAttr(fresh.map((i) => i.superficies))}>
             <h2 id="nuevos">Nuevos</h2>
             <PageList items={fresh} />
-          </>
+          </div>
         )}
         {groups.length > 1 ? (
-          groups.map((g) => (
-            <div key={g}>
-              <h2 id={g}>{g}</h2>
-              <PageList items={items.filter((i) => i.grupo === g)} />
-            </div>
-          ))
+          groups.map((g) => {
+            const list = items.filter((i) => i.grupo === g);
+            return (
+              <div key={g} data-superficies={surfacesAttr(list.map((i) => i.superficies))}>
+                <h2 id={g}>{g}</h2>
+                <PageList items={list} />
+              </div>
+            );
+          })
         ) : (
           items.length > 0 && (
             <>
