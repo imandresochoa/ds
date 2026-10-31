@@ -210,3 +210,11 @@ El Lab ajusta también el movimiento, el único primitivo que quedó fuera de la
 `AGENTS.md` decía que los PRs del kit los fusiona Andrés. Se quita: vale lo que dice «Git, GitHub y entornos». En el kit, un agente puede fusionar si tiene autorización expresa y el workflow «Comprobar» pasa. En producción sigue fusionando siempre una persona.
 
 Además, `next.config.ts` lleva `agentRules: false`. `next dev` añadía a `AGENTS.md` un bloque de reglas de Next cuando detectaba un agente, y ese bloque acabó en un commit. Con la opción apagada, Next lo quita y no lo vuelve a escribir.
+
+## 2026-10-31 · El sistema de ejemplo, publicado
+
+La landing del kit (`ds.aochoa.fyi`, en el repo del digital garden) enseña la interfaz real en una ventana. Para eso, `systems/ejemplo` se publica en `ds.aochoa.fyi/ejemplo`, con un proyecto de Vercel que construye este repo según `vercel.json`. El build exporta con `DS_RUTA=/ejemplo` y sirve `.next-build` como estático, sin el preset de Next de Vercel, porque `out/` no tiene la carpeta de la ruta dentro: el garden lleva `/ejemplo/:path*` al despliegue sin la ruta, como explica «Git, GitHub y entornos».
+
+- **Por qué en el kit.** El ejemplo cambia con el kit. Cada fusión en `main` actualiza la demo, y la landing no necesita saber nada del build.
+- **Por qué no en npm.** `vercel.json` no está en `files`, así que no llega a los sistemas.
+- **Descartado:** un subdominio propio para el ejemplo. Con todo en un solo dominio, el iframe es del mismo origen y no hay que abrir cabeceras de framing.
