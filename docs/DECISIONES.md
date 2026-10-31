@@ -204,3 +204,9 @@ El Lab ajusta también el movimiento, el único primitivo que quedó fuera de la
 - **Antipatrones con un solo título.** La metodología decía «Antipatrones» y la plantilla, «Rechaza estos reflejos». Como el título pasa al JSON de la pieza, el canónico es `## Antipatrones`. El otro se sigue leyendo para no tocar fichas existentes.
 - **Enlaces fuera del paquete.** La metodología va en el paquete, pero `TAREAS.md` y `DECISIONES.md` no. Sus enlaces apuntan al repo del kit en GitHub.
 
+
+## 2026-10-31 · Quién fusiona los PRs del kit
+
+`AGENTS.md` decía que los PRs del kit los fusiona Andrés. Se quita: vale lo que dice «Git, GitHub y entornos». En el kit, un agente puede fusionar si tiene autorización expresa y el workflow «Comprobar» pasa. En producción sigue fusionando siempre una persona.
+
+Además, `next.config.ts` lleva `agentRules: false`. `next dev` añadía a `AGENTS.md` un bloque de reglas de Next cuando detectaba un agente, y ese bloque acabó en un commit. Con la opción apagada, Next lo quita y no lo vuelve a escribir.
