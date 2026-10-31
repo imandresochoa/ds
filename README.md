@@ -69,6 +69,7 @@ Desde el repo del sistema:
 | `npx ds build` | Exporta el sitio estático a `out/`, para la raíz de un dominio o para la ruta de `publicacion.ruta` (`DS_RUTA` la cambia). |
 | `npx ds skills` | Copia o actualiza las skills del kit en `.claude/skills/` (Claude Code) y `.agents/skills/` (Codex). |
 | `npx ds doctor` | Comprueba la configuración. |
+| `npx ds feedback --texto "<…>"` | Sugerencias anónimas para el kit. Enseña el JSON anonimizado y solo lo envía con tu sí (`--enviar`). |
 | `npx ds version` | Versión del kit instalada. |
 | `npx ds enlazar <ruta>` / `desenlazar` | Usa un checkout local del kit, o vuelve a la versión fijada. |
 

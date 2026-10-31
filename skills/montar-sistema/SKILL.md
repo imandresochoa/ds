@@ -140,11 +140,17 @@ El Lab de primitivos (`/<id>/lab` con `npx ds dev`, o «Nuevo» → «Lab de pri
 
 - Ejecuta `npx ds doctor` y, con repo, `npx ds sync` y `npx ds check`.
 - Resume qué está hecho, qué queda pendiente y qué decisiones necesitan a la persona. Para verlo, `npx ds dev`.
+- **Feedback para el kit (opcional).** Ofrécelo una vez, al final:
+  1. Redacta en texto libre qué te habría venido bien para montar este sistema: lo que faltó en el kit, en la skill o en lo que te dieron. Son sugerencias, no un informe de errores. Escríbelas ya en genérico, sin nombres del producto, rutas, URLs ni valores.
+  2. Enséñalo sin enviar nada: `npx ds feedback --texto "<sugerencias>"` (o `--archivo <ruta>`, con el texto en un archivo temporal fuera de los repos). El comando anonimiza y saca el JSON exacto que se enviaría: enséñaselo a la persona y dile que acaba en un issue público de `imandresochoa/ds`.
+  3. Pregunta (cabecera «Feedback»): **Enviar** o **No enviar**, sin marcar ninguna como recomendada.
+  4. Solo con un sí, repite el mismo comando con `--enviar`. Con un no, no lo envíes ni lo vuelvas a ofrecer.
 
 ## No hagas
 
 - Escribir en el repo de producción, ni crear el sistema dentro de él.
 - Aceptar huellas (`--accept`) de fichas que no has revisado.
 - Usar `--aceptar-contraste`, `--sobrescribir` o `--archivo` sin preguntar.
+- Usar `ds feedback --enviar` sin el sí de la persona.
 - Inventar textos, valores o reglas, ni reescribir los textos del producto en los ejemplos.
 - Instalar nada en la carpeta de usuario sin que te lo pidan.

@@ -21,6 +21,8 @@
 //        (radio, sombra, fondo, borde, relleno y tokens), leídas de la instantánea de ds sync: piezas candidatas
 //   ds skills                 copia (o actualiza) las skills del kit en .claude/skills/ y .agents/skills/
 //   ds doctor                 comprueba la configuración del sistema
+//   ds feedback [--texto "<texto>" | --texto - | --archivo <ruta>] [--agente <id>] [--desde <origen>] [--stack a,b]
+//        [--ver | --enviar] [--json]   sugerencias anónimas para el kit: enseña el JSON exacto y solo lo envía con tu sí
 //   ds version                versión del kit instalada
 //   ds enlazar <ruta-al-kit>  usa un checkout local del kit (para pulir la interfaz con datos reales)
 //   ds desenlazar             vuelve a la versión del kit fijada en package.json
@@ -53,7 +55,7 @@ const DIRECTORY_FILE = 'directorio.json';
 const ORIGINS = ['repo', 'web', 'figma', 'cero'];
 
 // Opciones: `--clave valor` e interruptores (`--json`). El resto son argumentos posicionales.
-const VALUE_OPTIONS = new Set(['--sistemas', '--carpeta', '--desde', '--produccion', '--url', '--kit', '--seccion', '--limite', '--port', '--accept', '--solo', '--archivo', '--min-hojas', '--min-rasgos']);
+const VALUE_OPTIONS = new Set(['--sistemas', '--carpeta', '--desde', '--produccion', '--url', '--kit', '--seccion', '--limite', '--port', '--accept', '--solo', '--archivo', '--min-hojas', '--min-rasgos', '--texto', '--agente', '--stack']);
 const option = (name) => {
   const at = args.indexOf(name);
   return at >= 0 ? args[at + 1] : undefined;
@@ -262,6 +264,58 @@ function initDirectory() {
   if (JSON_OUT) return console.log(JSON.stringify(result, null, 2));
   console.log(`\nDirectorio «${nombre}» en ${target}.`);
   console.log(sistemas.length ? `Sistemas: ${sistemas.join(', ')}. Siguiente paso: npx ds dev.` : `Siguiente paso: añade las carpetas de los sistemas a "sistemas" en ${DIRECTORY_FILE} y ejecuta npx ds dev.`);
+}
+
+/**
+ * Lo que `ds feedback` necesita para anonimizar: nombres del sistema y del producto (de system.json, de las
+ * carpetas, de package.json y de los remotos de git), sus tokens, clases y componentes (del último sync) y el
+ * stack en etiquetas genéricas. Nada de esto se envía: solo sirve para quitarlo del texto.
+ */
+function feedbackContext(system, fb) {
+  const nombres = [path.basename(SITE)];
+  const tokens = [];
+  const clases = [];
+  const componentes = [];
+  const gitNames = (dir) => {
+    const remote = spawnSync('git', ['-C', dir, 'remote', 'get-url', 'origin'], { encoding: 'utf8' }).stdout?.trim();
+    const m = remote && /[:/]([^/:]+)\/([^/]+?)(?:\.git)?$/.exec(remote);
+    return m ? [m[1], m[2]] : [];
+  };
+  nombres.push(...gitNames(SITE));
+  let prodDir = null;
+  if (system) {
+    const prod = system.produccion ?? {};
+    nombres.push(system.id, system.nombre, ...fb.hostNames(system.origen?.url), ...fb.hostNames(prod.web));
+    for (const surface of Object.values(prod.superficies ?? {})) nombres.push(...fb.hostNames(surface?.url));
+    const codigo = typeof prod.codigo === 'string' && /github\.com\/([^/]+)\/([^/]+)/.exec(prod.codigo);
+    if (codigo) nombres.push(codigo[1], codigo[2]);
+    if (prod.repo) {
+      prodDir = path.resolve(SITE, prod.repo);
+      nombres.push(path.basename(prodDir));
+      if (fs.existsSync(prodDir)) nombres.push(...gitNames(prodDir));
+    }
+    for (const values of Object.values(readJson(path.join(SITE, 'tokens.produccion.json')) ?? {})) tokens.push(...Object.keys(values ?? {}));
+    const report = readJson(path.join(SITE, 'sync-report.json'));
+    for (const [key, c] of Object.entries(report?.cobertura ?? {})) {
+      const list = c?.sinDocumentar ?? [];
+      if (key.startsWith('tokens:')) tokens.push(...list);
+      else if (key.startsWith('componentes:')) componentes.push(...list.map((f) => path.basename(f).replace(/\.[^.]+$/, '')));
+      else clases.push(...list);
+    }
+    for (const entry of Object.values(report?.entradas ?? {})) for (const f of entry?.fuentes ?? []) clases.push(...(f?.clases ?? []));
+  }
+  // El stack sale del package.json de producción o, sin sistema, del de esta carpeta.
+  const pkgDir = prodDir && fs.existsSync(path.join(prodDir, 'package.json')) ? prodDir : system ? null : SITE;
+  const pkg = pkgDir ? readJson(path.join(pkgDir, 'package.json')) : null;
+  if (typeof pkg?.name === 'string') nombres.push(...pkg.name.replace(/^@/, '').split('/'));
+  const surfaces = Object.values(system?.produccion?.superficies ?? {});
+  const stack = fb.detectStack({
+    pkg,
+    tailwind: surfaces.map((s) => s?.tailwind).filter(Boolean),
+    css: surfaces.some((s) => s && !s.tailwind),
+    shadcn: Boolean(pkgDir && fs.existsSync(path.join(pkgDir, 'components.json'))),
+  });
+  return { nombres: nombres.filter((n) => typeof n === 'string' && n), tokens, clases, componentes, stack };
 }
 
 const commands = {
@@ -606,6 +660,73 @@ const commands = {
   async doctor() {
     requireSite();
     process.exit(await node(runtimeDir(), 'scripts/doctor.mjs'));
+  },
+  async feedback() {
+    // Qué le habría venido bien a quien instala el kit y monta un sistema. Se anonimiza aquí, antes de enseñarlo.
+    // Sin --enviar (o sin un «sí» en la terminal) no sale nada del equipo, y nunca se guarda nada en él.
+    const fb = await import('../lib/feedback.mjs');
+    const system = readJson(path.join(SITE, 'system.json'));
+    let texto = option('--texto');
+    if (option('--archivo')) texto = fs.readFileSync(path.resolve(option('--archivo')), 'utf8');
+    else if (texto === '-') texto = fs.readFileSync(0, 'utf8');
+    const interactive = Boolean(process.stdin.isTTY && process.stdout.isTTY) && !JSON_OUT;
+    if (!texto?.trim() && interactive) {
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      texto = await rl.question('¿Qué te habría venido bien al instalar el kit o al montar el sistema? ');
+      rl.close();
+    }
+    if (!texto?.trim()) fail('uso: ds feedback --texto "<sugerencias>" (--texto - las lee de la entrada estándar; --archivo <ruta>, de un archivo)');
+
+    const desde = option('--desde') ?? system?.origen?.desde;
+    if (option('--desde') && !fb.ORIGENES.includes(desde)) fail(`--desde admite ${fb.ORIGENES.join(', ')}`);
+    const agente = option('--agente') ?? fb.detectAgent();
+    if (!fb.AGENTES.includes(agente)) fail(`--agente admite ${fb.AGENTES.join(', ')}`);
+    const contexto = feedbackContext(system, fb);
+    // Las etiquetas a mano salen de la misma lista cerrada que las detectadas: una libre podría nombrar el producto.
+    const manual = option('--stack')?.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean);
+    const unknownTags = manual?.filter((t) => !fb.esEtiqueta(t)) ?? [];
+    if (unknownTags.length) log(`aviso: descarto las etiquetas que no son genéricas o que no conozco: ${unknownTags.join(', ')}`);
+    const informe = fb.buildReport({
+      kit: kitPkg.version,
+      agente,
+      so: fb.detectOs(),
+      node: process.versions.node.split('.')[0],
+      origen: desde,
+      stack: manual ?? contexto.stack,
+      sugerencias: fb.anonymize(texto, contexto),
+    });
+    const { ok, errores } = fb.validateReport(informe);
+    if (!ok) fail(`el informe no vale: ${errores.join('; ')}`);
+    const url = process.env.DS_FEEDBACK_URL || fb.FEEDBACK_URL;
+    const enviar = flag('--enviar');
+    if (JSON_OUT && !enviar) return console.log(JSON.stringify(informe, null, 2));
+
+    log('Esto es exactamente lo que se enviaría, ya anonimizado (rutas, URLs, correos, claves, colores y nombres, clases y tokens del producto):\n');
+    log(JSON.stringify(informe, null, 2));
+    log(`\nDestino: ${url}\nSe publica como un issue público en github.com/${fb.FEEDBACK_REPO}, con la etiqueta «feedback». No lleva tu nombre ni tu IP, y no se guarda nada en este equipo.`);
+    let send = enviar;
+    if (!send && !flag('--ver') && interactive) {
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      send = /^(s|si|sí|y|yes)$/i.test((await rl.question('¿Lo envío? (s/N) ')).trim());
+      rl.close();
+    }
+    if (!send) return log('\nNo se ha enviado nada. Para enviarlo, repite el mismo comando con --enviar. Un agente solo lo hace después del sí de la persona.');
+
+    let res;
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'user-agent': `ds-cli/${kitPkg.version}` },
+        body: JSON.stringify(informe),
+        signal: AbortSignal.timeout(15000),
+      });
+    } catch (error) {
+      fail(`no se pudo enviar (${error instanceof Error ? error.message : error}). No se ha guardado nada.`);
+    }
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) fail(`el endpoint respondió ${res.status}${body?.error ? `: ${body.error}` : ''}. No se ha guardado nada.`);
+    if (JSON_OUT) return console.log(JSON.stringify({ enviado: true, issue: body.issue ?? null, informe }, null, 2));
+    log(`\nEnviado. Gracias.${body.issue ? ` ${body.issue}` : ''}`);
   },
   async enlazar() {
     requireSystem();

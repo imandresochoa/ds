@@ -79,6 +79,20 @@ npx ds sync && npx ds check
 
 La skill `actualizar-kit` lo hace y resume el changelog.
 
+## Feedback para el kit
+
+`ds feedback` envía al kit sugerencias anónimas: qué le habría venido bien a quien lo instala y monta un sistema. La skill `montar-sistema` lo ofrece al cerrar. El comando funciona siempre, con o sin sistema.
+
+```bash
+npx ds feedback --texto "<sugerencias>"            # en seco: enseña el JSON exacto y no envía nada
+npx ds feedback --texto "<sugerencias>" --enviar   # lo envía (un agente, solo tras el sí de la persona)
+```
+
+- **Qué lleva.** Campos fijos (versión del kit, agente, sistema operativo, versión mayor de Node, origen del sistema y stack en etiquetas genéricas de una lista cerrada, como `react` o `tailwind-4`) y un texto libre de sugerencias. No es un informe de errores con causa y solución.
+- **Anonimizado en local.** Antes de enseñarlo, el CLI quita rutas, URLs, dominios, correos, usuarios (`@alguien`), claves (también las de Figma), commits y colores. Con `system.json`, quita también los nombres del sistema y del producto (`id`, `nombre`, `produccion.repo`, `web` y `codigo`, las carpetas, `package.json` y los remotos de git) y, tras un sync, sus tokens, clases y componentes. Deja marcadores como `<producto>`, `<ruta>`, `<token>` o `<clase>`.
+- **Solo con un sí.** Sin `--enviar`, en una terminal pregunta y, si no, solo enseña. `--ver` nunca envía. No se guarda nada en el equipo.
+- **Dónde acaba.** En un issue público de [imandresochoa/ds](https://github.com/imandresochoa/ds/issues?q=label%3Afeedback) con la etiqueta `feedback`. Lo crea una función del proyecto de Vercel del kit, que vuelve a validar el informe, limita el tamaño y el ritmo de envíos y no guarda IPs. `DS_FEEDBACK_URL` cambia el endpoint.
+
 ## Versiones del kit
 
 - **Parche**: arreglos de interfaz sin cambios en el contenido.

@@ -42,6 +42,7 @@ npx ds preset ver "<enlace del Lab>"      # lee un preset del Lab de primitivos:
 npx ds preset aplicar "<enlace del Lab>"  # lo escribe en experimental/, nunca en producción
 npx ds preset resolver                    # el enlace para reabrir en el Lab lo que hay en experimental/
 npx ds skills        # actualiza las skills del kit
+npx ds feedback --texto "<sugerencias>"   # sugerencias anónimas para el kit: enseña el JSON; --enviar, solo con el sí de la persona
 ```
 
 Al crear una ficha nueva, reinicia `ds dev`: las rutas son estáticas.
