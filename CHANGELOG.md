@@ -4,6 +4,7 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
 
 ## Sin publicar
 
+- **Selector de superficie en la cabecera.** Con dos superficies o más en `system.json`, junto a la marca del sistema aparece un selector (Todas, o una superficie). Filtra la barra lateral, ⌘K, los índices, las galerías, la home y la página de Producción. La elección va en la URL (`?superficie=<id>`) y el navegador la recuerda. Las fichas sin superficie se ven siempre. Viene del feedback de un sistema con dos interfaces muy distintas (imandresochoa/ds#28). Migración: ninguna.
 - **`ds feedback` ya no borra palabras sueltas.** La anonimización tomaba como nombre del producto la primera palabra de la carpeta o del repo y la quitaba de todo el texto: con una carpeta `feedback-prueba`, cada «feedback» salía como `<producto>`. Ahora quita el nombre entero en todas sus formas y sin los sufijos habituales de un repo (`-design-system`, `-web`, `-app`, `-site`, `-frontend`, `-landing`…). El vocabulario del kit (feedback, tokens, fichas, sync…) nunca se trata como nombre.
 
 ## 1.1.1 · 2026-10-31

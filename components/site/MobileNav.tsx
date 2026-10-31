@@ -6,10 +6,13 @@ import type { Nav } from '@/lib/nav';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useSurface, useSurfaceGroups } from './SurfaceFilter';
 
 /** Menú a pantalla completa de ui.shadcn.com en móvil: navegación, secciones y fichas. */
 export function MobileNav({ nav, className }: { nav: Nav; className?: string }) {
   const [open, setOpen] = useState(false);
+  const groups = useSurfaceGroups(nav);
+  const { surface, setSurface, surfaces } = useSurface();
   const link = (href: string, label: string, isNew = false) => (
     <Link key={href} href={href} onClick={() => setOpen(false)} className="flex items-center gap-2 text-2xl font-medium">
       {label}
@@ -42,12 +45,24 @@ export function MobileNav({ nav, className }: { nav: Nav; className?: string }) 
             <div className="text-sm font-medium text-muted-foreground">Menú</div>
             <div className="flex flex-col gap-3">{nav.top.map((item) => link(item.href, item.label))}</div>
           </div>
+          {surfaces.length > 1 && (
+            <div className="flex flex-col gap-4">
+              <div className="text-sm font-medium text-muted-foreground">Superficie</div>
+              <div className="flex flex-wrap gap-2">
+                {[{ id: null, nombre: 'Todas' }, ...surfaces].map((s) => (
+                  <Button key={s.id ?? ''} size="sm" variant={surface === s.id ? 'default' : 'outline'} aria-pressed={surface === s.id} onClick={() => setSurface(s.id)}>
+                    {s.nombre}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex flex-col gap-4">
             <div className="text-sm font-medium text-muted-foreground">Secciones</div>
             <div className="flex flex-col gap-3">{nav.sections.filter((s) => !nav.top.some((t) => t.href === s.href)).map((item) => link(item.href, item.label))}</div>
           </div>
           <div className="flex flex-col gap-8">
-            {nav.groups.filter((g) => g.items.length).map((g) => (
+            {groups.map((g) => (
               <div key={g.id} className="flex flex-col gap-4">
                 <div className="text-sm font-medium text-muted-foreground">{g.label}</div>
                 <div className="flex flex-col gap-3">{g.items.map((item) => link(item.href, item.titulo, item.nuevo))}</div>

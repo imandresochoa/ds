@@ -34,4 +34,12 @@ Una superficie es una parte del producto con su propio código: por ejemplo, una
 
 Fuera de `superficies`, `produccion` lleva `repo` (ruta al repo de producción, relativa al sistema), `rama` (`main` por defecto), `publico` (la carpeta de archivos públicos, de donde salen las fuentes e imágenes de la instantánea; `public` por defecto), `codigo` (URL base para ver un archivo) y `web`.
 
+### Elegir una superficie en la web
+
+Con dos superficies o más, la cabecera lleva un selector junto a la marca del sistema: **Todas** o una de ellas. Al elegir una, la barra lateral, ⌘K, los índices de sección, las galerías de Bloques y Gráficos, el escaparate de la home y la página de Producción (totales de fichas, cobertura y fichas por revisar) se quedan con lo de esa superficie. Los totales de una superficie cuentan sus fichas y las comunes.
+
+- Una ficha es de las superficies que declaran sus plataformas (`plataformas.<p>.superficies[].id`) y de las que pintan sus ejemplos (`superficie=`). Una ficha sin ninguna es común (tokens, principios, una pieza aún sin fuente) y se ve siempre.
+- La elección va en la URL (`?superficie=portal`), así que se puede enlazar, y el navegador la recuerda al pasar de una página a otra. **Todas** quita el parámetro.
+- El selector solo filtra lo que se ve: no cambia las fichas, el registry ni `design.md`.
+
 Si dos superficies implementan el mismo componente de forma distinta, la ficha lo anota en «Diferencias entre superficies». Unificarlas es una iniciativa, no un arreglo silencioso.

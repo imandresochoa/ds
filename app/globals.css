@@ -127,6 +127,11 @@
 }
 
 @layer base {
+  /* Selector de superficie (components/site/SurfaceFilter.tsx): totales del sistema sin elección, de la superficie con ella. */
+  html:not([data-superficie]) [data-solo='superficie'],
+  html[data-superficie] [data-solo='todas'] {
+    display: none !important;
+  }
   html {
     scroll-padding-top: var(--header-height);
   }

@@ -49,11 +49,11 @@ export function PageNav({ id, className, children }: { id?: string; className?: 
 }
 
 /** Enlaces de categoría de la galería, como la navegación de Blocks y Charts. */
-export function CategoryNav({ items }: { items: { href: string; label: string; active?: boolean }[] }) {
+export function CategoryNav({ items }: { items: { href: string; label: string; active?: boolean; superficies?: string }[] }) {
   return (
     <div className="no-scrollbar relative flex items-center overflow-x-auto">
       {items.map((item) => (
-        <Link key={item.href} href={item.href} data-active={item.active} className="flex h-7 shrink-0 items-center justify-center px-4 text-center text-base font-medium text-muted-foreground transition-colors first:pl-0 hover:text-primary data-[active=true]:text-primary">
+        <Link key={item.href} href={item.href} data-active={item.active} data-superficies={item.superficies} className="flex h-7 shrink-0 items-center justify-center px-4 text-center text-base font-medium text-muted-foreground transition-colors first:pl-0 hover:text-primary data-[active=true]:text-primary">
           {item.label}
         </Link>
       ))}

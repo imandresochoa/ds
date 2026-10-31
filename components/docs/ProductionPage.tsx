@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { loadEntries, loadSyncReport, SYNC_STATES } from '@/lib/core.mjs';
-import type { System } from '@/lib/nav';
+import { entrySurfaces, surfacesAttr, type System } from '@/lib/nav';
 import { Badge } from '@/components/ui/badge';
 import { StatusDot } from './StatusBadge';
 
@@ -32,12 +32,27 @@ export function ProductionPage({ system }: { system: System }) {
   const drift = entries.filter((e) => ['desajuste', 'ausente', 'nuevo'].includes(report.entradas?.[e.id]?.estado));
   const coverage = (report.cobertura ?? {}) as Record<string, Coverage>;
   const surfaces = (system.produccion?.superficies ?? {}) as Record<string, { nombre: string }>;
+  // Los totales de fichas, del sistema entero y, con varias superficies, de cada una (sus fichas y las comunes).
+  // El selector de la cabecera enseña los del sistema con «Todas» y los de la superficie elegida con una.
+  const totals = (list: typeof entries, only?: 'todas' | 'superficie', surface?: string) => {
+    const own = list.filter((e) => synced.includes(e));
+    const pending = own.filter((e) => drift.includes(e));
+    return [
+      { value: `${own.length - pending.length}/${own.length}`, label: 'fichas sincronizadas', surface, only },
+      { value: String(pending.length), label: 'fichas por revisar', surface, only },
+    ];
+  };
+  const surfaceIds = Object.keys(surfaces);
   const stats = [
-    { value: `${synced.length - drift.length}/${synced.length}`, label: 'fichas sincronizadas' },
-    { value: String(drift.length), label: 'fichas por revisar' },
+    ...(surfaceIds.length > 1
+      ? [
+          ...totals(entries, 'todas'),
+          ...surfaceIds.flatMap((id) => totals(entries.filter((e) => { const own = entrySurfaces(e); return !own.length || own.includes(id); }), 'superficie', id)),
+        ]
+      : totals(entries)),
     ...Object.entries(coverage).map(([key, c]) => {
       const k = coverageKind(key);
-      return { value: `${c.documentadas}/${c.total}`, label: `${k.label} de ${surfaces[k.surface]?.nombre ?? k.surface} ${k.done}` };
+      return { value: `${c.documentadas}/${c.total}`, label: `${k.label} de ${surfaces[k.surface]?.nombre ?? k.surface} ${k.done}`, surface: k.surface, only: undefined };
     }),
   ];
 
@@ -45,7 +60,7 @@ export function ProductionPage({ system }: { system: System }) {
     <div className="ds-prose">
       <div className="grid gap-3 sm:grid-cols-2">
         {stats.map((s) => (
-          <div key={s.label} data-slot="card" className="flex flex-col gap-1 rounded-xl border p-4">
+          <div key={`${s.label}:${s.surface ?? ''}`} data-slot="card" data-superficies={s.surface} data-solo={s.only} className="flex flex-col gap-1 rounded-xl border p-4">
             <span className="text-2xl font-semibold tracking-tight tabular-nums">{s.value}</span>
             <span className="text-sm text-muted-foreground">{s.label}</span>
           </div>
@@ -57,14 +72,14 @@ export function ProductionPage({ system }: { system: System }) {
       </p>
 
       {drift.length > 0 && (
-        <>
+        <div data-superficies={surfacesAttr(drift.map(entrySurfaces))}>
           <h2 id="por-revisar">Por revisar</h2>
           <div className="ds-table-scroll">
             <table>
               <thead><tr><th>Ficha</th><th>Estado</th></tr></thead>
               <tbody>
                 {drift.map((e) => (
-                  <tr key={e.id}>
+                  <tr key={e.id} data-superficies={surfacesAttr([entrySurfaces(e)])}>
                     <td><Link href={e.href}>{e.titulo}</Link> <span className="font-mono text-xs text-muted-foreground">{e.id}</span></td>
                     <td>
                       <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
@@ -77,13 +92,13 @@ export function ProductionPage({ system }: { system: System }) {
               </tbody>
             </table>
           </div>
-        </>
+        </div>
       )}
 
       {Object.entries(coverage).filter(([, c]) => c.sinDocumentar.length > 0).map(([key, c]) => {
         const k = coverageKind(key);
         return (
-          <div key={key}>
+          <div key={key} data-superficies={k.surface}>
             <h2 id={`sin-ficha-${key.replace(':', '-')}`}>{k.label[0].toUpperCase() + k.label.slice(1)} de {surfaces[k.surface]?.nombre ?? k.surface} sin ficha</h2>
             <p className="text-sm text-muted-foreground">{c.sinDocumentar.length} {k.label} de producción que ninguna ficha documenta. Es la lista de tareas pendientes.</p>
             <div className="mt-4 flex flex-wrap gap-1.5">

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { SECTIONS, loadEntries, loadSystem } from '@/lib/core.mjs';
-import { buildNav, groupLabel, sortGroups, type Entry } from '@/lib/nav';
+import { buildNav, entrySurfaces, groupLabel, sortGroups, surfacesAttr, type Entry } from '@/lib/nav';
 import { entryPreviews } from '@/lib/previews';
 import { previewSurfaces } from '@/lib/surfaces';
 import { Button } from '@/components/ui/button';
@@ -60,7 +60,7 @@ function EmptyGallery({ systemId, section }: { systemId: string; section: Sectio
 /** Ficha sin ejemplo en vivo: se enlaza igualmente, con su estado. */
 function EntryCard({ entry }: { entry: Entry }) {
   return (
-    <Link href={entry.href} data-slot="card" className="flex flex-col gap-1 rounded-xl border bg-background p-6 text-sm transition-colors hover:bg-accent/50">
+    <Link href={entry.href} data-slot="card" data-superficies={surfacesAttr([entrySurfaces(entry)])} className="flex flex-col gap-1 rounded-xl border bg-background p-6 text-sm transition-colors hover:bg-accent/50">
       <span className="flex items-center gap-2 font-medium">
         {entry.titulo}
         {entry.estado !== 'produccion' && <StatusDot item={{ estado: entry.estado, sync: null }} className="size-1.5" />}
@@ -94,7 +94,7 @@ export async function GalleryPage({ systemId, sectionId }: { systemId: string; s
       <GalleryHeader systemId={systemId} section={section} entries={entries} browse={blocks ? 'Ver bloques' : 'Ver gráficos'} />
       {groups.length > 0 && (
         <PageNav id="galeria">
-          <CategoryNav items={groups.map((g) => ({ href: `#${anchor(g.label)}`, label: g.label }))} />
+          <CategoryNav items={groups.map((g) => ({ href: `#${anchor(g.label)}`, label: g.label, superficies: surfacesAttr(g.entries.map(entrySurfaces)) }))} />
         </PageNav>
       )}
       <div className="container-wrapper section-soft flex-1 pb-12 md:py-12">
@@ -102,7 +102,7 @@ export async function GalleryPage({ systemId, sectionId }: { systemId: string; s
           {!entries.length && <EmptyGallery systemId={systemId} section={section} />}
           <div className="flex flex-col gap-12 md:gap-24">
             {groups.map((group) => (
-              <section key={group.label} id={anchor(group.label)} className="flex scroll-mt-24 flex-col gap-6">
+              <section key={group.label} id={anchor(group.label)} data-superficies={surfacesAttr(group.entries.map(entrySurfaces))} className="flex scroll-mt-24 flex-col gap-6">
                 {groups.length > 1 && <h2 className="text-lg font-semibold tracking-tight">{group.label}</h2>}
                 {blocks ? (
                   <div className="flex flex-col gap-12 md:gap-24">
@@ -110,8 +110,8 @@ export async function GalleryPage({ systemId, sectionId }: { systemId: string; s
                       const item = live[entry.id];
                       if (!item) return <EntryCard key={entry.id} entry={entry} />;
                       return (
+                        <div key={entry.id} data-superficies={surfacesAttr([entrySurfaces(entry)])}>
                         <BlockViewer
-                          key={entry.id}
                           id={entry.slug}
                           title={entry.titulo}
                           href={entry.href}
@@ -124,6 +124,7 @@ export async function GalleryPage({ systemId, sectionId }: { systemId: string; s
                           vista={item.preview.vista}
                           mode={item.preview.modo}
                         />
+                        </div>
                       );
                     })}
                   </div>
@@ -133,7 +134,7 @@ export async function GalleryPage({ systemId, sectionId }: { systemId: string; s
                       const item = live[entry.id];
                       if (!item) return <EntryCard key={entry.id} entry={entry} />;
                       return (
-                        <div key={entry.id} id={entry.slug} data-slot="chart" className="relative flex scroll-mt-24 flex-col overflow-hidden rounded-xl border bg-background">
+                        <div key={entry.id} id={entry.slug} data-slot="chart" data-superficies={surfacesAttr([entrySurfaces(entry)])} className="relative flex scroll-mt-24 flex-col overflow-hidden rounded-xl border bg-background">
                           <div className="flex items-center gap-2 border-b py-2 pr-12 pl-4">
                             <Link href={entry.href} className="text-sm font-medium underline-offset-2 hover:underline">{entry.titulo}</Link>
                             <CopyButton value={item.preview.html} className="top-1.5 bg-transparent" />

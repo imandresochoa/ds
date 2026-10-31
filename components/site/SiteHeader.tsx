@@ -14,8 +14,9 @@ import { CommandMenu } from './CommandMenu';
 import { GitHubIcon, SystemMark } from './icons';
 import { MobileNav } from './MobileNav';
 import { ModeSwitcher } from './ModeSwitcher';
+import { SurfaceSwitcher } from './SurfaceFilter';
 
-/** Cabecera de ui.shadcn.com: navegación superior, búsqueda, repo, tema y «Nuevo». */
+/** Cabecera de ui.shadcn.com: navegación superior, búsqueda, repo, tema y «Nuevo». Con varias superficies, su selector. */
 export function SiteHeader({ nav }: { nav: Nav }) {
   return (
     <header className="sticky top-0 z-50 w-full bg-background">
@@ -23,6 +24,7 @@ export function SiteHeader({ nav }: { nav: Nav }) {
         <div className="flex h-(--header-height) items-center **:data-[slot=separator]:h-4!">
           <MobileNav nav={nav} className="flex lg:hidden" />
           <SystemSwitcher nav={nav} className="mr-2 hidden lg:flex" />
+          <SurfaceSwitcher className="mr-2 -ml-1 hidden lg:flex" />
           <MainNav items={nav.top} className="hidden lg:flex" />
           <div className="ml-auto flex items-center gap-2 md:flex-1 md:justify-end">
             <div className="hidden w-full flex-1 md:flex md:w-auto md:flex-none">

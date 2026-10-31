@@ -1,5 +1,6 @@
 // Datos de navegación que el servidor prepara para la interfaz (cabecera, barra lateral, ⌘K y anterior/siguiente).
 import { CAMBIO_PROMPT, CONTENT_SECTIONS, KIT_PAGES, SECTIONS, listSystems, loadDocs, loadEntries, loadPages, loadSyncReport, loadSystem } from './core.mjs';
+import { entryPreviews } from './previews';
 
 export type NavItem = {
   href: string;
@@ -18,7 +19,10 @@ export type NavItem = {
   plataformas: Record<string, string>;
   // clave: plataforma, superficie y fuente (única en la ficha). Varias superficies pueden citar el mismo archivo.
   fuentes: { clave: string; superficie: string; fuente: string; estado: string; motivo?: string }[];
+  /** Superficies a las que pertenece la ficha (ver entrySurfaces). Vacía: común a todas. */
+  superficies: string[];
 };
+export type SurfaceSummary = { id: string; nombre: string };
 export type NavLink = { href: string; label: string };
 export type NavGroup = { id: string; label: string; href: string | null; items: NavItem[] };
 export type SystemSummary = {
@@ -34,6 +38,8 @@ export type SystemSummary = {
 export type Nav = {
   system: SystemSummary;
   systems: SystemSummary[];
+  /** Superficies de producción. Con dos o más, la cabecera lleva el selector que filtra las fichas. */
+  superficies: SurfaceSummary[];
   /** Navegación de la cabecera. */
   top: NavLink[];
   /** Primer grupo de la barra lateral de Docs: las secciones. */
@@ -73,6 +79,25 @@ const summary = (s: System): SystemSummary => ({
   codigo: s.produccion?.codigo ?? null,
   repo: repoUrl(s.produccion?.codigo),
 });
+
+/**
+ * Superficies de una ficha: las que declaran sus plataformas (`plataformas.<p>.superficies[].id`) y las que pintan
+ * sus ejemplos (`superficie=`). Sin ninguna, la ficha es común (tokens, principios, una pieza aún sin fuente).
+ */
+export function entrySurfaces(entry: Entry): string[] {
+  const declared = Object.values(entry.platforms).flatMap((p) => p.superficies.map((s) => s.id));
+  const painted = entryPreviews(entry).map((p) => p.superficie).filter((s): s is string => Boolean(s));
+  return [...new Set([...declared, ...painted])];
+}
+
+/**
+ * Valor de `data-superficies` para un elemento que agrupa fichas: el selector de la cabecera lo oculta si ninguna
+ * es de la superficie elegida. Si alguna es común, se ve siempre (undefined, sin atributo).
+ */
+export function surfacesAttr(lists: string[][]): string | undefined {
+  if (!lists.length || lists.some((l) => !l.length)) return undefined;
+  return [...new Set(lists.flat())].join(' ');
+}
 
 /** Etiqueta del grupo de una ficha dentro de su sección. */
 export function groupLabel(section: Section, entry: Entry): string {
@@ -124,12 +149,13 @@ export function buildNav(systemId: string): Nav {
         .filter((f) => f.superficie !== 'tokens')
         .map(({ clave, superficie, fuente, estado, motivo }) => ({ clave, superficie, fuente, estado, motivo })),
       iniciativa: found ? { titulo: found.titulo, href: found.href } : null,
+      superficies: entrySurfaces(entry),
     };
   };
 
   const page = (href: string, titulo: string, resumen: string, md: string | null, seccion: string): NavItem => ({
     href, titulo, resumen, seccion, md,
-    estado: 'produccion', sync: null, creado: null, actualizado: null, nuevo: false, fuente: null, grupo: null, iniciativa: null, plataformas: {}, fuentes: [],
+    estado: 'produccion', sync: null, creado: null, actualizado: null, nuevo: false, fuente: null, grupo: null, iniciativa: null, plataformas: {}, fuentes: [], superficies: [],
   });
 
   const pageItems = [
@@ -154,6 +180,7 @@ export function buildNav(systemId: string): Nav {
   return {
     system: summary(system),
     systems: listSystems().map(summary),
+    superficies: Object.entries((system.produccion?.superficies ?? {}) as Record<string, { nombre?: string }>).map(([sid, s]) => ({ id: sid, nombre: s?.nombre ?? sid })),
     top: [
       { href: base, label: 'Inicio' },
       { href: `${base}/docs`, label: 'Docs' },

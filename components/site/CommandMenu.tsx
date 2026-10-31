@@ -15,6 +15,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Kbd, KbdGroup } from '@/components/ui/kbd';
 import { StatusDot } from '../docs/StatusBadge';
+import { useSurfaceGroups } from './SurfaceFilter';
 
 /** Búsqueda (⌘K o /) con el diálogo de ui.shadcn.com: páginas, fichas de cada sección y acciones. */
 export function CommandMenu({ nav }: { nav: Nav }) {
@@ -22,6 +23,7 @@ export function CommandMenu({ nav }: { nav: Nav }) {
   const { setTheme, resolvedTheme } = useTheme();
   const { copy } = useCopy();
   const [open, setOpen] = useState(false);
+  const groups = useSurfaceGroups(nav);
 
   const run = useCallback((command: () => unknown) => {
     setOpen(false);
@@ -84,7 +86,7 @@ export function CommandMenu({ nav }: { nav: Nav }) {
                 </MenuItem>
               ))}
             </CommandGroup>
-            {nav.groups.filter((g) => g.items.length).map((g) => (
+            {groups.map((g) => (
               <CommandGroup key={g.id} heading={g.label} className={group}>
                 {g.items.map((item) => (
                   <MenuItem key={item.href} value={`${g.label} ${item.titulo} ${item.resumen}`} onSelect={() => run(() => router.push(item.href))}>

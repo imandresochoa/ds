@@ -8,7 +8,7 @@ La interfaz copia la estructura y el estilo de ui.shadcn.com: neutra, sin decora
 ## Estructura
 
 - **Portada** (`/`). Con un sistema, lleva a él. Con varios (un directorio), es el Directorio: una tarjeta por sistema con sus fichas, su sync y su cobertura, y los enlaces a su registry y su `design.md` (ver «Kit y sistemas»).
-- **Cabecera** (fija). A la izquierda, la marca del sistema (un selector si hay varios) y la navegación: Inicio, Docs, Componentes, Bloques, Gráficos e Iniciativas. A la derecha, buscar, el repo de código (si `produccion.codigo` existe), modo claro u oscuro y **Nuevo**, con el Lab de primitivos, el prompt de cada sección y «Pedir un cambio».
+- **Cabecera** (fija). A la izquierda, la marca del sistema (un selector si hay varios), el selector de superficie (si `system.json` tiene dos o más; ver «Plataformas y superficies») y la navegación: Inicio, Docs, Componentes, Bloques, Gráficos e Iniciativas. A la derecha, buscar, el repo de código (si `produccion.codigo` existe), modo claro u oscuro y **Nuevo**, con el Lab de primitivos, el prompt de cada sección y «Pedir un cambio».
 - **Home** (`/<sistema>`). Un aviso con la última ficha creada, el nombre y la descripción del sistema, «Empezar» y «Ver componentes». Debajo, un escaparate con los ejemplos en vivo de las fichas marcadas con `destacado: true`. Si no hay ninguna, usa las que tienen ejemplo, primero las de producción, hasta nueve. Sin ejemplos, muestra una tarjeta por sección.
 - **Docs.** Tres columnas, como en shadcn:
   - **Barra lateral**: «Secciones» (Introducción y una entrada por sección), «Empezar» (las páginas propias de `content/docs/`, más Producción y Para agentes, que pone el kit), un grupo por sección con sus fichas y, si el sistema la activa, Metodología.
