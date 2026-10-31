@@ -29,7 +29,8 @@ Una superficie es una parte del producto con su propio código: por ejemplo, una
 - `cobertura`: si se cuenta lo que esta superficie tiene sin documentar. `true` cuenta clases o, si la superficie es Tailwind, componentes; `"clases"` o `"componentes"` lo fuerzan (ver «Enlace con producción»).
 - `componentes`: carpeta o lista de carpetas de componentes para esa cobertura. Por defecto, `src/components`.
 - `tailwind`: versión de Tailwind con la que se compilan los ejemplos de la superficie en el navegador.
-- `estilosExtra` y `cssExtra`: hojas de otra superficie (fuentes) y variables que en producción pone el framework.
+- `estilosExtra` y `cssExtra`: hojas de otra superficie (fuentes) y variables que en producción pone el framework. `cssExtra` va antes del CSS del marco, así que no cambia cómo se mide el ejemplo: no hace falta para `html, body { height: 100% }`.
+- `altoVista`: alto de la vista de los ejemplos de la superficie, en px (640 por defecto). Es lo que vale `100vh` en un ejemplo con `vista` o en uno cuyo contenido depende del alto de la vista. Opcional.
 
 Fuera de `superficies`, `produccion` lleva `repo` (ruta al repo de producción, relativa al sistema), `rama` (`main` por defecto), `publico` (la carpeta de archivos públicos, de donde salen las fuentes e imágenes de la instantánea; `public` por defecto), `codigo` (URL base para ver un archivo) y `web`.
 

@@ -4,6 +4,7 @@ import { SITE_ROUTE } from '@/lib/site';
 import { CodeBlock } from './CodeBlock';
 import { ComponentPreview } from './ComponentPreview';
 import type { PreviewSurface } from './Preview';
+import { fenceViewport } from '@/lib/previews';
 
 /** Lenguajes que Shiki resalta; el resto (prompts, texto) se pinta tal cual. */
 const LANGS = new Set(['html', 'css', 'scss', 'js', 'jsx', 'ts', 'tsx', 'json', 'yaml', 'bash', 'sh', 'shell', 'swift', 'kotlin', 'md', 'markdown', 'mdx', 'diff']);
@@ -35,6 +36,8 @@ async function Part({ part, surfaces, index }: { part: MarkdownPart; surfaces?: 
         surfaceLabel={Object.keys(surfaces ?? {}).length > 1 ? surfaceId : undefined}
         background={typeof meta.fondo === 'string' ? meta.fondo : undefined}
         align={meta.alinear === 'inicio' ? 'start' : 'center'}
+        vista={fenceViewport(meta.vista)}
+        mode={typeof meta.modo === 'string' ? meta.modo : undefined}
         code={code}
         codeHtml={await highlight(code, 'html')}
         priority={index === 0}
