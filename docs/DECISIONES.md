@@ -267,3 +267,10 @@ Para saber qué le habría venido bien a la gente al instalar el kit y montar un
 - Se descartó quitar los dibujos de los ejemplos o rebajar el aviso: el ejemplo debe parecerse a producción, y el aviso sigue sirviendo para los colores viejos.
 - El precio: un color que solo aparece en un comentario del código cuenta como de producción. Es raro y no compensa analizar el código.
 
+## 2026-10-31 · El sistema de ejemplo, publicado
+
+La landing del kit (`ds.aochoa.fyi`, en el repo del digital garden) enseña la interfaz real en una ventana. Para eso, `systems/ejemplo` se publica en `ds.aochoa.fyi/ejemplo`, con un proyecto de Vercel que construye este repo según `vercel.json`. El build exporta con `DS_RUTA=/ejemplo` y sirve `.next-build` como estático, sin el preset de Next de Vercel, porque `out/` no tiene la carpeta de la ruta dentro: el garden lleva `/ejemplo/:path*` al despliegue sin la ruta, como explica «Git, GitHub y entornos».
+
+- **Por qué en el kit.** El ejemplo cambia con el kit. Cada fusión en `main` actualiza la demo, y la landing no necesita saber nada del build.
+- **Por qué no en npm.** `vercel.json` no está en `files`, así que no llega a los sistemas.
+- **Descartado:** un subdominio propio para el ejemplo. Con todo en un solo dominio, el iframe es del mismo origen y no hay que abrir cabeceras de framing.

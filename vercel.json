@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "DS_RUTA=/ejemplo npm run build",
+  "outputDirectory": ".next-build",
+  "cleanUrls": true
+}
