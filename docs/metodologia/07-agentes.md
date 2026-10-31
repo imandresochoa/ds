@@ -52,6 +52,7 @@ El kit instala skills en cada sistema (`ds init` y `ds skills`): en `.claude/ski
 | --- | --- |
 | `montar-sistema` | Montar un sistema desde el repo, la web o Figma de un producto, o desde cero, y aplicar un preset del Lab. Es la de entrada: `ds instalar` la deja en la carpeta de usuario para usarla antes de que exista el sistema. |
 | `inventariar-produccion` | Planificar qué documentar, con prioridades y tandas. |
+| `recomendar-produccion` | Recomendar mejoras para producción: valores escritos a mano que ya son tokens, copias de tokens, hojas que no se cargan, foco y contraste. Escribe `docs/RECOMENDACIONES.md`. |
 | `nueva-ficha` | Documentar un componente, bloque, gráfico, fundamento, token o iniciativa. |
 | `auditar-sistema` | Comprobar que todo cuadra con producción y arreglarlo. Antes de publicar, tras cada merge en producción y como rutina diaria programada (apartado «Rutina diaria» de `AGENTS.md`). |
 | `revisar-sync` | Entender qué cambió en producción y actualizar o aceptar fichas. |

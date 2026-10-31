@@ -67,7 +67,7 @@ npx ESPEC_DEL_KIT init "<Nombre>" --carpeta <carpeta> --desde <repo|web|figma|ce
 3. `npx ds doctor` sin errores. Después, `npx ds sync`. Anota la cobertura (clases o componentes, y tokens sin documentar) y los modos que encontró (`modos de <superficie>` en la salida). Si el producto tiene modo oscuro y el sync no lo ve, revisa con qué selector lo activa y avisa.
 4. Escribe `DESIGN.md` con las secciones de la plantilla, solo con lo que puedas comprobar. Los antipatrones van como borrador para que la persona los revise.
 5. **Fichas de tokens**: una por grupo (color, tipografía, espaciado, radios, sombras, movimiento), con `nombre` y `rol`. Los valores los pone el sync, uno por modo si el producto tiene varios. El `rol` es el mismo en todos los modos.
-6. **Plan de fichas** con la skill `inventariar-produccion`. No crees todas las fichas sin acordarlo.
+6. **Plan de fichas** con la skill `inventariar-produccion`. No crees todas las fichas sin acordarlo. Con el mismo sync, escribe `docs/RECOMENDACIONES.md` con la skill `recomendar-produccion`: lo que producción podría mejorar con su propio sistema.
 7. **Auditoría diaria**: prográmala con la skill `auditar-sistema` (apartado «Rutina diaria») y anótalo en `AGENTS.md`.
 
 ### Desde una web o Figma

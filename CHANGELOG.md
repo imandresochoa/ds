@@ -2,6 +2,10 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+- **Recomendaciones para producción.** El sync añade `hallazgos` a `sync-report.json`: colores y valores compuestos escritos a mano que ya son tokens, copias de tokens fuera de `:root` y de los modos, tokens que nada usa y hojas que ninguna superficie carga, con archivo y línea. No cambian `ds check`. La skill nueva `recomendar-produccion` los revisa y escribe `docs/RECOMENDACIONES.md` en el sistema. `montar-sistema` la usa en el paso 6 y `auditar-sistema` la mantiene al día. Para tenerla: `npx ds skills`.
+
 ## 1.0.0 · 2026-10-30
 
 Cierra el rediseño al modelo de shadcn/ui en cinco fases: interfaz (0.9.0), instalación con `montar-sistema` (0.9.0), Lab de primitivos (0.10.1), registry propio y Directorio, y metodología al día. Desde aquí, la versión mayor solo cambia si hay que tocar fichas, `system.json` o lo que se publica para agentes (ver «Versiones del kit» en la metodología).
