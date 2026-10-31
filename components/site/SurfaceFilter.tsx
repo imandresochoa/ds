@@ -28,7 +28,8 @@ export function useSurfaceGroups(nav: Nav) {
 /**
  * La superficie elegida en la cabecera, para todo el sistema. Va en la URL (`?superficie=`), y se recuerda en el
  * navegador para que siga puesta al pasar de una página a otra. Las piezas de servidor (galerías, índices,
- * cobertura) marcan lo suyo con `data-superficies`, y una regla de CSS oculta lo que no es de la elegida.
+ * cobertura) marcan lo suyo con `data-superficies`, y una regla de CSS oculta lo que no es de la elegida. Lo que
+ * solo tiene sentido sin elección (los totales del sistema) o con ella (los de una superficie) lleva `data-solo`.
  */
 export function SurfaceProvider({ nav, children }: { nav: Nav; children: React.ReactNode }) {
   const pathname = usePathname();
@@ -61,6 +62,13 @@ export function SurfaceProvider({ nav, children }: { nav: Nav; children: React.R
     if (fromUrl) setSurface(fromUrl);
     else setState(valid(stored));
   }, [enabled, key, valid, setSurface]);
+
+  // <html data-superficie>: con él, globals.css alterna lo marcado con `data-solo="todas"` o `data-solo="superficie"`.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (enabled && surface) root.dataset.superficie = surface;
+    else delete root.dataset.superficie;
+  }, [enabled, surface]);
 
   // La URL lleva siempre la elección: los enlaces internos no la conservan, así que se repone tras cada cambio de página.
   useEffect(() => {
