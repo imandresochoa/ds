@@ -16,6 +16,7 @@ import path from 'node:path';
 import postcss from 'postcss';
 import { PLATFORM_SECTIONS, listSystems, loadEntries, loadLock, previewClasses } from '../lib/core.mjs';
 import { buildTokens, readModeTokens, readThemeTokens } from '../lib/css-tokens.mjs';
+import { codeTexts, findHallazgos } from '../lib/hallazgos.mjs';
 
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
@@ -228,8 +229,12 @@ for (const system of listSystems()) {
   const report = { generado: new Date().toISOString(), origen: ref, commit, fechaCommit: commitDate, sinCommit, estilosAusentes, paquetesAusentes, tokens: tokenInfo, entradas: {}, cobertura: {} };
   // Archivos que alguna ficha declara como fuente (para la cobertura por componentes).
   const declaredSources = new Set();
-  // Todos los colores escritos en las hojas de producción.
-  const prodHexes = new Set(Object.values(surfaceCss).flatMap((sheets) => sheets.flatMap(({ root }) => hexes(root.toString()))));
+  // Todos los colores escritos en producción: en las hojas y en el código y los datos (un SVG en un .tsx, una paleta
+  // en src/data/). Sin tests ni Markdown.
+  const prodHexes = new Set([
+    ...Object.values(surfaceCss).flatMap((sheets) => sheets.flatMap(({ root }) => hexes(root.toString()))),
+    ...codeTexts(src).flatMap(hexes),
+  ]);
   const documented = Object.fromEntries(Object.keys(prod.superficies).map((id) => [id, new Set()]));
 
   for (const entry of entries) {
@@ -344,6 +349,10 @@ for (const system of listSystems()) {
     report.cobertura[`tokens:${surfaceId}`] = { total: names.length, documentadas: names.filter(isDocumented).length, sinDocumentar: names.filter((n) => !isDocumented(n)) };
   }
 
+  // 5. Hallazgos: lo que producción podría hacer mejor con su propio sistema (skill recomendar-produccion).
+  // Son observaciones, no fallos: check no los mira.
+  report.hallazgos = findHallazgos(src, prod.superficies, tokens, tokenInfo);
+
   if (ACCEPT) fs.writeFileSync(path.join(system.dir, 'produccion.lock.json'), JSON.stringify(lock, null, 2) + '\n');
   fs.writeFileSync(path.join(system.dir, 'sync-report.json'), JSON.stringify(report, null, 2) + '\n');
 
@@ -366,6 +375,11 @@ for (const system of listSystems()) {
     if (modes.length > 1) log(`modos de ${id}: ${modes.map(([mode, sels]) => `${mode} (${sels.join(', ')})`).join(' · ')}`);
   }
   for (const [id, c] of Object.entries(report.cobertura)) log(`cobertura ${id}: ${c.documentadas}/${c.total}`);
+  for (const [id, h] of Object.entries(report.hallazgos.superficies)) {
+    const parts = [[h.valoresSueltos.length, 'valores sueltos'], [h.copiasDeTokens.length, 'copias de tokens'], [h.tokensSinUso.length, 'tokens sin uso']].filter(([n]) => n);
+    if (parts.length) log(`hallazgos ${id}: ${parts.map(([n, what]) => `${n} ${what}`).join(' · ')}`);
+  }
+  if (report.hallazgos.hojasSinCargar.length) log(`hallazgos: ${report.hallazgos.hojasSinCargar.length} hojas que ninguna superficie carga`);
 }
 
 if (failed) {

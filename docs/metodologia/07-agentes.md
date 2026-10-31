@@ -15,7 +15,7 @@ resumen: Qué lee un agente, en qué orden, y cómo se mejora la guía con evalu
 | `/directorio.json` | Solo en un directorio: cada sistema con su cobertura y el enlace a su registry. |
 | `<ruta de la ficha>.md` | Cada página en Markdown, en la misma ruta. |
 
-En la interfaz, «Copiar página» copia cada página en Markdown y la tarjeta «¿Trabajas con un agente?» copia un contexto listo para pegar. Desde la terminal, `npx ds info --json`, `npx ds search <texto> --json` y `npx ds ver <pieza>` dan lo mismo a un agente sin abrir la web ni hacer build: `search` devuelve piezas con la forma del índice y `ver`, el JSON de una pieza. El Lab de primitivos pasa sus cambios con un enlace: `npx ds preset ver` lo lee y `npx ds preset aplicar` lo escribe en `experimental/`.
+En la interfaz, «Copiar página» copia cada página en Markdown y la tarjeta «¿Trabajas con un agente?» copia un contexto listo para pegar. Desde la terminal, `npx ds info --json`, `npx ds search <texto> --json` y `npx ds ver <pieza>` dan lo mismo a un agente sin abrir la web ni hacer build: `search` devuelve piezas con la forma del índice y `ver`, el JSON de una pieza. `npx ds patrones --json` agrupa las clases de producción que comparten forma aunque tengan prefijos distintos. El Lab de primitivos pasa sus cambios con un enlace: `npx ds preset ver` lo lee y `npx ds preset aplicar` lo escribe en `experimental/`.
 
 ## Orden de lectura para un agente
 
@@ -51,7 +51,8 @@ El kit instala skills en cada sistema (`ds init` y `ds skills`): en `.claude/ski
 | Skill | Cuándo |
 | --- | --- |
 | `montar-sistema` | Montar un sistema desde el repo, la web o Figma de un producto, o desde cero, y aplicar un preset del Lab. Es la de entrada: `ds instalar` la deja en la carpeta de usuario para usarla antes de que exista el sistema. |
-| `inventariar-produccion` | Planificar qué documentar, con prioridades y tandas. |
+| `inventariar-produccion` | Planificar qué documentar, con prioridades y tandas. Parte de la lista de la persona y de Figma, y usa `ds patrones` para las piezas repartidas en varias hojas. |
+| `recomendar-produccion` | Recomendar mejoras para producción: valores escritos a mano que ya son tokens, copias de tokens, hojas que no se cargan, foco y contraste. Escribe `docs/RECOMENDACIONES.md`. |
 | `nueva-ficha` | Documentar un componente, bloque, gráfico, fundamento, token o iniciativa. |
 | `auditar-sistema` | Comprobar que todo cuadra con producción y arreglarlo. Antes de publicar, tras cada merge en producción y como rutina diaria programada (apartado «Rutina diaria» de `AGENTS.md`). |
 | `revisar-sync` | Entender qué cambió en producción y actualizar o aceptar fichas. |

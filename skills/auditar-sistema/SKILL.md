@@ -25,7 +25,7 @@ Lee `sync-report.json` y apunta cada problema. Si pasa limpio, ve al paso 3: el 
 | Ficha `ausente` | El archivo o una clase ya no existe. | Busca el nombre nuevo en producción. Reescribe la ficha (reglas, ejemplos, variantes) o pásala a `obsoleto`. Nunca aceptes una ausencia. |
 | Ficha `desajuste` | Producción cambió desde la última revisión. | `git -C <repo> log -p <cambioDesde>..origin/<produccion.rama> -- <fuente>` (`main` por defecto). Actualiza la ficha y acepta con `npx ds sync --accept <id>`. |
 | `<id> usa <id>, que no existe` (aviso de `ds dev` y `ds build`) | El grafo del registry apunta a una pieza que no está. | Corrige el id en `usa` o crea la ficha que falta. |
-| `Colores que no existen en producción` | La ficha escribe a mano valores viejos. | Toma los valores reales de `tokens.produccion.json` (con modos, el del modo que describe la ficha) o de la hoja. Cambia también nombres que ya no describan el color. |
+| `Colores que no existen en producción` | La ficha escribe a mano valores viejos: no están ni en las hojas ni en el código o los datos de producción. | Toma los valores reales de `tokens.produccion.json` (con modos, el del modo que describe la ficha) o de la hoja. Cambia también nombres que ya no describan el color. |
 | `N de M colores ya están en producción` | Una ficha en exploración seguramente se aplicó. | Compruébalo en la hoja de producción. Si se aplicó: estado `produccion`, `tokens` declarados, valores reales, CSS experimental retirado o reducido a la muestra, «Pendiente» actualizado. Si no, corrige los valores. |
 | Clases inventadas | Los ejemplos usan clases que producción ya no tiene. | Rehaz el ejemplo con las clases reales o mueve el estilo a `experimental/`. |
 | Estado sin fuentes, o fuentes con estado distinto de `produccion` | El estado no dice la verdad. | Corrige el estado. |
@@ -44,6 +44,8 @@ El check no ve lo visual. Con `npx ds dev`, abre las fichas que cambiaron y las 
 ## 4. Cobertura
 
 `cobertura` en el informe lista lo que producción tiene y ninguna ficha documenta. No es un error, pero si creció mucho desde la última auditoría (un rediseño), propón una tanda de fichas nuevas con `inventariar-produccion`.
+
+`hallazgos` lista lo que producción hace a mano (valores que ya son tokens, copias de tokens, hojas que no se cargan). Tampoco es un error del sistema. Si cambió desde la última auditoría, actualiza `docs/RECOMENDACIONES.md` con `recomendar-produccion`: quita lo que producción ya arregló y añade lo nuevo.
 
 ## 5. Cerrar
 

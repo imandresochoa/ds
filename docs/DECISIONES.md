@@ -211,6 +211,62 @@ El Lab ajusta también el movimiento, el único primitivo que quedó fuera de la
 
 Además, `next.config.ts` lleva `agentRules: false`. `next dev` añadía a `AGENTS.md` un bloque de reglas de Next cuando detectaba un agente, y ese bloque acabó en un commit. Con la opción apagada, Next lo quita y no lo vuelve a escribir.
 
+## 2026-10-31 · Recomendaciones para producción
+
+Al montar un sistema, el agente lee producción entera y ve lo que hace a mano: un color de un token escrito tal cual, una copia local de un token, una hoja que ya no se carga. Eso se quedaba en el resumen de la sesión. Ahora tiene su sitio.
+
+- **El sync detecta y la skill redacta.** Lo mecánico (valores sueltos, copias de tokens, tokens sin uso, hojas sin cargar) lo calcula el sync y queda en `sync-report.json` → `hallazgos`, igual en cada ejecución. La skill `recomendar-produccion` lo revisa en el código, añade lo que pide criterio (foco, contraste, piezas casi duplicadas, valores casi iguales) y prioriza. Se descartó dejarlo todo al agente: dos sesiones darían listas distintas y la auditoría diaria no podría ver qué cambió.
+- **Un documento aparte del inventario.** `docs/INVENTARIO.md` dice qué falta documentar en el sistema; `docs/RECOMENDACIONES.md`, qué mejorar en producción. Mezclarlos confunde a quién va dirigida cada cosa.
+- **Sin escribir en producción.** Las recomendaciones son un documento: cada una entra en producción con un PR que hace una persona (regla 6).
+- **No es un fallo.** `ds check` no mira los hallazgos: no dicen que el sistema mienta, sino que producción podría usarlo mejor.
+- **Solo valores distintivos.** Se comparan colores y valores compuestos (sombras, pilas de fuentes, curvas). Los valores simples (`8px`, `0`, `1`) darían demasiadas coincidencias casuales. Los radios y espacios casi iguales los busca la skill.
+
+## 2026-10-31 · `montar-sistema` pregunta antes y encadena tandas
+
+Sale del informe de un agente que montó un sistema real. Se paró después del plan, se le escaparon piezas que vivían repartidas en varias hojas con prefijos distintos, no miró los componentes de Figma y dejó partes de `DESIGN.md` en «Pendiente» que la persona sabía. Cinco fichas llevaron buena parte de la sesión y quedaban unas veinticinco.
+
+- **Alcance al principio**, en la misma llamada que el origen. «Todo, tanda tras tanda» es la recomendada: montar un sistema sin sus fichas deja el trabajo a medias.
+- **Lo que dice la persona y Figma manda sobre lo deducido.** Agrupar clases por prefijo no ve una pieza con cuatro prefijos. Una lista con nombres o los componentes de Figma sí.
+- **Decisiones abiertas antes de escribir `DESIGN.md`**, no al final, para que no se queden en «Pendiente» cosas que la persona sabe.
+- **Encadenar no rebaja el listón.** Cada ficha se comprueba y cada huella se revisa. Un commit por tanda, solo en el repo del sistema, e `INVENTARIO.md` al día para retomar en otra sesión. Se descartó un modo que creara fichas sin comprobar el ejemplo: es rápido, pero lo que llega al registry tiene que ser verdad.
+
+## 2026-10-31 · Patrones compartidos en el inventario
+
+En un producto sin carpeta de componentes compartidos, el inventario por prefijos de clase no vio las tarjetas: vivían en cuatro hojas con cuatro prefijos distintos. El agente que lo sufrió pidió detectar patrones compartidos, como un mismo token o un mismo radio en varias hojas.
+
+- **Un comando, no solo la skill.** `ds patrones` lee la instantánea de `produccion/` con postcss y devuelve grupos; la skill los interpreta. Comparar a ojo las reglas de veinte hojas es justo lo que se le escapa a un agente.
+- **Firma por rasgos, no por igualdad.** Dos tarjetas escritas por separado casi nunca tienen el mismo relleno. Por eso la firma es lo que comparten (cada pareja de clases da una candidata, que se cierra con todo lo que tienen en común las clases que la contienen) y no la regla entera. Un solo rasgo basta, porque la petición era «un mismo radio»; los grupos con más rasgos salen antes a igual número de hojas.
+- **Ruido fuera.** Los resets (`border: 0`, `background: transparent`) no cuentan: en un producto real llenaban los primeros puestos con botones sin estilo. Una firma solo de relleno tampoco. Los selectores con pseudoclases, los de dentro de `@media` y los que cuelgan de una clase de modo (`.dark .x`) quedan fuera porque son ajustes de otra pieza.
+- **Lo que nombra la persona va primero.** La lista de piezas que dé la persona y los componentes con nombre de Figma mandan sobre lo deducido del CSS. `ds patrones` sirve para encontrar dónde vive cada una y lo que falta.
+- **Se descartó** tocar el sync para guardar los patrones en `sync-report.json`: el informe crecería con algo que solo usa el inventario, y el comando se puede ejecutar cuando haga falta.
+
+## 2026-10-31 · El marco de los ejemplos en vivo
+
+Sale de un agente que montó un sistema real: la hoja del producto declaraba `html, body { height: 100% }`, todos los ejemplos se quedaban en 150 px y tuvo que poner `cssExtra` con `height: auto` y `min-height` en línea para ver una primera pantalla.
+
+- **Medir el contenido, no el documento.** El marco medía `document.documentElement.offsetHeight`, que con `height: 100%` es el alto del propio iframe. Ahora mide hasta dónde llega lo último del `body` (sus hijos con su margen y el padding del body), y el body pone el contenido arriba (`align-content: flex-start`, `box-sizing: border-box`) para que el alto del body no cuente. Se descartó forzar `html, body { height: auto }`: cambia la hoja del producto, y los ejemplos tienen que verse como en producción.
+- **Un alto de vista conocido.** Dentro de un iframe, `100vh` es el alto del iframe; si el marco crece con el contenido, una sección de `100vh` lo hace crecer sin fin. El marco mide el contenido con dos altos de vista: si cambia, el contenido depende de la vista y el marco se queda en el alto de vista (`altoVista` de la superficie, 640 por defecto), sin margen alrededor y con desplazamiento dentro. Un ejemplo puede fijarlo con `vista` o `vista=<px>`, como el `iframeHeight` de los bloques de shadcn. Se descartó reescribir las unidades `vh` del CSS (frágil con `dvh`, `svh`, `calc()` y Tailwind) y poner un tope arbitrario al crecimiento (un número sin significado).
+- **640 px por defecto.** Es un alto de pantalla de portátil menos la barra del navegador, aproximado, y cabe en la página de una ficha sin ocuparla entera. Cada superficie lo cambia con `altoVista`.
+- **Conmutador de modo con los selectores del informe.** El sync ya guarda los selectores de cada modo. El marco quita los atributos y clases de los demás modos y pone los del elegido, en `html` o en `body`. Solo sale si la superficie tiene más de un modo, en la ficha (arriba a la derecha del ejemplo) y en la barra del visor de bloques. La portada y las galerías pequeñas no lo llevan: enseñan el modo base, o el de `modo=`.
+- **`@media (prefers-color-scheme)` emulada.** Chrome no aplica a un iframe el `color-scheme` de su elemento como preferencia, y no hay otra forma de fijarla desde la página. Como las hojas de la instantánea se sirven desde el mismo origen, el marco reescribe las condiciones `prefers-color-scheme` de sus @media: cierta la del modo elegido y falsa la otra. Una hoja de otro origen no se puede leer y se queda como está.
+
+## 2026-10-31 · Feedback anónimo de quien monta un sistema
+
+Para saber qué le habría venido bien a la gente al instalar el kit y montar un sistema, `ds feedback` envía sugerencias que redacta el agente, con el sí de la persona. `montar-sistema` lo ofrece al cerrar, y el comando está siempre disponible.
+
+- **Campos fijos y un texto libre.** Versión del kit, agente, SO, versión mayor de Node, origen y stack en etiquetas de una lista cerrada, más «qué te habría venido bien». Se descartó un formato problema → causa → solución: lo útil son las sugerencias, y un formato rígido empuja a contar detalles del producto.
+- **Anonimizado en el equipo.** El CLI quita rutas, URLs, dominios, correos, usuarios, claves, commits y colores, y con `system.json` y el último sync, los nombres del sistema y del producto y sus tokens, clases y componentes. Enseña el JSON exacto antes de enviar. Es la regla 1 llevada al feedback: nada del producto sale del equipo.
+- **Solo con un sí.** Por defecto en seco. En una terminal pregunta; un agente usa `--enviar` solo tras la respuesta de la persona. No se guarda nada en local.
+- **Endpoint propio que abre un issue.** `api/feedback.mjs`, en el proyecto de Vercel que despliega el kit, valida la forma, limita tamaño y ritmo (en memoria, sin IPs) y crea un issue público con la etiqueta `feedback` usando un token de grano fino que vive en Vercel. Las sugerencias van en un bloque de código para que no haya menciones ni enlaces. Descartado: un servicio de analítica (más datos de los necesarios) y que el CLI cree el issue directamente (necesitaría un token o una cuenta de GitHub de quien envía).
+
+## 2026-10-31 · Colores de las fichas, también en el código
+
+`ds check` exige que los colores escritos en una ficha existan en producción, para que una ficha no enseñe valores viejos. Solo miraba las hojas de estilo. En un sistema real fallaban 16 fichas cuyos ejemplos reproducen dibujos: iconos en SVG dentro de componentes y paletas en archivos de datos. Esos colores son de producción aunque no estén en el CSS.
+
+- Se buscan también en el código y los datos (`.tsx`, `.ts`, `.js`, `.vue`, `.svelte`, `.astro`, `.html`, `.json`), sin tests, que pueden traer colores de prueba, ni Markdown, que es documentación y no producción.
+- Se descartó quitar los dibujos de los ejemplos o rebajar el aviso: el ejemplo debe parecerse a producción, y el aviso sigue sirviendo para los colores viejos.
+- El precio: un color que solo aparece en un comentario del código cuenta como de producción. Es raro y no compensa analizar el código.
+
 ## 2026-10-31 · El sistema de ejemplo, publicado
 
 La landing del kit (`ds.aochoa.fyi`, en el repo del digital garden) enseña la interfaz real en una ventana. Para eso, `systems/ejemplo` se publica en `ds.aochoa.fyi/ejemplo`, con un proyecto de Vercel que construye este repo según `vercel.json`. El build exporta con `DS_RUTA=/ejemplo` y sirve `.next-build` como estático, sin el preset de Next de Vercel, porque `out/` no tiene la carpeta de la ruta dentro: el garden lleva `/ejemplo/:path*` al despliegue sin la ruta, como explica «Git, GitHub y entornos».

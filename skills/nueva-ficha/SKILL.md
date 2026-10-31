@@ -5,7 +5,7 @@ description: Crea o completa una ficha del sistema de diseño (componente, bloqu
 
 # Crear una ficha
 
-Lee primero la metodología del kit (ruta en `npx ds info --json` → `kit.metodologia`): `05-ficha.md` (anatomía) y `03-estados.md` (estados). Antes de crear una ficha, comprueba con `npx ds search <nombre>` que no existe ya. `npx ds ver <pieza>` te da lo que usa una pieza y quién la usa.
+Lee primero la metodología del kit (ruta en `npx ds info --json` → `kit.metodologia`): `05-ficha.md` (anatomía) y `03-estados.md` (estados). Antes de crear una ficha, comprueba con `npx ds search <nombre>` que no existe ya. Si `docs/INVENTARIO.md` le da nombre (de la lista de la persona o de Figma), usa ese. `npx ds ver <pieza>` te da lo que usa una pieza y quién la usa.
 
 `usa` es lo que la pieza compone (el grafo del registry); `relacionados`, «ver también». No los mezcles.
 
@@ -28,7 +28,7 @@ Archivo único `content/<sección>/<slug>.md`, o carpeta `<slug>/index.md` + `we
 1. Busca la pieza en el repo de producción y lee su código y su CSS.
 2. Declara `plataformas.web.superficies` con `id` (superficie de `system.json`), `fuente` (ruta en producción) y `clases` (las clases propias de la pieza, sin las de utilidades).
 3. Estado `produccion`.
-4. Ejemplos en vivo con ```` ```html preview superficie=<id> ```` usando **solo clases que existen** y **textos copiados de producción** (nunca inventados ni reescritos).
+4. Ejemplos en vivo con ```` ```html preview superficie=<id> ```` usando **solo clases que existen** y **textos copiados de producción** (nunca inventados ni reescritos). Para una primera pantalla con `100vh`, añade `vista` (o `vista=<px>`) en vez de poner `min-height` en línea; el resto de opciones, en «Anatomía de una ficha».
 5. `npx ds sync`: la ficha queda «Pendiente de verificar». Revisa el informe; si las clases existen y la ficha describe el código real, `npx ds sync --accept <sección>/<slug>`.
 
 ## 3. Si no existe en producción

@@ -10,13 +10,13 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { CopyButton } from './CodeBlock';
-import { Preview, type PreviewSurface } from './Preview';
+import { Preview, PreviewModeToggle, previewModes, type PreviewSurface } from './Preview';
 
 /**
  * Visor de un bloque, como el de la página Blocks de shadcn: barra con Vista/Código, el título que lleva a la ficha,
  * los anchos de escritorio, tablet y móvil, y el botón que copia lo que necesita un agente para usarlo.
  */
-export function BlockViewer({ id, title, href, md, html, code, codeHtml, surface, background }: {
+export function BlockViewer({ id, title, href, md, html, code, codeHtml, surface, background, vista, mode: initialMode }: {
   id: string;
   title: string;
   href: string;
@@ -26,10 +26,14 @@ export function BlockViewer({ id, title, href, md, html, code, codeHtml, surface
   codeHtml: string | null;
   surface: PreviewSurface;
   background?: string;
+  vista?: number | true;
+  mode?: string;
 }) {
   const [view, setView] = useState('vista');
   const [width, setWidth] = useState('100');
   const { copy, copied } = useCopy();
+  const modes = previewModes(surface);
+  const [mode, setMode] = useState(initialMode && modes.includes(initialMode) ? initialMode : modes[0]);
 
   return (
     <div id={id} data-view={view} className="group/block-view-wrapper flex min-w-0 scroll-mt-24 flex-col-reverse items-stretch gap-4 overflow-hidden md:flex-col">
@@ -50,6 +54,12 @@ export function BlockViewer({ id, title, href, md, html, code, codeHtml, surface
               <ToggleGroupItem value="30" title="Móvil"><SmartphoneIcon /></ToggleGroupItem>
             </ToggleGroup>
           </div>
+          {modes.length > 1 && (
+            <>
+              <Separator orientation="vertical" className="mx-1 hidden h-4! lg:flex" />
+              <PreviewModeToggle modes={modes} value={mode} onChange={setMode} />
+            </>
+          )}
           <Separator orientation="vertical" className="mx-1 hidden h-4! lg:flex" />
           <Button
             variant="outline"
@@ -68,7 +78,7 @@ export function BlockViewer({ id, title, href, md, html, code, codeHtml, surface
         <div className="absolute inset-0 [background-image:radial-gradient(#d4d4d4_1px,transparent_1px)] [background-size:20px_20px] dark:[background-image:radial-gradient(#404040_1px,transparent_1px)]" />
         <div className="relative z-10 transition-[width] duration-300" style={{ width: `${width}%`, minWidth: 320 }}>
           <div className="overflow-hidden rounded-lg border bg-background md:rounded-xl">
-            <Preview html={html} surface={surface} background={background} align="start" minHeight={240} />
+            <Preview html={html} surface={surface} background={background} align="start" minHeight={240} vista={vista} mode={mode} />
           </div>
         </div>
       </div>
