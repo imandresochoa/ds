@@ -121,6 +121,8 @@ export async function GalleryPage({ systemId, sectionId }: { systemId: string; s
                           codeHtml={item.codeHtml}
                           surface={item.surface}
                           background={item.preview.fondo ?? undefined}
+                          vista={item.preview.vista}
+                          mode={item.preview.modo}
                         />
                       );
                     })}
@@ -136,7 +138,7 @@ export async function GalleryPage({ systemId, sectionId }: { systemId: string; s
                             <Link href={entry.href} className="text-sm font-medium underline-offset-2 hover:underline">{entry.titulo}</Link>
                             <CopyButton value={item.preview.html} className="top-1.5 bg-transparent" />
                           </div>
-                          <Preview html={item.preview.html} surface={item.surface} background={item.preview.fondo ?? undefined} minHeight={240} />
+                          <Preview html={item.preview.html} surface={item.surface} background={item.preview.fondo ?? undefined} minHeight={240} vista={item.preview.vista} mode={item.preview.modo} />
                         </div>
                       );
                     })}

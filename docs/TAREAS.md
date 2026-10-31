@@ -97,7 +97,7 @@ Tareas:
 - [ ] Sistema `base` con los tokens neutros del shell y herencia (`extiende`).
 - [ ] `ds check` en el CI del repo de producción (cuando haya staging; ver «Entornos»).
 - [ ] Evaluaciones de `design.md` con escenarios fijos (`evals/`).
-- [ ] Ejemplos en vivo en cada modo: conmutador claro/oscuro en el marco del ejemplo, con el selector del informe (`tokens.<superficie>.modos`).
+- [x] Ejemplos en vivo en cada modo: conmutador claro/oscuro en el marco del ejemplo, con el selector del informe (`tokens.<superficie>.modos`). Va con `modo=` en el bloque y el marco que aguanta `100vh` (`vista=`, `altoVista`).
 - [ ] Publicación: `ds build` + despliegue estático con `ds check` antes de cada despliegue.
 - [x] Workflow en cada PR (`comprobar.yml`) con `npm ci`, typecheck, build y un `ds init` de prueba, con la misma versión de Node que «Publicar en npm». Así un `package-lock.json` desajustado se ve en el PR y no al publicar (pasó con la 0.10.0: npm 11.19.1 pedía dos dependencias de `@emnapi` que el lockfile no tenía).
 - [x] Recomendaciones para producción: `hallazgos` en el sync y skill `recomendar-produccion`, que escribe `docs/RECOMENDACIONES.md` en el sistema.

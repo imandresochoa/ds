@@ -47,7 +47,14 @@ Los títulos `## Reglas` y `## Antipatrones` pasan tal cual al JSON de la pieza 
 ## Cuerpo por plataforma (`web.md`)
 
 - Un apartado por superficie (Landing, Portal).
-- Ejemplos en vivo con bloques ` ```html preview ` . Opciones: `superficie=portal`, `fondo=night` (cualquier token de color).
+- Ejemplos en vivo con bloques ` ```html preview ` . Opciones, todas opcionales:
+  - `superficie=portal`: qué superficie lo pinta. Por defecto, la primera.
+  - `fondo=night`: cualquier token de color.
+  - `alinear=inicio`: el contenido arranca a la izquierda en vez de centrado.
+  - `vista=720` o `vista` sola: alto de la vista del marco en px, lo que vale `100vh` dentro. Sola, usa `altoVista` de la superficie (640 por defecto). Con ella, el marco mide eso y el ejemplo va sin margen: es para primeras pantallas y pantallas completas.
+  - `modo=light`: modo con el que se abre el ejemplo, si la superficie tiene varios. Por defecto, el modo base.
+- El marco mide lo que ocupa el ejemplo aunque la hoja del producto fije `html, body { height: 100% }`. Si el contenido depende del alto de la vista (`100vh`, `100dvh`), el marco no crece sin fin: se queda en el alto de vista de la superficie y el contenido se desplaza dentro. No hace falta `min-height` en línea ni `cssExtra` para eso.
+- Si la superficie tiene más de un modo en el último sync (`tokens.<superficie>.modos` del informe), el marco lleva un conmutador (Claro, Oscuro…). Aplica el selector del modo en el documento del ejemplo: el atributo o la clase en `html` (o en `body`, si el selector es de `body`). Un modo que solo existe como `@media (prefers-color-scheme: …)` se emula reescribiendo esas condiciones en las hojas del marco, porque el navegador no deja fijar la preferencia de un iframe.
 - El código de uso para copiar (` ```tsx `, ` ```swift `, ` ```kotlin `).
 - La **API** en tabla: clases o props, qué hacen y valores por defecto.
 
