@@ -1,6 +1,6 @@
 ---
 titulo: La interfaz
-resumen: "La estructura de ui.shadcn.com: cabecera, Docs a tres columnas y páginas anchas para Bloques, Gráficos e Iniciativas."
+resumen: "La estructura de ui.shadcn.com: cabecera, Docs con barra lateral para todas las secciones e índices con los ejemplos en vivo."
 ---
 
 La interfaz copia la estructura y el estilo de ui.shadcn.com: neutra, sin decoración, con el contenido como única fuente de color. También copia su forma de pensar un sistema: documentación que se lee de arriba abajo y piezas que se ven en vivo y se copian. La diferencia es que aquí cada pieza enlaza con su código en producción.
@@ -15,13 +15,15 @@ La interfaz copia la estructura y el estilo de ui.shadcn.com: neutra, sin decora
   - **Puntos.** Uno de color si la ficha no está en producción o el sync avisa. El azul de «Nuevo», si se creó en las dos últimas semanas y no en la primera semana del sistema: lo que entró al montarlo no es novedad.
   - **Contenido**: título, descripción, insignias (estado, código, iniciativa), «Copiar página» en Markdown y anterior y siguiente.
   - **Derecha**: «En esta página» y la tarjeta «¿Trabajas con un agente?», que copia el contexto del sistema.
-- **Índice de sección** (`/<sistema>/componentes`, `/fundamentos`, `/tokens`). Como el índice de componentes de shadcn: «Nuevos» (las que llevan el punto azul de «Nuevo») y «Todos», en rejilla alfabética. Fundamentos y Tokens se agrupan por `grupo`.
-- **Ficha.** Los ejemplos en vivo con su código debajo. Si el código pasa de ocho líneas, se pliega con «Ver código». Las pestañas Web, iOS y Android siguen el conmutador de base de shadcn y solo aparecen las plataformas que existen. Al final van «Tokens que usa», «Enlace con producción», «Usa» (las piezas que compone) y «Relacionados».
-- **Páginas anchas.** Bloques y Gráficos tienen la forma de Blocks y Charts: cabecera, navegación por categoría y galería.
-  - Cada bloque va en un visor con Vista y Código, anchos de escritorio, tablet y móvil, y un botón que copia el prompt para que un agente lo use. Es el equivalente a `npx shadcn add`.
-  - Los gráficos van en tarjetas, en rejilla.
-  - Iniciativas muestra tarjetas «En curso» y «Publicadas».
+- **Índice de sección** (`/<sistema>/componentes`, `/bloques`, `/graficos`, `/iniciativas`…). Todas las secciones usan el layout de Docs, con la barra lateral, y la misma forma, con la densidad de Geist y de los índices de shadcn:
+  - Cabecera corta: título, una línea de descripción y una acción, el prompt de la sección.
+  - Una tarjeta por ficha con su primer ejemplo en vivo, reducido, y debajo el nombre, el punto de estado (si no está en producción) y «Nuevo», con la misma regla que el punto de la barra lateral.
+  - Un componente se ve a escala fija y centrado; un bloque, con el ancho de una pantalla de escritorio (1280 px) y desde arriba; un gráfico, con el de una tarjeta de panel. Lo que no cabe en el marco se recorta. Los ejemplos se cargan al acercarse a la pantalla.
+  - Una ficha sin ejemplo, una iniciativa o una página de la metodología se ven como tarjeta de texto con su resumen.
+  - Componentes va en orden alfabético, sin grupos. Bloques y Gráficos llevan un título por categoría; Fundamentos y Tokens, por `grupo`; Iniciativas, «En curso» y «Publicadas».
   - Una sección vacía explica qué va en ella y da el prompt para pedírselo al agente.
+- **Ficha.** Los ejemplos en vivo con su código debajo. Si el código pasa de ocho líneas, se pliega con «Ver código». Las pestañas Web, iOS y Android siguen el conmutador de base de shadcn y solo aparecen las plataformas que existen. Al final van «Tokens que usa», «Enlace con producción», «Usa» (las piezas que compone) y «Relacionados».
+- **Visor de bloques.** Va en la ficha de un bloque, no en el índice: Vista y Código, anchos de escritorio, tablet y móvil, y un botón que copia el prompt para que un agente lo use. Es el equivalente a `npx shadcn add`.
 - **Lab de primitivos** (`/<sistema>/lab`). Es el equivalente al Create de shadcn, pero solo con primitivos. Tiene dos pestañas:
   - **Generar** crea los tokens, con los nombres de shadcn, desde unos pocos primitivos: neutro, marca y error; familias, tamaño base, escala e interlineado; unidad de espaciado; radio base; opacidad y difuminado de las sombras; y duración base, escala y curvas del movimiento.
   - **Ajustar tokens** cambia los que el sistema ya tiene, de cada superficie de producción o de `experimental/`.

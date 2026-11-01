@@ -6,6 +6,8 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
 
 - **Una sola navegación, como la de Geist.** La cabecera ya no lleva enlaces (Inicio, Docs, Componentes…): se queda con la marca y el nombre del sistema, el selector de superficie, la búsqueda, el repo, el tema y «Nuevo». La barra lateral pierde el grupo «Secciones», que repetía la cabecera, y queda con grupos fijos: Empezar, una sección por grupo y Metodología. «Vista general» abre el índice de cada sección. Las fichas van por orden alfabético y sin subgrupos. Migración: ninguna.
 - **El punto de «Nuevo» vuelve a informar.** Sale en las fichas creadas en las dos últimas semanas, salvo las de la primera semana del sistema. Antes salía en todo lo creado en 30 días, así que un sistema recién montado lo llevaba en todas las fichas.
+- **Índices con los ejemplos en vivo.** El índice de cada sección es una rejilla de tarjetas: el primer ejemplo de la ficha, reducido y cargado al acercarse a la pantalla, con el nombre y el estado debajo. Las fichas sin ejemplo se ven con su resumen. Ya no se repiten «Nuevos» y «Todos»: «Nuevo» va en la tarjeta, con la misma regla que el punto de la barra lateral. Componentes va en orden alfabético; Bloques y Gráficos, por categoría; Iniciativas, «En curso» y «Publicadas».
+- **Bloques, Gráficos e Iniciativas con la barra lateral.** Dejan de ser páginas anchas: usan el layout de Docs, como el resto de secciones, y la misma tarjeta. El Lab sigue siendo ancho. Las URLs no cambian. Migración: ninguna.
 
 ## 1.2.0 · 2026-10-31
 
