@@ -77,6 +77,8 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   const related = byIds(entry.data.relacionados as string[]).filter((r) => !uses.includes(r));
   const item = nav.items.find((i) => i.href === entry.href)!;
   const sources = ((sync?.fuentes ?? []) as Source[]).filter((f) => f.superficie !== 'tokens');
+  // Un bloque enseña sus ejemplos en el visor ancho (anchos de escritorio, tablet y móvil), no en la tarjeta compacta.
+  const block = entry.section === 'bloques' ? { title: entry.titulo, md: `${entry.href}.md` } : undefined;
   const startPrompt = `Implementa «${entry.titulo}» para ${PLATFORMS[platform as keyof typeof PLATFORMS]} en el sistema ${system.id}. Lee ${sitePath(entry.href)}.md y docs/metodologia/06-plataformas.md. Crea ${entry.file.replace(/index\.md$|\.md$/, '')}/${platform}.md con estado exploracion y no toques producción.`;
 
   // Un solo generador de ids para toda la página: los títulos repetidos («Reglas» en web.md y en index.md) no chocan.
@@ -104,7 +106,7 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   );
 
   return (
-    <DocsArticle nav={nav} href={entry.href} title={entry.titulo} description={entry.resumen} md={`${entry.href}.md`} badges={badges} toc={toc}>
+    <DocsArticle nav={nav} href={entry.href} title={entry.titulo} description={entry.resumen} md={`${entry.href}.md`} badges={badges} toc={toc} wide={Boolean(block)}>
       {showPlatforms && available.length > 1 && (
         <nav aria-label="Plataforma" className="mb-4 inline-flex w-full items-center gap-6">
           {available.map(([id, label]) => {
@@ -135,7 +137,7 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
         </div>
       )}
 
-      {platformMd && <Markdown prepared={platformMd.parts} surfaces={surfaces} />}
+      {platformMd && <Markdown prepared={platformMd.parts} surfaces={surfaces} block={block} />}
 
       {entry.section === 'tokens' && tokenRows.length > 0 && (
         <div className="ds-prose">
@@ -172,7 +174,7 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
         </div>
       )}
 
-      {commonMd && <div className={platformMd ? 'mt-12' : undefined}><Markdown prepared={commonMd.parts} surfaces={surfaces} /></div>}
+      {commonMd && <div className={platformMd ? 'mt-12' : undefined}><Markdown prepared={commonMd.parts} surfaces={surfaces} block={block} /></div>}
 
       <div className={cn('ds-prose', extras.length > 0 && 'mt-12')}>
         {tokensHeading && (
