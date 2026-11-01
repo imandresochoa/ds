@@ -17,6 +17,8 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 
 - [ ] Revisar contra ui.shadcn.com al lado y ajustar detalles finos.
 - [ ] Visor de bloques redimensionable arrastrando, como en shadcn.
+- [x] Ficha con el ritmo de Geist: ejemplos compactos con «Ver código» plegado, cabecera corta, contexto para agentes en «Copiar página» y apartados del sistema compactos (ver `DECISIONES.md`, 2026-11-01).
+- [ ] Fondo del marco en cada modo: con el conmutador en Claro, el marco sigue pintando el fondo base de la superficie (`surface.background` es un valor fijo, no un token).
 - [x] Inicio con un solo sistema: redirige al sistema.
 
 ## Instalación y publicación

@@ -1,8 +1,8 @@
 'use client';
 
-import { CheckIcon, ChevronDownIcon, CopyIcon, ExternalLinkIcon, FileTextIcon, LinkIcon } from 'lucide-react';
+import { BotIcon, CheckIcon, ChevronDownIcon, CopyIcon, ExternalLinkIcon, FileTextIcon, LinkIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { openInAgentPrompt } from '@/lib/agent';
+import { agentContext, openInAgentPrompt } from '@/lib/agent';
 import type { SystemSummary } from '@/lib/nav';
 import { sitePath } from '@/lib/site';
 import { useCopy } from '@/lib/use-copy';
@@ -12,9 +12,10 @@ import { Separator } from '@/components/ui/separator';
 
 /**
  * «Copiar página» de shadcn: copia la página en Markdown (el mismo .md que leen los agentes). El menú abre el .md,
- * copia el enlace y, si el sistema lo activa (`abrirEnAgentes`), abre la página en Claude o ChatGPT.
+ * copia el enlace, copia el contexto del sistema para un agente y, si el sistema lo activa (`abrirEnAgentes`), abre la
+ * página en Claude o ChatGPT. Una página sin Markdown (los índices) copia directamente el contexto para agentes.
  */
-export function DocsCopyPage({ md, system, abrirEnAgentes }: { md: string | null; system: Pick<SystemSummary, 'nombre'>; abrirEnAgentes: boolean }) {
+export function DocsCopyPage({ md, system, abrirEnAgentes }: { md: string | null; system: Pick<SystemSummary, 'id' | 'nombre'>; abrirEnAgentes: boolean }) {
   const { copy, copied } = useCopy();
   const copyPage = async () => {
     if (!md) return toast.error('Esta página no tiene versión Markdown');
@@ -22,14 +23,15 @@ export function DocsCopyPage({ md, system, abrirEnAgentes }: { md: string | null
     if (!res.ok) return toast.error('No se encontró el Markdown de esta página');
     await copy(await res.text());
   };
+  const copyContext = () => void copy(agentContext(system, window.location.origin), 'Contexto para agentes copiado');
   const url = () => window.location.href.split('#')[0];
   const open = (base: string) => window.open(`${base}?q=${encodeURIComponent(openInAgentPrompt(system, url()))}`, '_blank', 'noopener');
 
   return (
     <div className="group/buttons relative flex rounded-lg bg-secondary *:[[data-slot=button]]:focus-visible:relative *:[[data-slot=button]]:focus-visible:z-10">
-      <Button variant="secondary" size="sm" className="h-8 shadow-none md:h-7 md:text-[0.8rem]" onClick={() => void copyPage()}>
-        {copied ? <CheckIcon /> : <CopyIcon />}
-        Copiar página
+      <Button variant="secondary" size="sm" className="h-8 shadow-none md:h-7 md:text-[0.8rem]" onClick={md ? () => void copyPage() : copyContext}>
+        {copied ? <CheckIcon /> : md ? <CopyIcon /> : <BotIcon />}
+        {md ? 'Copiar página' : 'Copiar contexto'}
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -45,6 +47,18 @@ export function DocsCopyPage({ md, system, abrirEnAgentes }: { md: string | null
             </DropdownMenuItem>
           )}
           <DropdownMenuItem onSelect={() => void copy(url(), 'Enlace copiado')}><LinkIcon />Copiar enlace</DropdownMenuItem>
+          {md && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={copyContext} className="items-start">
+                <BotIcon className="mt-0.5" />
+                <span className="flex flex-col">
+                  Copiar contexto para agentes
+                  <span className="max-w-56 text-xs text-muted-foreground">Qué leer primero del sistema y que use solo lo que está en producción.</span>
+                </span>
+              </DropdownMenuItem>
+            </>
+          )}
           {abrirEnAgentes && (
             <>
               <DropdownMenuSeparator />

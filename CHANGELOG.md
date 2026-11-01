@@ -2,6 +2,10 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+- **La ficha se lee como una página de componente de Geist.** Cada ejemplo es una tarjeta compacta (del alto de su contenido, desde 96 px) con una franja «Ver código» al pie: el código va siempre plegado, y la franja lleva la superficie, el conmutador de modo y el botón de copiar. Cabecera con una fila discreta de estado, código e iniciativa. «Enlace con producción» pasa de tabla a una línea por fuente; «Usa» y «Relacionados», a tarjetas de dos líneas. La tarjeta «¿Trabajas con un agente?» deja la columna derecha: «Copiar contexto para agentes» está en el menú de «Copiar página» (y en ⌘K). Migración: ninguna.
+
 ## 1.2.0 · 2026-10-31
 
 Una función nueva que sale del primer feedback real con `ds feedback`, y un arreglo del propio feedback. Migración: ninguna; `npm install @imandresochoa/ds@1.2.0`.

@@ -3,13 +3,13 @@ import Link from 'next/link';
 import type { TocItem } from '@/lib/markdown';
 import { neighbours, type Nav } from '@/lib/nav';
 import { Button } from '@/components/ui/button';
-import { AgentCta } from './AgentCta';
 import { DocsCopyPage } from './DocsCopyPage';
 import { DocsToc } from './DocsToc';
 
 /**
- * Página de Docs de ui.shadcn.com: título con «Copiar página» y anterior/siguiente, descripción, insignias,
- * contenido a 640 px y, a la derecha, «En esta página» y la tarjeta para agentes.
+ * Página de Docs de ui.shadcn.com, con el ritmo de una página de componente de Geist: título con «Copiar página»
+ * y anterior/siguiente, una línea de descripción, las insignias en una fila discreta, contenido a 640 px y, a la
+ * derecha, solo «En esta página». El contexto para agentes está en el menú de «Copiar página» y en ⌘K.
  */
 export function DocsArticle({ nav, href, title, description, md, badges, toc = [], children }: {
   nav: Nav;
@@ -31,11 +31,9 @@ export function DocsArticle({ nav, href, title, description, md, badges, toc = [
             <div className="flex items-center justify-between gap-4 md:items-start">
               <h1 className="scroll-m-24 text-3xl font-semibold tracking-tight">{title}</h1>
               <div className="docs-nav flex items-center gap-2">
-                {md && (
-                  <div className="hidden sm:block">
-                    <DocsCopyPage md={md} system={nav.system} abrirEnAgentes={nav.abrirEnAgentes} />
-                  </div>
-                )}
+                <div className="hidden sm:block">
+                  <DocsCopyPage md={md} system={nav.system} abrirEnAgentes={nav.abrirEnAgentes} />
+                </div>
                 <div className="ml-auto flex gap-2">
                   {previous && (
                     <Button variant="secondary" size="icon" className="extend-touch-target size-8 shadow-none md:size-7" asChild>
@@ -50,9 +48,9 @@ export function DocsArticle({ nav, href, title, description, md, badges, toc = [
                 </div>
               </div>
             </div>
-            {description && <p className="text-[1.05rem] text-balance text-muted-foreground sm:text-base md:max-w-[80%]">{description}</p>}
+            {description && <p className="text-[1.05rem] text-pretty text-muted-foreground sm:text-base">{description}</p>}
+            {badges && <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.8rem] text-muted-foreground">{badges}</div>}
           </div>
-          {badges && <div className="-mt-2 flex flex-wrap items-center gap-2">{badges}</div>}
           <div className="w-full flex-1 pb-16 sm:pb-0">{children}</div>
           <div className="hidden h-16 w-full items-center gap-2 px-4 sm:flex sm:px-0">
             {previous && (
@@ -75,9 +73,6 @@ export function DocsArticle({ nav, href, title, description, md, badges, toc = [
             <DocsToc toc={toc} />
           </div>
         )}
-        <div className="hidden flex-1 flex-col gap-6 px-6 xl:flex">
-          <AgentCta system={nav.system} />
-        </div>
       </div>
     </div>
   );
