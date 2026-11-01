@@ -137,7 +137,7 @@ function emulateScheme(win: MediaWindow, doc: Document, scheme: string | null) {
  * en html (o en body, si el selector es de body). Si algún modo de la superficie es una @media (prefers-color-scheme),
  * se emula el esquema del modo elegido (ver emulateScheme). Solo toca lo que cambia, para no disparar observadores.
  */
-function applyMode(frame: HTMLIFrameElement, modos: Record<string, string[]>, mode: string) {
+export function applyMode(frame: HTMLIFrameElement, modos: Record<string, string[]>, mode: string) {
   const doc = frame.contentDocument;
   const win = frame.contentWindow as MediaWindow | null;
   if (!doc?.body || !win) return;
