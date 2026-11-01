@@ -18,6 +18,7 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 - [ ] Revisar contra ui.shadcn.com al lado y ajustar detalles finos.
 - [ ] Visor de bloques redimensionable arrastrando, como en shadcn.
 - [x] Inicio con un solo sistema: redirige al sistema.
+- [x] Una sola navegación, como Geist: cabecera sin enlaces y barra lateral con grupos fijos (Empezar, secciones y Metodología), «Vista general» para cada índice y punto de «Nuevo» sin el lote del montaje.
 
 ## Instalación y publicación
 

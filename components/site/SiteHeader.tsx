@@ -1,31 +1,32 @@
 'use client';
 
-import { CodeIcon, FlaskConicalIcon, PlusIcon } from 'lucide-react';
+import { ChevronsUpDownIcon, CodeIcon, FlaskConicalIcon, PlusIcon } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import type { Nav } from '@/lib/nav';
 import { cn } from '@/lib/utils';
 import { useCopy } from '@/lib/use-copy';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CommandMenu } from './CommandMenu';
 import { GitHubIcon, SystemMark } from './icons';
 import { MobileNav } from './MobileNav';
 import { ModeSwitcher } from './ModeSwitcher';
-import { SurfaceSwitcher } from './SurfaceFilter';
+import { SurfaceSwitcher, useSurface } from './SurfaceFilter';
 
-/** Cabecera de ui.shadcn.com: navegación superior, búsqueda, repo, tema y «Nuevo». Con varias superficies, su selector. */
+/**
+ * Cabecera como la de Geist: la marca del sistema (y su selector de superficie, si hay varias), la búsqueda, el repo,
+ * el tema y «Nuevo». Sin enlaces de navegación: la navegación es la barra lateral.
+ */
 export function SiteHeader({ nav }: { nav: Nav }) {
   return (
     <header className="sticky top-0 z-50 w-full bg-background">
       <div className="container-wrapper px-6">
         <div className="flex h-(--header-height) items-center **:data-[slot=separator]:h-4!">
           <MobileNav nav={nav} className="flex lg:hidden" />
-          <SystemSwitcher nav={nav} className="mr-2 hidden lg:flex" />
-          <SurfaceSwitcher className="mr-2 -ml-1 hidden lg:flex" />
-          <MainNav items={nav.top} className="hidden lg:flex" />
+          <SystemSwitcher nav={nav} className="hidden lg:flex" />
+          <SurfaceCrumb />
           <div className="ml-auto flex items-center gap-2 md:flex-1 md:justify-end">
             <div className="hidden w-full flex-1 md:flex md:w-auto md:flex-none">
               <CommandMenu nav={nav} />
@@ -47,45 +48,40 @@ export function SiteHeader({ nav }: { nav: Nav }) {
   );
 }
 
-function MainNav({ items, className }: { items: Nav['top']; className?: string }) {
-  const pathname = usePathname().replace(/\/$/, '');
+/** Tras la marca, como el proyecto tras el equipo en Vercel: «/» y el selector de superficie. Solo con dos o más. */
+function SurfaceCrumb() {
+  const { surfaces } = useSurface();
+  if (surfaces.length < 2) return null;
   return (
-    <nav className={cn('items-center gap-0', className)}>
-      {items.map((item) => (
-        <Button key={item.href} variant="ghost" asChild size="sm" className="px-2.5">
-          <Link href={item.href} data-active={pathname === item.href} className="relative items-center">
-            {item.label}
-          </Link>
-        </Button>
-      ))}
-    </nav>
+    <div className="hidden items-center lg:flex">
+      <span className="mx-1 text-lg font-light text-muted-foreground/50 select-none" aria-hidden>/</span>
+      <SurfaceSwitcher />
+    </div>
   );
 }
 
-/** Marca del sistema. Con más de un sistema, abre la lista para cambiar. */
+/** Marca y nombre del sistema; llevan al inicio. Con más de un sistema, abren la lista para cambiar. */
 function SystemSwitcher({ nav, className }: { nav: Nav; className?: string }) {
   const router = useRouter();
-  const mark = <SystemMark system={nav.system} />;
+  const brand = (
+    <>
+      <SystemMark system={nav.system} />
+      <span className="max-w-48 truncate">{nav.system.nombre}</span>
+    </>
+  );
   if (nav.systems.length < 2) {
     return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button asChild variant="ghost" size="icon" className={cn('size-8', className)}>
-            <Link href={`/${nav.system.id}`}>
-              {mark}
-              <span className="sr-only">{nav.system.nombre}</span>
-            </Link>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>{nav.system.nombre}</TooltipContent>
-      </Tooltip>
+      <Button asChild variant="ghost" size="sm" className={cn('h-8 gap-2 px-1.5 font-semibold', className)}>
+        <Link href={`/${nav.system.id}`}>{brand}</Link>
+      </Button>
     );
   }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className={cn('size-8', className)}>
-          {mark}
+        <Button variant="ghost" size="sm" className={cn('h-8 gap-2 px-1.5 font-semibold', className)}>
+          {brand}
+          <ChevronsUpDownIcon className="text-muted-foreground" />
           <span className="sr-only">Cambiar de sistema</span>
         </Button>
       </DropdownMenuTrigger>
