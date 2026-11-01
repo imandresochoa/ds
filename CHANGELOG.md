@@ -2,6 +2,11 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+- **Una sola navegación, como la de Geist.** La cabecera ya no lleva enlaces (Inicio, Docs, Componentes…): se queda con la marca y el nombre del sistema, el selector de superficie, la búsqueda, el repo, el tema y «Nuevo». La barra lateral pierde el grupo «Secciones», que repetía la cabecera, y queda con grupos fijos: Empezar, una sección por grupo y Metodología. «Vista general» abre el índice de cada sección. Las fichas van por orden alfabético y sin subgrupos. Migración: ninguna.
+- **El punto de «Nuevo» vuelve a informar.** Sale en las fichas creadas en las dos últimas semanas, salvo las de la primera semana del sistema. Antes salía en todo lo creado en 30 días, así que un sistema recién montado lo llevaba en todas las fichas.
+
 ## 1.2.0 · 2026-10-31
 
 Una función nueva que sale del primer feedback real con `ds feedback`, y un arreglo del propio feedback. Migración: ninguna; `npm install @imandresochoa/ds@1.2.0`.

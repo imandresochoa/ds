@@ -43,6 +43,13 @@ export function CommandMenu({ nav }: { nav: Nav }) {
     return () => document.removeEventListener('keydown', down);
   }, []);
 
+  // El inicio, el índice de cada sección que sale en la barra lateral (su «Vista general») y el Lab.
+  const pages = [
+    { href: `/${nav.system.id}`, label: 'Inicio' },
+    ...groups.filter((g) => g.href).map((g) => ({ href: g.href as string, label: g.label })),
+    { href: nav.lab, label: 'Lab de primitivos' },
+  ];
+
   const origin = typeof window === 'undefined' ? '' : window.location.origin;
   const actions = [
     { label: 'Copiar contexto para agentes', icon: BotIcon, run: () => copy(agentContext(nav.system, origin), 'Contexto para agentes copiado') },
@@ -79,7 +86,7 @@ export function CommandMenu({ nav }: { nav: Nav }) {
           <CommandList className="no-scrollbar min-h-80 scroll-pt-2 scroll-pb-1.5">
             <CommandEmpty className="py-12 text-center text-sm text-muted-foreground">No hay resultados.</CommandEmpty>
             <CommandGroup heading="Páginas" className={group}>
-              {[...nav.top, ...nav.sections.filter((s) => !nav.top.some((t) => t.href === s.href)), { href: nav.lab, label: 'Lab de primitivos' }].map((item) => (
+              {pages.map((item) => (
                 <MenuItem key={item.href} value={`pagina ${item.label}`} onSelect={() => run(() => router.push(item.href))}>
                   <ArrowRightIcon />
                   {item.label}
