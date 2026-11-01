@@ -2,9 +2,9 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
-## Sin publicar
+## 2.0.0 · 2026-11-01
 
-Versión mayor: cambia dónde viven los tokens. Una ficha de `content/tokens/` deja de leerse hasta que se migra.
+Versión mayor: cambia dónde viven los tokens. Una ficha de `content/tokens/` deja de leerse hasta que se migra con `npx ds migrar --aplicar` (ver «Migración desde la 1.x», abajo). Además, la interfaz se reordena con la navegación de Geist: una sola barra lateral, índices con los ejemplos en vivo y fichas más densas.
 
 - **Los tokens van en su fundamento.** Desaparece la sección Tokens, también de la barra lateral, la cabecera, `ds info` y el registry. Cada fundamento lista en `tokens` los que documenta, con `nombre` y `rol`. La ficha pinta su tabla (un valor por superficie y por modo, y la columna Experimental) en el apartado `## Tokens` del cuerpo, o en uno nuevo al final, y entra en «En esta página». En componentes, bloques y gráficos, `tokens` sigue siendo la lista de los que usan.
 - **`ds migrar [--aplicar] [--json]`**, nuevo. Sin `--aplicar`, enseña lo que haría.

@@ -6,7 +6,7 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 
 - [x] Interfaz con la estructura de ui.shadcn.com: cabecera, Docs a tres columnas, índices de sección, galerías de Bloques y Gráficos, ⌘K.
 - [x] Secciones: Fundamentos, Componentes, Bloques, Gráficos, Iniciativas y Metodología (interna); páginas de Docs por sistema en `content/docs/`.
-- [x] Los tokens van en su fundamento (2.0): sin sección Tokens, tabla en el apartado «Tokens» de la ficha y `ds migrar`. Sin publicar.
+- [x] Los tokens van en su fundamento (2.0): sin sección Tokens, tabla en el apartado «Tokens» de la ficha y `ds migrar`. Sale en la 2.0.0.
 - [x] Estados por ficha y por plataforma; pestañas Web, iOS y Android cuando hay más de una.
 - [x] Sync con producción: instantánea de CSS, tokens, huellas, clases inventadas, cobertura y cambios sin commit.
 - [x] Capa para agentes: `llms.txt`, `design.md`, `registry.json`, `llms-full.txt` y `.md` por página.
