@@ -58,3 +58,15 @@ export function prepareMarkdown(source: string, slug: Slugger = createSlugger())
   flush();
   return { parts, toc };
 }
+
+/**
+ * Separa del Markdown el apartado `## <título>`: lo de antes, su texto (sin el título) y lo de después, desde el
+ * siguiente `#` o `##`. Sin ese apartado, todo queda en `before`.
+ */
+export function splitSection(source: string, title: string): { before: string; section: string; after: string } {
+  const lines = source.split('\n');
+  const start = lines.findIndex((l) => /^##\s/.test(l) && l.replace(/^##\s+/, '').trim().toLowerCase() === title.toLowerCase());
+  if (start < 0) return { before: source, section: '', after: '' };
+  const end = lines.findIndex((l, i) => i > start && /^#{1,2}\s/.test(l));
+  return { before: lines.slice(0, start).join('\n'), section: lines.slice(start + 1, end < 0 ? undefined : end).join('\n'), after: end < 0 ? '' : lines.slice(end).join('\n') };
+}

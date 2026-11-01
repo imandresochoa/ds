@@ -24,7 +24,7 @@ Instala la skill `montar-sistema` para Claude Code y Codex en tu carpeta de usua
 2. Pide lo que falte según la respuesta (la ruta, la URL o qué es el producto), el nombre y la carpeta. Por defecto, `../<producto>-design-system`. Pregunta también si tienes una **lista de piezas** con sus nombres y si hay **archivo de Figma**: los dos mandan sobre lo que se deduce del CSS.
 3. Crea el repo del sistema con `ds init`, que se niega a hacerlo dentro de producción.
 4. Lo llena según el origen:
-   - **Repo**: superficies, primer sync, las decisiones abiertas (para quién y voz, superficies sin tokens, hojas que no se cargan), `DESIGN.md`, fichas de tokens y plan de fichas.
+   - **Repo**: superficies, primer sync, las decisiones abiertas (para quién y voz, superficies sin tokens, hojas que no se cargan), `DESIGN.md`, fundamentos con sus tokens y plan de fichas.
    - **Web o Figma**: primitivos sacados de lo publicado, en exploración.
    - **Nada**: `DESIGN.md` con lo que cuentes y unos primitivos de partida, que ajustas en el Lab de primitivos.
 5. Crea las fichas por tandas, según el alcance. En «todo» no se para entre tandas salvo por dudas que bloqueen, pero revisa cada ficha y cada huella. Hace un commit por tanda en el repo del sistema y deja `docs/INVENTARIO.md` al día para retomarlo.
@@ -55,7 +55,7 @@ Si partes de una web, de Figma o de nada, ajusta los primitivos en el Lab: `npx 
    - El preset se escribe en `experimental/tokens.css`, nunca en producción.
    - Si un par que cambia el preset no llega a AA, no se escribe nada, salvo con `--aceptar-contraste`. Ese paso lo decide una persona.
    - Un archivo que no generó el Lab no se pisa, salvo con `--sobrescribir`.
-4. Crea las fichas de tokens en `content/tokens/`, con estado `exploracion`, `nombre` y `rol`. Los valores los leen de `experimental/`.
+4. Lista los tokens en el fundamento de cada grupo (`content/fundamentos/color.md`, `tipografia.md`…), con `nombre` y `rol` y estado `exploracion`. Los valores los pinta el kit desde `experimental/`.
 
 `npx ds preset resolver` devuelve el enlace para volver a abrir en el Lab lo que hay en `experimental/tokens.css`.
 

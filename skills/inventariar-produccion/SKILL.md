@@ -1,6 +1,6 @@
 ---
 name: inventariar-produccion
-description: Recorre el repo de producción y entrega un inventario priorizado de lo que falta documentar en el sistema de diseño (componentes, bloques, gráficos, fundamentos y tokens). Úsala para planificar el relleno de un sistema o cuando pregunten «qué nos falta».
+description: Recorre el repo de producción y entrega un inventario priorizado de lo que falta documentar en el sistema de diseño (componentes, bloques, gráficos y fundamentos con sus tokens). Úsala para planificar el relleno de un sistema o cuando pregunten «qué nos falta».
 ---
 
 # Inventario de producción
@@ -18,7 +18,7 @@ Solo lectura. El resultado es un plan, no fichas.
    - **Formas compartidas**: `npx ds patrones` (con `--json` para leerlo entero). Agrupa clases de hojas y prefijos distintos que comparten firma: el mismo radio, la misma sombra, el mismo fondo o borde, los mismos `var(--token)`. Encuentra las piezas que el producto repite sin una carpeta común, como una tarjeta escrita cuatro veces con cuatro prefijos. Cada grupo es una candidata, no una pieza: abre las clases y decide si son la misma pieza, variantes de una o una coincidencia (un radio de 50 % en un avatar y en un punto). Un grupo marcado como «variante» de otro es la misma forma con más rasgos en común; suele ser el núcleo de la pieza.
    - **Bloques**: secciones de página, pantallas y flujos (rutas de la app, bloques `<section>` de la web).
    - **Gráficos**: visualizaciones de datos (librería de gráficos, `<svg>` o `<canvas>` con datos).
-   - **Fundamentos**: tipografía, color, espaciado, iconografía, movimiento, voz (busca guías en `docs/`).
+   - **Fundamentos**: tipografía, color, espaciado, iconografía, movimiento, voz (busca guías en `docs/`). Los tokens sin documentar de `cobertura` van en el fundamento de su grupo.
 4. Cruza con las fichas existentes (`content/`) para no repetir.
 5. Para cada pieza: nombre propuesto (el de la persona o el de Figma, si lo hay), sección, `funcion` y `nivel` (componentes) o `categoria` (bloques y gráficos), fuente en producción, clases principales (todas las de un grupo de `ds patrones` si es una pieza repartida), **uso** (cuántas páginas o archivos la usan: `grep -rl`) y dependencias: los ids de las piezas que compone, que irán en `usa`.
 6. Prioriza: primero las piezas de la lista de la persona y de Figma, después lo más usado y lo que otras piezas necesitan (átomos antes que organismos) y por último lo visible en las páginas principales. Una forma que cruza muchas hojas pesa como una pieza muy usada.

@@ -5,12 +5,11 @@ resumen: Las capas del sistema, de los fundamentos a los gráficos, y sistemas q
 
 ## Las capas
 
-Cada ficha pertenece a una capa. Las capas van del criterio a lo más compuesto; una capa solo usa piezas de las anteriores. Lo que compone una pieza se declara en `usa` (ver «Anatomía de una ficha»). Los fundamentos van primero porque son el porqué; los tokens son ese criterio convertido en valores.
+Cada ficha pertenece a una capa. Las capas van del criterio a lo más compuesto; una capa solo usa piezas de las anteriores. Lo que compone una pieza se declara en `usa` (ver «Anatomía de una ficha»). Los fundamentos van primero porque son el porqué, y cada uno lleva sus tokens: ese criterio convertido en valores. Color tiene sus reglas y la tabla de sus colores en la misma página, como la página Colors de Geist.
 
 | Capa | Qué contiene | Ejemplo |
 | --- | --- | --- |
-| **Fundamentos** | Reglas de criterio: tipografía, color, maquetación, movimiento, voz, ilustración. Explican cómo y cuándo, y enlazan a sus tokens. | «Los titulares van en serif ligera» |
-| **Tokens** | Valores con nombre y su rol, uno por modo si el producto tiene varios (claro, oscuro). Se leen del código de producción o, mientras no están en él, de `experimental/`. | `--ink`, `--radius-lg`, `--dur-micro` |
+| **Fundamentos** | Criterio y valores: tipografía, color, espaciado, maquetación, movimiento, voz, ilustración. Explican cómo y cuándo, y listan sus tokens: valores con nombre y su rol, uno por modo si el producto tiene varios (claro, oscuro). Los valores se leen del código de producción o, mientras no están en él, de `experimental/`. | «Los titulares van en serif ligera»; `--ink`, `--radius-lg`, `--dur-micro` |
 | **Componentes** | Piezas reutilizables. Se listan **por orden alfabético**, como en shadcn; su **función** y su **nivel atómico** son datos de la ficha. | Botón, Enlace de texto, Cabecera |
 | **Bloques** | Composiciones que resuelven un problema. Se agrupan por `categoria`: **secciones**, **pantallas** y **flujos**. | Hero, Precios, Alta |
 | **Gráficos** | Cómo presenta datos el producto. Se agrupan por `categoria`: área, barras, líneas, circular, radar, radial y tooltip. | Ingresos por mes |
@@ -25,6 +24,8 @@ Bloques y Gráficos son estructura: el kit no trae ninguno. Cada sistema los lle
 Las **iniciativas** no son una capa: agrupan trabajo en curso que atraviesa capas (ver Estados).
 
 Antes de la 1.0, los bloques se llamaban **patrones** y su categoría iba en `nivel`. Las dos formas se siguen leyendo: `content/patrones/` aparece como Bloques y `nivel: seccion` cuenta como `categoria: seccion`.
+
+Antes de la 2.0, los tokens tenían su propia sección (`content/tokens/`), con una ficha por grupo al lado del fundamento del mismo tema. Esa carpeta ya no se lee: `npx ds migrar` pasa cada ficha de tokens a su fundamento. Los ids antiguos (`tokens/color` en `relacionados`, en el lock o en el informe del sync) cuentan como `fundamentos/color`.
 
 ## Sistemas anidados
 
@@ -61,11 +62,11 @@ Empieza por los semánticos y añade los de componente cuando un componente los 
 
 ## Modos
 
-Un modo (claro, oscuro, alto contraste, una segunda marca) no es una capa ni un juego de tokens aparte: es otro valor para los mismos tokens. Por eso vive dentro de la capa de tokens.
+Un modo (claro, oscuro, alto contraste, una segunda marca) no es una capa ni un juego de tokens aparte: es otro valor para los mismos tokens. Por eso vive dentro de los tokens, en la tabla de cada fundamento.
 
 - Un token tiene un valor por modo. Un modo redefine nombres que ya existen y no inventa otros: `--ink` en oscuro, no `--ink-dark`.
 - Los modos cambian los semánticos. Los primitivos son la paleta y no cambian de modo; los de componente apuntan a semánticos y cambian con ellos.
-- La ficha de tokens enseña los valores de cada modo uno al lado del otro. Si un rol se lee bien en claro y no en oscuro, el fallo es del token, no del componente.
+- La tabla de tokens de un fundamento enseña los valores de cada modo uno al lado del otro. Si un rol se lee bien en claro y no en oscuro, el fallo es del token, no del componente.
 - Un token nuevo en un producto con modos se propone con un valor para cada modo.
 
 El sync lee los modos del CSS de producción (ver «Enlace con producción»).

@@ -7,7 +7,7 @@ nivel: atomo
 destacado: true
 creado: 2026-10-11
 actualizado: 2026-10-11
-relacionados: [fundamentos/ejemplo]
+tokens: [ejemplo-tinta, ejemplo-papel, ejemplo-radio]
 plataformas:
   web:
     estado: exploracion

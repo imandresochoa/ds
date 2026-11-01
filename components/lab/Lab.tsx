@@ -121,7 +121,7 @@ export function Lab({ systemId, bases, saved, production }: { systemId: string; 
             <InfoIcon className="mt-0.5 size-4 shrink-0" />
             {production
               ? 'Este sistema ya tiene producción. Lo que cambies aquí no la toca: el agente lo deja en una iniciativa, con el CSS en experimental/.'
-              : 'El Lab no escribe nada. Copia el preset para tu agente: lo aplica en experimental/ y crea las fichas de tokens en exploración.'}
+              : 'El Lab no escribe nada. Copia el preset para tu agente: lo aplica en experimental/ y lista los tokens en sus fundamentos, en exploración.'}
           </p>
           <ContrastReport results={results} adjusted={tab === 'ajustar' ? adj.ajustes : undefined} onFix={(mode, token, value) => adjust(mode, token, value)} />
 

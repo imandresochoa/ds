@@ -1,8 +1,8 @@
 import { ArrowUpRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { loadEntries, loadExperimentalTokens, loadProductionTokens, loadSyncReport, modeLabel, PLATFORM_SECTIONS, PLATFORMS, resolvedTokenValue, SECTIONS, STATUSES, SYNC_STATES, tokenModes, tokenValue } from '@/lib/core.mjs';
-import { createSlugger, prepareMarkdown, type TocItem } from '@/lib/markdown';
+import { documentedTokens, loadEntries, loadSyncReport, modeLabel, PLATFORM_SECTIONS, PLATFORMS, resolvedTokenValue, SECTIONS, STATUSES, SYNC_STATES, TOKEN_SECTION, tokenValue } from '@/lib/core.mjs';
+import { createSlugger, prepareMarkdown, splitSection, type TocItem } from '@/lib/markdown';
 import type { Entry, Nav, System } from '@/lib/nav';
 import { sitePath } from '@/lib/site';
 import { previewSurfaces } from '@/lib/surfaces';
@@ -11,34 +11,10 @@ import { cn } from '@/lib/utils';
 import { CodeBlock } from './CodeBlock';
 import { DocsArticle } from './docs/DocsArticle';
 import { StatusBadge, StatusDot } from './docs/StatusBadge';
+import { isColor, loadTokenColumns, TokenTable, type TokenRow } from './docs/TokenTable';
 import { Markdown } from './Markdown';
 
-const isColor = (value: string) => /^(#|rgba?\(|hsla?\(|hwb\(|(ok)?(lab|lch)\(|color\()/i.test(value.trim());
-
-type TokenRow = { nombre: string; rol?: string };
-/** Columna de los tokens de experimental/ en la tabla de una ficha de tokens. */
-const EXPERIMENTAL = 'experimental';
-type TokenValues = Record<string, string | Record<string, string>>;
 type Source = { clave: string; plataforma: string; superficie: string; fuente: string; clases: string[]; estado: string; motivo?: string; huella?: string; commitRevisado?: string | null };
-
-// Se escribe el valor tal cual está en producción; la muestra usa el valor con sus var() resueltas.
-function TokenValue({ raw, resolved }: { raw?: string; resolved?: string }) {
-  if (raw === undefined) return <span className="text-muted-foreground">—</span>;
-  const color = resolved ?? raw;
-  return (
-    <span className="inline-flex items-center gap-2 font-mono text-[0.8rem]" title={resolved !== raw ? resolved : undefined}>
-      {isColor(color) && <span className="size-3.5 shrink-0 rounded-sm border" style={{ background: color }} />}
-      {raw}
-    </span>
-  );
-}
-
-// Una celda por modo, una al lado de otra. Si el token vale lo mismo en todos, una sola celda que los abarca.
-function TokenCells({ values, name, modes }: { values: TokenValues; name: string; modes: string[] }) {
-  const cells = (modes.length ? modes : [undefined]).map((mode) => ({ raw: tokenValue(values[name], mode), resolved: resolvedTokenValue(values, name, mode) }));
-  if (cells.every((c) => c.raw === cells[0].raw && c.resolved === cells[0].resolved)) return <td colSpan={cells.length}><TokenValue {...cells[0]} /></td>;
-  return <>{cells.map((c, i) => <td key={modes[i]}><TokenValue {...c} /></td>)}</>;
-}
 
 /** Título de un apartado generado (no viene del Markdown): lleva id y entra en «En esta página». */
 function Heading({ id, children }: { id: string; children: React.ReactNode }) {
@@ -49,23 +25,15 @@ function Heading({ id, children }: { id: string; children: React.ReactNode }) {
  * Ficha con el ritmo de una página de componente de Geist: cabecera corta (título, una línea, insignias discretas),
  * conmutador de plataforma si hay más de una, ejemplos compactos con el código plegado y, al final, lo que añade el
  * sistema (tokens, enlace con producción, usa y relacionados), en formato compacto para que no pese más que los ejemplos.
+ * Un fundamento lleva además la tabla de los tokens que documenta, en su apartado «Tokens».
  */
 export function EntryPage({ system, entry, platform, nav }: { system: System; entry: Entry; platform: string; nav: Nav }) {
   const report = loadSyncReport(system);
   const sync = report?.entradas?.[entry.id];
-  const tokenRows: TokenRow[] = (entry.data.tokens ?? []).map((t: string | TokenRow) => (typeof t === 'string' ? { nombre: t } : t));
-  // Lo que aún no está en producción (experimental/, también lo que escribe el Lab) va en su propia columna.
-  const experimental = loadExperimentalTokens(system);
-  const withExperimental = experimental !== null && tokenRows.some((t) => experimental.values[t.nombre] !== undefined);
-  const production = loadProductionTokens(system) as Record<string, TokenValues>;
-  const tokens: Record<string, TokenValues> = withExperimental ? { ...production, [EXPERIMENTAL]: experimental.values as TokenValues } : production;
+  // En un fundamento, `tokens` son los que documenta (la tabla); en las demás fichas, los que usa (los chips).
+  const tokenRows: TokenRow[] = entry.section === TOKEN_SECTION ? documentedTokens(entry) : (entry.data.tokens ?? []).map((t: string | TokenRow) => (typeof t === 'string' ? { nombre: t } : t));
+  const { tokens, surfaceIds, surfaceNames, modes } = loadTokenColumns(system, tokenRows.map((t) => t.nombre));
   const surfaces = previewSurfaces(system);
-  const surfaceNames: Record<string, string> = { ...Object.fromEntries(Object.entries(system.produccion?.superficies ?? {}).map(([id, s]) => [id, (s as { nombre: string }).nombre])), [EXPERIMENTAL]: 'Experimental' };
-  const surfaceIds = Object.keys(tokens);
-  // Modos de cada superficie (claro, oscuro…) y los selectores que los activan, según el último sync.
-  const modeSelectors = (id: string) => (id === EXPERIMENTAL ? experimental?.info.modos ?? null : report?.tokens?.[id]?.modos ?? null) as Record<string, string[]> | null;
-  const modes = Object.fromEntries(surfaceIds.map((id) => [id, tokenModes(tokens[id], modeSelectors(id))]));
-  const modeColumns = surfaceIds.flatMap((id) => (modes[id].length ? modes[id] : [null]).map((mode) => ({ id, mode })));
   const showPlatforms = PLATFORM_SECTIONS.includes(entry.section);
   // Solo se muestran las plataformas que existen; con una sola, no hay conmutador.
   const available = Object.entries(PLATFORMS).filter(([id]) => entry.platforms[id as keyof typeof entry.platforms].estado !== 'sin-iniciar' || id === platform);
@@ -86,15 +54,21 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   // En una ficha de un solo archivo, el cuerpo común es la versión web: solo falta si la web está sin iniciar.
   const hasPlatformBody = Boolean(current.body) || (platform === 'web' && current.estado !== 'sin-iniciar');
   const platformMd = showPlatforms && current.body ? prepareMarkdown(current.body, slug) : null;
-  const commonMd = entry.body.trim() ? prepareMarkdown(entry.body, slug) : null;
   const extra = (title: string): TocItem => ({ id: slug(title), title, depth: 2 });
-  const tokensHeading = entry.section !== 'tokens' && tokenRows.length > 0 ? extra('Tokens que usa') : null;
+  // La tabla va en el apartado `## Tokens` del cuerpo, debajo de su texto; sin él, en uno nuevo al final.
+  const tokenPart = entry.section === TOKEN_SECTION && tokenRows.length > 0 ? splitSection(entry.body, 'Tokens') : null;
+  const commonBody = tokenPart?.before ?? entry.body;
+  const commonMd = commonBody.trim() ? prepareMarkdown(commonBody, slug) : null;
+  const tableHeading = tokenPart ? extra('Tokens') : null;
+  const tableIntroMd = tokenPart?.section.trim() ? prepareMarkdown(tokenPart.section, slug) : null;
+  const afterMd = tokenPart?.after.trim() ? prepareMarkdown(tokenPart.after, slug) : null;
+  const tokensHeading = entry.section !== TOKEN_SECTION && tokenRows.length > 0 ? extra('Tokens que usa') : null;
   const productionHeading = sources.length > 0 ? extra('Enlace con producción') : null;
   const usesHeading = uses.length > 0 ? extra('Usa') : null;
   const relatedHeading = related.length > 0 ? extra('Relacionados') : null;
   const pieceLists = [{ heading: usesHeading, list: uses }, { heading: relatedHeading, list: related }].filter((g): g is { heading: TocItem; list: Entry[] } => g.heading !== null);
   const extras = [tokensHeading, productionHeading, usesHeading, relatedHeading].filter((t): t is TocItem => t !== null);
-  const toc = [...(platformMd?.toc ?? []), ...(commonMd?.toc ?? []), ...extras];
+  const toc = [...(platformMd?.toc ?? []), ...(commonMd?.toc ?? []), ...(tableHeading ? [tableHeading, ...(tableIntroMd?.toc ?? [])] : []), ...(afterMd?.toc ?? []), ...extras];
 
   const badgeLink = 'inline-flex items-center gap-1 transition-colors hover:text-foreground [&_svg]:size-3';
   const badges = (
@@ -139,42 +113,17 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
 
       {platformMd && <Markdown prepared={platformMd.parts} surfaces={surfaces} block={block} />}
 
-      {entry.section === 'tokens' && tokenRows.length > 0 && (
-        <div className="ds-prose">
-          <p className="text-sm text-muted-foreground">
-            {!withExperimental ? 'Valores leídos del código de producción en el último sync.' : surfaceIds.length > 1 ? 'Valores leídos del código de producción en el último sync. La columna Experimental sale de experimental/: todavía no está en producción.' : 'Valores de experimental/: todavía no están en producción.'} Cómo se usan, en su fundamento.
-            {surfaceIds.filter((id) => modes[id].length).map((id) => (
-              <span key={id}> {surfaceIds.length > 1 ? `${surfaceNames[id] ?? id}: ` : 'Un valor por modo: '}{modes[id].map((m) => `${modeLabel(m)}${modeSelectors(id)?.[m] ? ` (${modeSelectors(id)?.[m].join(', ')})` : ''}`).join(' · ')}.</span>
-            ))}
-          </p>
-          <div className="ds-table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Token</th>
-                  <th>Rol</th>
-                  {modeColumns.map(({ id, mode }) => <th key={`${id}:${mode}`}>{mode ? (surfaceIds.length > 1 ? `${surfaceNames[id] ?? id} · ${modeLabel(mode)}` : modeLabel(mode)) : surfaceNames[id] ?? id}</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {tokenRows.map((t) => {
-                  // Las variables de @theme que apuntan a otra (--color-x: var(--x)) dicen a cuál.
-                  const theme = surfaceIds.map((id) => report?.tokens?.[id]?.theme?.[t.nombre] as string | undefined).find(Boolean);
-                  return (
-                    <tr key={t.nombre}>
-                      <td><code>--{t.nombre}</code>{theme?.includes('var(') && <div className="mt-1 text-xs text-muted-foreground">@theme: {theme}</div>}</td>
-                      <td>{t.rol}</td>
-                      {surfaceIds.map((id) => <TokenCells key={id} values={tokens[id] ?? {}} name={t.nombre} modes={modes[id]} />)}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
       {commonMd && <div className={platformMd ? 'mt-12' : undefined}><Markdown prepared={commonMd.parts} surfaces={surfaces} block={block} /></div>}
+
+      {/* Cada envoltorio .ds-prose quita el margen a su primer hijo: el apartado lleva el suyo. */}
+      {tableHeading && (
+        <section className={commonMd ? 'mt-14' : undefined}>
+          <div className="ds-prose"><Heading id={tableHeading.id}>{tableHeading.title}</Heading></div>
+          {tableIntroMd && <div className="mt-5"><Markdown prepared={tableIntroMd.parts} surfaces={surfaces} /></div>}
+          <TokenTable system={system} rows={tokenRows} className="mt-5" />
+        </section>
+      )}
+      {afterMd && <div className="mt-14"><Markdown prepared={afterMd.parts} surfaces={surfaces} /></div>}
 
       <div className={cn('ds-prose', extras.length > 0 && 'mt-12')}>
         {tokensHeading && (
