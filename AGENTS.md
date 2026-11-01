@@ -10,13 +10,14 @@ El kit contiene la interfaz (con la estructura de ui.shadcn.com), el CLI `ds`, l
 
 | Ruta | Qué hay |
 | --- | --- |
-| `bin/ds.mjs` | CLI: `instalar`, `init` (también `--directorio`), `info`, `search`, `ver`, `dev`, `build`, `preset`, `sync`, `check`, `patrones`, `skills`, `doctor`, `feedback`, `version`, `enlazar`, `desenlazar`. |
+| `bin/ds.mjs` | CLI: `instalar`, `init` (también `--directorio`), `info`, `search`, `ver`, `dev`, `build`, `preset`, `sync`, `check`, `patrones`, `skills`, `doctor`, `migrar`, `feedback`, `version`, `enlazar`, `desenlazar`. |
 | `lib/core.mjs` | Lee sistemas y fichas. `DS_SISTEMAS` apunta a repos externos; sin ella, `systems/`. |
 | `lib/meta.mjs` | Secciones, estados, grupos y prompts de acción. |
 | `lib/lab.mjs` | Lab de primitivos: preset, tokens derivados y contraste. Lo comparten la página `/<sistema>/lab` y `ds preset`. |
 | `lib/css-tokens.mjs` | Lee tokens y modos del CSS; lo comparten el sync y la interfaz. |
 | `lib/hallazgos.mjs` | Lo que producción hace a mano (valores que ya son tokens, copias, tokens sin uso, hojas sin cargar). Lo usa el sync; lo lee la skill `recomendar-produccion`. |
 | `lib/patrones.mjs` | Agrupa clases de hojas y prefijos distintos con la misma forma (radio, sombra, fondo, borde, relleno y tokens), leídas de la instantánea de producción. Lo usa `ds patrones`. |
+| `lib/migrar.mjs` | Migraciones del contenido de un sistema entre versiones mayores (2.0: `content/tokens/` a sus fundamentos). Lo usa `ds migrar`. |
 | `lib/registry.mjs` | El registry: índice (`registry.json`) y un JSON por pieza (`r/`). Lo comparten `ds build` y el CLI. |
 | `lib/feedback.mjs` | Informe de `ds feedback`: campos fijos, anonimización y validación. Lo comparten el CLI y `api/feedback.mjs`. |
 | `api/` | Funciones del proyecto de Vercel del kit: `feedback.mjs` abre un issue con cada informe. No va en npm. |

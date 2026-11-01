@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import postcss from 'postcss';
-import { PLATFORM_SECTIONS, listSystems, loadEntries, loadLock, previewClasses } from '../lib/core.mjs';
+import { PLATFORM_SECTIONS, documentedTokens, legacyTokenFiles, listSystems, loadEntries, loadLock, previewClasses, tokenName } from '../lib/core.mjs';
 import { buildTokens, readModeTokens, readThemeTokens } from '../lib/css-tokens.mjs';
 import { codeTexts, findHallazgos } from '../lib/hallazgos.mjs';
 
@@ -223,6 +223,12 @@ for (const system of listSystems()) {
   // 3. Huellas por ficha: reglas CSS de sus clases, o el archivo completo si es un componente de código.
   const lock = loadLock(system);
   const entries = loadEntries(system);
+  // content/tokens/ ya no se lee (2.0): sus tokens contarían como sin documentar. check falla hasta que se migre.
+  const legacy = legacyTokenFiles(system);
+  if (legacy.length) {
+    log(`content/tokens/ ya no se lee (${legacy.length} ficha(s)): pasa sus tokens a su fundamento con npx ds migrar`);
+    if (CHECK) failed = true;
+  }
   // Si producción tiene cambios sin commit, la instantánea los incluye: se avisa para no confundirlo con main.
   // Sin trim: la primera línea de --porcelain puede empezar por espacio (« M ruta»).
   const sinCommit = src === repo ? execFileSync('git', ['-C', repo, 'status', '--porcelain'], { encoding: 'utf8' }).split('\n').filter(Boolean).map((line) => line.slice(3)) : [];
@@ -295,7 +301,7 @@ for (const system of listSystems()) {
     const invented = used.filter((name) => !allDefined.has(name) && !classPattern(name).test(expCss));
 
     // Los tokens se leen en vivo de producción: basta con comprobar que existen.
-    const tokenNamesUsed = (entry.data.tokens ?? []).map((t) => (typeof t === 'string' ? t : t.nombre));
+    const tokenNamesUsed = (entry.data.tokens ?? []).map(tokenName);
     const missingTokens = tokenNamesUsed.filter((name) => !Object.values(tokens).some((values) => name in values));
     if (tokenNamesUsed.length) fuentes.push({ clave: 'tokens', plataforma: 'web', superficie: 'tokens', fuente: 'tokens.produccion.json', clases: [], estado: missingTokens.length ? 'ausente' : 'ok', motivo: missingTokens.length ? `Tokens que no existen en producción: ${missingTokens.join(', ')}` : undefined });
 
@@ -337,7 +343,7 @@ for (const system of listSystems()) {
       report.cobertura[`componentes:${surfaceId}`] = { total: all.length, documentadas: all.filter((f) => declaredSources.has(f)).length, sinDocumentar: all.filter((f) => !declaredSources.has(f)) };
     }
   }
-  const tokenNames = new Set(entries.filter((e) => e.section === 'tokens').flatMap((e) => (e.data.tokens ?? []).map((t) => (typeof t === 'string' ? t : t.nombre))));
+  const tokenNames = new Set(entries.flatMap((e) => documentedTokens(e).map((t) => t.nombre)));
   for (const [surfaceId, values] of Object.entries(tokens)) {
     const names = Object.keys(values);
     // Una variable de @theme que solo apunta a otro token (--color-x: var(--x)) queda documentada con él.

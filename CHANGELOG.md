@@ -2,6 +2,30 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+Versión mayor: cambia dónde viven los tokens. Una ficha de `content/tokens/` deja de leerse hasta que se migra.
+
+- **Los tokens van en su fundamento.** Desaparece la sección Tokens, también de la barra lateral, la cabecera, `ds info` y el registry. Cada fundamento lista en `tokens` los que documenta, con `nombre` y `rol`. La ficha pinta su tabla (un valor por superficie y por modo, y la columna Experimental) en el apartado `## Tokens` del cuerpo, o en uno nuevo al final, y entra en «En esta página». En componentes, bloques y gráficos, `tokens` sigue siendo la lista de los que usan.
+- **`ds migrar [--aplicar] [--json]`**, nuevo. Sin `--aplicar`, enseña lo que haría.
+- **Registry y capa para agentes.** Sale el tipo `token` de `registry.json` → `tipos`. El JSON de un fundamento lleva `tokens` con `nombre`, `rol` y `produccion`, y su `.md` (también en `llms-full.txt`), una tabla «Tokens». Los tokens que usa una pieza apuntan en `usa` al fundamento. La cobertura de tokens del sync cuenta los que listan los fundamentos.
+- **Avisos.** Mientras exista `content/tokens/`, `ds doctor` y `ds check` fallan, y `ds dev`, `ds build` y `ds sync` avisan.
+
+### Migración desde la 1.x
+
+1. `npm install @imandresochoa/ds@2` y `npx ds skills`.
+2. `npx ds migrar` enseña el plan y `npx ds migrar --aplicar` lo escribe:
+   - Cada ficha de `content/tokens/<slug>.md` con un fundamento del mismo slug se junta con él. Su lista `tokens` pasa al fundamento y su texto, al apartado `## Tokens` del cuerpo. Manda el frontmatter del fundamento. Si los estados no coinciden, el comando avisa.
+   - Si no hay fundamento con ese slug, la ficha pasa a `content/fundamentos/<slug>.md` tal cual.
+   - Los ids `tokens/<slug>` de `relacionados`, `usa` y `produccion.lock.json` pasan a `fundamentos/<slug>`. La referencia de un fundamento a sí mismo se quita.
+   - Los enlaces a `/<id>/tokens/<slug>` en las fichas, las páginas de Docs y `DESIGN.md` pasan a `/<id>/fundamentos/<slug>#tokens`.
+   - La tabla de `AGENTS.md` deja de listar la sección `tokens`.
+3. Revisa los avisos: frases que todavía hablan de «la ficha de tokens» y estados que no coinciden.
+4. `npx ds doctor`, `npx ds sync` y `npx ds dev`. Abre cada fundamento y comprueba su apartado «Tokens».
+5. Las URLs publicadas `/<id>/tokens/<slug>`, `/<id>/r/tokens/<slug>.json` y `/<id>/tokens/<slug>.md` dejan de existir. Su contenido está en `/<id>/fundamentos/<slug>`. Cambia los enlaces que tengas fuera del sistema.
+
+Sin `ds migrar`, a mano: mueve la lista `tokens` de cada ficha de `content/tokens/` a la ficha del mismo slug en `content/fundamentos/` (o mueve el archivo si no la hay), lleva su texto a un apartado `## Tokens` y borra `content/tokens/`.
+
 ## 1.2.0 · 2026-10-31
 
 Una función nueva que sale del primer feedback real con `ds feedback`, y un arreglo del propio feedback. Migración: ninguna; `npm install @imandresochoa/ds@1.2.0`.

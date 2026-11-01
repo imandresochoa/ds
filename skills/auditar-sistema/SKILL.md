@@ -37,7 +37,7 @@ Cada ficha que toques: `actualizado` con la fecha de hoy. No inventes copy: usa 
 El check no ve lo visual. Con `npx ds dev`, abre las fichas que cambiaron y las de fundamentos:
 
 - Muestras de color del mismo tamaño, con el hex y el nombre que dice la tabla.
-- Con modos (claro y oscuro), las dos columnas de las fichas de tokens: un rol que en un modo no se distingue de su fondo es un hallazgo para diseño, no algo que se arregle en la ficha.
+- Con modos (claro y oscuro), las dos columnas de la tabla de tokens de cada fundamento: un rol que en un modo no se distingue de su fondo es un hallazgo para diseño, no algo que se arregle en la ficha.
 - Ejemplos en vivo que se parezcan a la web publicada (`produccion.web`). Compara con una captura de la página real.
 - Nada cortado, desbordado o vacío en móvil.
 

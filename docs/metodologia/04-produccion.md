@@ -8,7 +8,7 @@ El sistema vive en un repo distinto del producto. El enlace entre los dos lo hac
 ## Qué hace el sync
 
 1. **Instantánea.** Copia las hojas de estilo de cada superficie (y sus fuentes e imágenes) a `produccion/`. Los ejemplos en vivo cargan esa copia: lo que ves es el CSS de producción, no una recreación. Los `@import` locales y de paquetes npm se incrustan (los de paquete se leen del `node_modules` de la copia local de producción), porque el ejemplo no puede resolverlos.
-2. **Tokens.** Lee las propiedades personalizadas de `:root` y de cada modo (claro, oscuro…) y las variables de `@theme` de Tailwind 4, y las guarda en `tokens.produccion.json`. Las fichas de tokens muestran esos valores, un modo al lado del otro: nunca se escriben a mano. Ver «Modos y `@theme`».
+2. **Tokens.** Lee las propiedades personalizadas de `:root` y de cada modo (claro, oscuro…) y las variables de `@theme` de Tailwind 4, y las guarda en `tokens.produccion.json`. La tabla de tokens de cada fundamento muestra esos valores, un modo al lado del otro: nunca se escriben a mano. Ver «Modos y `@theme`».
 3. **Huellas.** Para cada ficha con fuentes, reúne las reglas CSS de sus clases (o el archivo entero si es un componente de código) y calcula una huella. La compara con la última revisada en `produccion.lock.json`.
 4. **Clases inventadas.** Comprueba que cada clase usada en los ejemplos existe en producción o en el CSS experimental. Y que los colores escritos en una ficha existen en producción: en sus hojas o en su código y sus datos (un SVG dibujado en un `.tsx`, una paleta en `src/data/`), sin contar tests ni Markdown.
 5. **Cobertura.** Lista lo que producción tiene y ninguna ficha documenta: los tokens y, por superficie, las clases o los componentes. Es la lista de tareas pendientes del sistema. Ver «Cobertura».
@@ -42,7 +42,7 @@ Las variables de `@theme` y `@theme inline` también son tokens: radios, sombras
 
 - **Clases**, en las superficies con CSS de clases propias: clases definidas en sus hojas que ninguna ficha declara en `clases`. Las que solo activan un modo (`.dark`) no cuentan.
 - **Componentes**, en las superficies Tailwind: allí las clases son utilidades y contarlas no dice nada. Se cuentan los archivos `.tsx`, `.jsx`, `.vue`, `.svelte` y `.astro` de `src/components/` (o de las carpetas de `componentes` en `system.json`), sin tests ni stories, que ninguna ficha declara como `fuente`.
-- **Tokens**, en todas: los de `tokens.produccion.json` que ninguna ficha de tokens nombra. Una variable de `@theme` que solo apunta a otro token (`--color-x: var(--x)`) cuenta como documentada si lo está su destino.
+- **Tokens**, en todas: los de `tokens.produccion.json` que ningún fundamento lista en `tokens`. Una variable de `@theme` que solo apunta a otro token (`--color-x: var(--x)`) cuenta como documentada si lo está su destino.
 
 `"cobertura": true` elige clases o componentes según la superficie; `"clases"` o `"componentes"` lo fuerzan.
 

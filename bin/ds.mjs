@@ -21,6 +21,8 @@
 //        (radio, sombra, fondo, borde, relleno y tokens), leídas de la instantánea de ds sync: piezas candidatas
 //   ds skills                 copia (o actualiza) las skills del kit en .claude/skills/ y .agents/skills/
 //   ds doctor                 comprueba la configuración del sistema
+//   ds migrar [--aplicar] [--json]   migra el contenido a esta versión del kit (2.0: content/tokens/ → su fundamento);
+//        sin --aplicar, solo enseña lo que haría
 //   ds feedback [--texto "<texto>" | --texto - | --archivo <ruta>] [--agente <id>] [--desde <origen>] [--stack a,b]
 //        [--ver | --enviar] [--json]   sugerencias anónimas para el kit: enseña el JSON exacto y solo lo envía con tu sí
 //   ds version                versión del kit instalada
@@ -624,8 +626,8 @@ const commands = {
     if (failing.length) console.log(`Aceptado por la persona: ${below(failing.length)}.`);
     if (previous.length) console.log(`Aviso: ${below(previous.length)} y ya estaba así antes del preset.`);
     console.log(system.produccion
-      ? 'Producción no cambia. Lleva el cambio a una iniciativa y anota en sus fichas de tokens los valores nuevos (estado exploracion).'
-      : 'Crea o actualiza las fichas de tokens en content/tokens/ (estado exploracion), con nombre y rol. Para verlo: npx ds dev.');
+      ? 'Producción no cambia. Lleva el cambio a una iniciativa y anota en los fundamentos de esos tokens los valores nuevos (estado exploracion).'
+      : 'Lista los tokens, con nombre y rol, en el fundamento de cada grupo en content/fundamentos/ (estado exploracion). Para verlo: npx ds dev.');
   },
   async sync() {
     requireSystem();
@@ -660,6 +662,21 @@ const commands = {
   async doctor() {
     requireSite();
     process.exit(await node(runtimeDir(), 'scripts/doctor.mjs'));
+  },
+  async migrar() {
+    requireSystem();
+    const { planTokensMigration } = await import('../lib/migrar.mjs');
+    const system = readJson(path.join(SITE, 'system.json'));
+    const plan = planTokensMigration(SITE, system.id ?? path.basename(SITE));
+    const aplicar = flag('--aplicar');
+    const escrito = aplicar ? plan.aplicar() : [];
+    if (JSON_OUT) return console.log(JSON.stringify({ aplicado: aplicar, fichas: plan.fichas, cambios: plan.cambios, avisos: plan.avisos, escrito }, null, 2));
+    if (!plan.fichas.length && !plan.cambios.length) return console.log('Nada que migrar: el contenido ya está al día con el kit ' + kitPkg.version + '.');
+    console.log(aplicar ? 'Migrado (2.0: los tokens van en su fundamento):' : 'Esto haría ds migrar --aplicar (2.0: los tokens van en su fundamento):');
+    for (const f of plan.fichas) console.log(`  ${f.origen} → ${f.destino} (${f.accion === 'juntar' ? 'se junta con el fundamento' : 'pasa a ser un fundamento'}, ${f.tokens} tokens)`);
+    for (const c of plan.cambios) console.log(`  ${c.archivo}: ${c.motivo}`);
+    for (const a of plan.avisos) console.log(`Aviso: ${a}`);
+    console.log(aplicar ? 'Revisa el diff, ejecuta npx ds sync y npx ds dev, y haz commit.' : 'Nada se ha escrito. Para aplicarlo: npx ds migrar --aplicar');
   },
   async feedback() {
     // Qué le habría venido bien a quien instala el kit y monta un sistema. Se anonimiza aquí, antes de enseñarlo.

@@ -14,8 +14,8 @@ La interfaz copia la estructura y el estilo de ui.shadcn.com: neutra, sin decora
   - **Barra lateral**: «Secciones» (Introducción y una entrada por sección), «Empezar» (las páginas propias de `content/docs/`, más Producción y Para agentes, que pone el kit), un grupo por sección con sus fichas y, si el sistema la activa, Metodología.
   - **Contenido**: título, descripción, insignias (estado, código, iniciativa), «Copiar página» en Markdown y anterior y siguiente.
   - **Derecha**: «En esta página» y la tarjeta «¿Trabajas con un agente?», que copia el contexto del sistema.
-- **Índice de sección** (`/<sistema>/componentes`, `/fundamentos`, `/tokens`). Como el índice de componentes de shadcn: «Nuevos» (creadas en los últimos 30 días, con punto azul) y «Todos», en rejilla alfabética. Fundamentos y Tokens se agrupan por `grupo`.
-- **Ficha.** Los ejemplos en vivo con su código debajo. Si el código pasa de ocho líneas, se pliega con «Ver código». Las pestañas Web, iOS y Android siguen el conmutador de base de shadcn y solo aparecen las plataformas que existen. Al final van «Tokens que usa», «Enlace con producción», «Usa» (las piezas que compone) y «Relacionados».
+- **Índice de sección** (`/<sistema>/componentes`, `/fundamentos`). Como el índice de componentes de shadcn: «Nuevos» (creadas en los últimos 30 días, con punto azul) y «Todos», en rejilla alfabética. Fundamentos se agrupa por `grupo`.
+- **Ficha.** Los ejemplos en vivo con su código debajo. Si el código pasa de ocho líneas, se pliega con «Ver código». Las pestañas Web, iOS y Android siguen el conmutador de base de shadcn y solo aparecen las plataformas que existen. Un fundamento lleva su tabla de tokens en el apartado «Tokens». Al final van «Tokens que usa», «Enlace con producción», «Usa» (las piezas que compone) y «Relacionados».
 - **Páginas anchas.** Bloques y Gráficos tienen la forma de Blocks y Charts: cabecera, navegación por categoría y galería.
   - Cada bloque va en un visor con Vista y Código, anchos de escritorio, tablet y móvil, y un botón que copia el prompt para que un agente lo use. Es el equivalente a `npx shadcn add`.
   - Los gráficos van en tarjetas, en rejilla.

@@ -8,7 +8,7 @@ Repo del sistema de diseño de NOMBRE_DEL_SISTEMA. Aquí solo vive el **contenid
 | --- | --- |
 | `system.json` | Configuración: id, nombre, repo de producción, superficies y plataformas. |
 | `DESIGN.md` | Criterio para agentes, escrito a mano. Se publica como `/<id>/design.md` con un apéndice generado. |
-| `content/<sección>/` | Fichas en Markdown con frontmatter YAML: `fundamentos`, `tokens`, `componentes`, `bloques`, `graficos`, `iniciativas`. Las páginas de Docs, en `content/docs/`. |
+| `content/<sección>/` | Fichas en Markdown con frontmatter YAML: `fundamentos` (con la lista de sus tokens), `componentes`, `bloques`, `graficos`, `iniciativas`. Las páginas de Docs, en `content/docs/`. |
 | `docs/INVENTARIO.md` | Plan de fichas por tandas: lo hecho, lo que falta y las dudas. Lo crea la skill `inventariar-produccion`. |
 | `experimental/` | CSS de piezas en exploración o desarrollo (aún no están en producción). |
 | `produccion/`, `tokens.produccion.json`, `sync-report.json` | Generados por `ds sync`. No se editan. |
@@ -35,6 +35,7 @@ npx ds check         # falla si hay fichas desajustadas, ausentes o con clases i
 npx ds patrones      # clases de hojas y prefijos distintos con la misma forma (piezas candidatas)
 npx ds build         # exporta el sitio estático a out/ (bajo publicacion.ruta, si la hay)
 npx ds doctor        # comprueba la configuración
+npx ds migrar        # tras una versión mayor del kit: enseña la migración (--aplicar la escribe)
 npx ds info --json   # sistema, secciones, producción, skills y rutas del kit
 npx ds search boton  # busca fichas antes de crear una
 npx ds ver boton     # una pieza en JSON: lo que usa, quién la usa y su sync
@@ -60,7 +61,7 @@ Si pone «sin programar», prográmala siguiendo el apartado «Rutina diaria» d
 ## Skills
 
 - `montar-sistema`: monta el sistema desde el repo, la web o Figma del producto, o desde cero (superficies, tokens, primeras fichas), y aplica los presets del Lab de primitivos.
-- `nueva-ficha`: documenta un componente, bloque, gráfico, fundamento, token, iniciativa o página de Docs.
+- `nueva-ficha`: documenta un componente, bloque, gráfico, fundamento (con sus tokens), iniciativa o página de Docs.
 - `auditar-sistema`: revisa que todo el sistema cuadre con producción y arregla lo que no. Antes de publicar y tras cada merge en producción.
 - `revisar-sync`: interpreta el informe de sync y propone qué actualizar o aceptar.
 - `inventariar-produccion`: lista priorizada de lo que falta documentar.

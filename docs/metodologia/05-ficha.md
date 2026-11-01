@@ -16,11 +16,11 @@ funcion: acciones             # componentes: acciones | navegacion | formularios
 nivel: atomo                  # componentes: atomo | molecula | organismo (regla de composición)
 categoria: seccion            # bloques: seccion | pantalla | flujo · gráficos: area | barras | lineas | circular | radar | radial | tooltip
 destacado: true               # opcional: su primer ejemplo sale en la home
-grupo: Base                   # tokens y fundamentos: agrupación en la barra lateral
+grupo: Base                   # fundamentos: agrupación en la barra lateral
 creado: 2026-10-11
 actualizado: 2026-10-11
 iniciativa: sistema-agentic-first   # opcional
-tokens: [ink, paper]          # tokens que usa (en fichas de tokens: lista con nombre y rol)
+tokens: [ink, paper]          # tokens que usa (en un fundamento: los que documenta, con nombre y rol)
 usa: [componentes/icono]      # piezas que compone: el grafo del registry (los tokens entran solos)
 relacionados: [componentes/enlace-de-texto]   # ver también: no es una dependencia
 plataformas:
@@ -62,16 +62,28 @@ Los títulos `## Reglas` y `## Antipatrones` pasan tal cual al JSON de la pieza 
 
 Las páginas que no son fichas (introducción, instalación, guías) van en `content/docs/`. `index.md` es la Introducción; sin él, la Introducción es `DESIGN.md` sin su título. El orden se fija en `content/docs/meta.json` con `{"paginas": ["instalacion", "..."]}`. `produccion` y `agentes` están reservados: esas páginas las pone el kit.
 
-## Fundamento y tokens: sin solaparse
+## Un fundamento y sus tokens
 
-- **El fundamento** explica cómo y cuándo se usa algo (reglas, antipatrones) y enlaza a sus tokens.
-- **La ficha de tokens** solo tiene la tabla: nombre, rol y valor de producción. Si un token está también en `experimental/` (por ejemplo, porque salió del Lab de primitivos), la tabla enseña ese valor en la columna «Experimental». Las reglas de uso no van ahí.
-- Se enlazan entre sí con `relacionados`.
+Un tema (color, tipografía, espaciado, movimiento) tiene una sola ficha, en Fundamentos, con el criterio y los valores juntos.
+
+- **El cuerpo** explica cómo y cuándo se usa (reglas, antipatrones), como cualquier fundamento.
+- **`tokens`** lista los que documenta, con su rol. El valor no se escribe: el kit pinta la tabla con el de producción en el último sync, uno por superficie y por modo. Si un token está también en `experimental/` (por ejemplo, porque salió del Lab de primitivos), la tabla enseña ese valor en la columna «Experimental».
+
+```yaml
+tokens:
+  - nombre: ink
+    rol: Lo que se lee primero (títulos, cuerpo).
+  - nombre: paper
+    rol: El suelo de la página.
+```
+
+- **La tabla** va en el apartado `## Tokens` del cuerpo, debajo de su texto (de dónde salen, qué superficies los usan). Sin ese apartado, el kit lo añade al final. Entra en «En esta página».
+- En las demás secciones, `tokens` sigue siendo la lista de los que usa la pieza, sin rol.
 
 ## `usa` y `relacionados`
 
-- **`usa`** dice qué piezas compone esta: los componentes de un bloque, o el icono dentro de un botón. Con ella, el registry arma el grafo (`usa` y `usadoPor`) y un agente sabe qué se ve afectado si cambia una pieza. Los `tokens` de la ficha entran solos en el grafo, a través de la ficha de tokens que los documenta.
-- **`relacionados`** es «ver también»: el fundamento de una ficha de tokens, o el sustituto de una pieza obsoleta. No es una dependencia.
+- **`usa`** dice qué piezas compone esta: los componentes de un bloque, o el icono dentro de un botón. Con ella, el registry arma el grafo (`usa` y `usadoPor`) y un agente sabe qué se ve afectado si cambia una pieza. Los `tokens` que usa una pieza entran solos en el grafo, a través del fundamento que los documenta.
+- **`relacionados`** es «ver también»: otro fundamento del mismo tema, o el sustituto de una pieza obsoleta. No es una dependencia.
 - Un id de `usa` que no existe se avisa en `ds build` y `ds dev`.
 
 ## Escribir para agentes
