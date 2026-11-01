@@ -4,7 +4,7 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 
 ## Hecho
 
-- [x] Interfaz con la estructura de ui.shadcn.com: cabecera, Docs a tres columnas, índice con «Nuevos», galerías de Bloques y Gráficos, ⌘K.
+- [x] Interfaz con la estructura de ui.shadcn.com: cabecera, Docs a tres columnas, índices de sección, galerías de Bloques y Gráficos, ⌘K.
 - [x] Secciones: Fundamentos, Tokens, Componentes, Bloques, Gráficos, Iniciativas y Metodología (interna); páginas de Docs por sistema en `content/docs/`.
 - [x] Estados por ficha y por plataforma; pestañas Web, iOS y Android cuando hay más de una.
 - [x] Sync con producción: instantánea de CSS, tokens, huellas, clases inventadas, cobertura y cambios sin commit.
@@ -18,6 +18,8 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 - [ ] Revisar contra ui.shadcn.com al lado y ajustar detalles finos.
 - [ ] Visor de bloques redimensionable arrastrando, como en shadcn.
 - [x] Inicio con un solo sistema: redirige al sistema.
+- [x] Índices con tarjetas en vivo y Bloques, Gráficos e Iniciativas con la barra lateral (2026-11-01).
+- [ ] Visor ancho en la ficha de un bloque: tras quitar la galería, `BlockViewer` no se usa en ninguna página.
 
 ## Instalación y publicación
 

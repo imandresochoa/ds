@@ -2,6 +2,11 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+- **Índices con los ejemplos en vivo.** El índice de cada sección es una rejilla de tarjetas: el primer ejemplo de la ficha, reducido y cargado al acercarse a la pantalla, con el nombre y el estado debajo. Las fichas sin ejemplo se ven con su resumen. Ya no se repiten «Nuevos» y «Todos»: «Nuevo» va en la tarjeta. Componentes va en orden alfabético; Bloques y Gráficos, por categoría; Iniciativas, «En curso» y «Publicadas».
+- **Bloques, Gráficos e Iniciativas con la barra lateral.** Dejan de ser páginas anchas: usan el layout de Docs, como el resto de secciones, y la misma tarjeta. El Lab sigue siendo ancho. Las URLs no cambian. Migración: ninguna.
+
 ## 1.2.0 · 2026-10-31
 
 Una función nueva que sale del primer feedback real con `ds feedback`, y un arreglo del propio feedback. Migración: ninguna; `npm install @imandresochoa/ds@1.2.0`.
