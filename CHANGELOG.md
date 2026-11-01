@@ -4,10 +4,31 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
 
 ## Sin publicar
 
+Versión mayor: cambia dónde viven los tokens. Una ficha de `content/tokens/` deja de leerse hasta que se migra.
+
+- **Los tokens van en su fundamento.** Desaparece la sección Tokens, también de la barra lateral, la cabecera, `ds info` y el registry. Cada fundamento lista en `tokens` los que documenta, con `nombre` y `rol`. La ficha pinta su tabla (un valor por superficie y por modo, y la columna Experimental) en el apartado `## Tokens` del cuerpo, o en uno nuevo al final, y entra en «En esta página». En componentes, bloques y gráficos, `tokens` sigue siendo la lista de los que usan.
+- **`ds migrar [--aplicar] [--json]`**, nuevo. Sin `--aplicar`, enseña lo que haría.
+- **Registry y capa para agentes.** Sale el tipo `token` de `registry.json` → `tipos`. El JSON de un fundamento lleva `tokens` con `nombre`, `rol` y `produccion`, y su `.md` (también en `llms-full.txt`), una tabla «Tokens». Los tokens que usa una pieza apuntan en `usa` al fundamento. La cobertura de tokens del sync cuenta los que listan los fundamentos.
+- **Avisos.** Mientras exista `content/tokens/`, `ds doctor` y `ds check` fallan, y `ds dev`, `ds build` y `ds sync` avisan.
 - **Una sola navegación, como la de Geist.** La cabecera ya no lleva enlaces (Inicio, Docs, Componentes…): se queda con la marca y el nombre del sistema, el selector de superficie, la búsqueda, el repo, el tema y «Nuevo». La barra lateral pierde el grupo «Secciones», que repetía la cabecera, y queda con grupos fijos: Empezar, una sección por grupo y Metodología. «Vista general» abre el índice de cada sección. Las fichas van por orden alfabético y sin subgrupos. Migración: ninguna.
 - **El punto de «Nuevo» vuelve a informar.** Sale en las fichas creadas en las dos últimas semanas, salvo las de la primera semana del sistema. Antes salía en todo lo creado en 30 días, así que un sistema recién montado lo llevaba en todas las fichas.
 - **Índices con los ejemplos en vivo.** El índice de cada sección es una rejilla de tarjetas: el primer ejemplo de la ficha, reducido y cargado al acercarse a la pantalla, con el nombre y el estado debajo. Las fichas sin ejemplo se ven con su resumen. Ya no se repiten «Nuevos» y «Todos»: «Nuevo» va en la tarjeta, con la misma regla que el punto de la barra lateral. Componentes va en orden alfabético; Bloques y Gráficos, por categoría; Iniciativas, «En curso» y «Publicadas».
 - **Bloques, Gráficos e Iniciativas con la barra lateral.** Dejan de ser páginas anchas: usan el layout de Docs, como el resto de secciones, y la misma tarjeta. El Lab sigue siendo ancho. Las URLs no cambian. Migración: ninguna.
+
+### Migración desde la 1.x
+
+1. `npm install @imandresochoa/ds@2` y `npx ds skills`.
+2. `npx ds migrar` enseña el plan y `npx ds migrar --aplicar` lo escribe:
+   - Cada ficha de `content/tokens/<slug>.md` con un fundamento del mismo slug se junta con él. Su lista `tokens` pasa al fundamento y su texto, al apartado `## Tokens` del cuerpo. Manda el frontmatter del fundamento. Si los estados no coinciden, el comando avisa.
+   - Si no hay fundamento con ese slug, la ficha pasa a `content/fundamentos/<slug>.md` tal cual.
+   - Los ids `tokens/<slug>` de `relacionados`, `usa` y `produccion.lock.json` pasan a `fundamentos/<slug>`. La referencia de un fundamento a sí mismo se quita.
+   - Los enlaces a `/<id>/tokens/<slug>` en las fichas, las páginas de Docs y `DESIGN.md` pasan a `/<id>/fundamentos/<slug>#tokens`.
+   - La tabla de `AGENTS.md` deja de listar la sección `tokens`.
+3. Revisa los avisos: frases que todavía hablan de «la ficha de tokens» y estados que no coinciden.
+4. `npx ds doctor`, `npx ds sync` y `npx ds dev`. Abre cada fundamento y comprueba su apartado «Tokens».
+5. Las URLs publicadas `/<id>/tokens/<slug>`, `/<id>/r/tokens/<slug>.json` y `/<id>/tokens/<slug>.md` dejan de existir. Su contenido está en `/<id>/fundamentos/<slug>`. Cambia los enlaces que tengas fuera del sistema.
+
+Sin `ds migrar`, a mano: mueve la lista `tokens` de cada ficha de `content/tokens/` a la ficha del mismo slug en `content/fundamentos/` (o mueve el archivo si no la hay), lleva su texto a un apartado `## Tokens` y borra `content/tokens/`.
 
 ## 1.2.0 · 2026-10-31
 

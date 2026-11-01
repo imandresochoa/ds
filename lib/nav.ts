@@ -90,7 +90,7 @@ const summary = (s: System): SystemSummary => ({
 
 /**
  * Superficies de una ficha: las que declaran sus plataformas (`plataformas.<p>.superficies[].id`) y las que pintan
- * sus ejemplos (`superficie=`). Sin ninguna, la ficha es común (tokens, principios, una pieza aún sin fuente).
+ * sus ejemplos (`superficie=`). Sin ninguna, la ficha es común (fundamentos, una pieza aún sin fuente).
  */
 export function entrySurfaces(entry: Entry): string[] {
   const declared = Object.values(entry.platforms).flatMap((p) => p.superficies.map((s) => s.id));

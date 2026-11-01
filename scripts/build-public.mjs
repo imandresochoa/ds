@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
-import { CONTENT_SECTIONS, FUNCIONES, KIT_PAGES, PLATFORM_SECTIONS, PLATFORMS, ROOT, STATUSES, SYNC_STATES, listSystems, loadDocs, loadPages, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
+import { CONTENT_SECTIONS, FUNCIONES, KIT_PAGES, PLATFORM_SECTIONS, PLATFORMS, ROOT, STATUSES, SYNC_STATES, documentedTokens, legacyTokenFiles, listSystems, loadDocs, loadExperimentalTokens, loadPages, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
 import { categoria, loadDirectoryIndex, loadRegistry } from '../lib/registry.mjs';
 
 const PUBLIC = path.join(ROOT, 'public');
@@ -33,11 +33,31 @@ const write = (rel, content) => {
 const copyDir = (from, to) => fs.existsSync(from) && fs.cpSync(from, path.join(PUBLIC, to), { recursive: true });
 const statusLabel = (s) => STATUSES[s]?.label ?? s;
 
-/** Una ficha completa en Markdown: frontmatter, cuerpo común y una sección por plataforma. */
-function entryMarkdown(system, entry, report) {
+/**
+ * Los tokens que documenta un fundamento, en una tabla: nombre, rol y un valor por superficie y modo del último sync,
+ * más la columna Experimental si alguno está en experimental/. null si la ficha no documenta tokens.
+ */
+function tokenTableMarkdown(system, entry, tokens, report) {
+  const rows = documentedTokens(entry);
+  if (!rows.length) return null;
+  const experimental = loadExperimentalTokens(system);
+  const surfaces = Object.entries(tokens).map(([id, values]) => ({ id, values, modos: report?.tokens?.[id]?.modos ?? null, nombre: system.produccion?.superficies?.[id]?.nombre ?? id }));
+  if (experimental && rows.some((t) => experimental.values[t.nombre] !== undefined)) surfaces.push({ id: 'experimental', values: experimental.values, modos: experimental.info.modos ?? null, nombre: 'Experimental' });
+  const columns = surfaces.flatMap((s) => {
+    const modes = tokenModes(s.values, s.modos);
+    return (modes.length ? modes : [undefined]).map((mode) => ({ ...s, mode, label: [surfaces.length > 1 || !mode ? s.nombre : null, mode ? modeLabel(mode) : null].filter(Boolean).join(' · ') }));
+  });
+  const head = `| Token | Rol |${columns.map((c) => ` ${c.label} |`).join('')}\n| --- | --- |${' --- |'.repeat(columns.length)}`;
+  const cell = (text) => String(text ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+  const body = rows.map((t) => `| \`--${t.nombre}\` | ${cell(t.rol)} |${columns.map((c) => { const v = tokenValue(c.values[t.nombre], c.mode); return ` ${v === undefined ? '—' : `\`${v}\``} |`; }).join('')}`);
+  return `# Tokens\n\n${head}\n${body.join('\n')}`;
+}
+
+/** Una ficha completa en Markdown: frontmatter, cuerpo común, sus tokens (en un fundamento) y una sección por plataforma. */
+function entryMarkdown(system, entry, report, tokens) {
   const sync = report?.entradas?.[entry.id];
   const front = { ...entry.data, id: entry.id, url: at(entry.href), sync: sync?.estado ?? null };
-  const parts = [`---\n${YAML.stringify(front).trim()}\n---`, `# ${entry.titulo}`, entry.resumen, md(entry.body.trim())];
+  const parts = [`---\n${YAML.stringify(front).trim()}\n---`, `# ${entry.titulo}`, entry.resumen, md(entry.body.trim()), tokenTableMarkdown(system, entry, tokens, report)];
   for (const [platform, info] of Object.entries(entry.platforms)) {
     if (info.body.trim()) parts.push(`# ${PLATFORMS[platform]}\n\n${md(info.body.trim())}`);
     else if (PLATFORM_SECTIONS.includes(entry.section)) parts.push(`# ${PLATFORMS[platform]}\n\nEstado: ${statusLabel(info.estado)}. Sin implementación documentada.`);
@@ -78,11 +98,14 @@ for (const system of listSystems()) {
   const { entries, index, piece, avisos } = loadRegistry(system, { at });
   const report = loadSyncReport(system);
   const tokens = index.tokens;
+  // content/tokens/ ya no se lee desde la 2.0: sus fichas no salen en el sitio hasta que se migran.
+  const legacy = legacyTokenFiles(system);
+  if (legacy.length) console.warn(`aviso ${system.id}: content/tokens/ ya no se lee (${legacy.join(', ')}). Pasa sus tokens a su fundamento con npx ds migrar.`);
 
   copyDir(path.join(system.dir, 'produccion'), `_ds/${system.id}/produccion`);
   copyDir(path.join(system.dir, 'experimental'), `_ds/${system.id}/experimental`);
 
-  for (const entry of entries) write(`${system.id}/${entry.section}/${entry.slug}.md`, entryMarkdown(system, entry, report));
+  for (const entry of entries) write(`${system.id}/${entry.section}/${entry.slug}.md`, entryMarkdown(system, entry, report, tokens));
   // Las páginas propias de Docs; las del kit (Producción, Para agentes) se generan en la interfaz.
   const pages = loadPages(system).filter((p) => !KIT_PAGES.some((k) => k.slug === p.slug));
   for (const page of pages) write(page.slug ? `${system.id}/docs/${page.slug}.md` : `${system.id}/docs.md`, `# ${page.titulo}\n\n${page.resumen}\n\n${md(page.body.trim())}\n`);
@@ -137,7 +160,7 @@ for (const system of listSystems()) {
     '',
   ].join('\n');
   write(`${system.id}/design.md`, `${handwritten}\n\n${generated}`);
-  write(`${system.id}/llms-full.txt`, entries.map((e) => entryMarkdown(system, e, report)).join('\n\n---\n\n'));
+  write(`${system.id}/llms-full.txt`, entries.map((e) => entryMarkdown(system, e, report, tokens)).join('\n\n---\n\n'));
 
   llms.push(`## ${system.nombre}`, '', `- [design.md](${at(`/${system.id}/design.md`)}): reglas, API de clases, tokens y estados`, `- [registry.json](${at(`/${system.id}/registry.json`)}): índice de piezas; cada una en \`${at(`/${system.id}/r/<sección>/<slug>.json`)}\` con su estado, lo que usa, sus fuentes y su sync`, `- [llms-full.txt](${at(`/${system.id}/llms-full.txt`)}): todas las fichas en un archivo`, '');
   llms.push('### Docs', '', ...pages.map((p) => `- [${p.titulo}](${at(`/${system.id}/${p.slug ? `docs/${p.slug}` : 'docs'}.md`)})${p.resumen ? `: ${p.resumen}` : ''}`), '');

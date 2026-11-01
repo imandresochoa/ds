@@ -33,7 +33,7 @@ function initiativeMeta(entry: Entry, entries: Entry[]) {
 /**
  * Índice de una sección, con la densidad de los índices de Geist y de shadcn: cabecera corta y una tarjeta por
  * ficha con su primer ejemplo en vivo. Componentes va en orden alfabético; las secciones que agrupan (categorías
- * de Bloques y Gráficos, grupos de Fundamentos y Tokens, estado de las Iniciativas) llevan un título por grupo.
+ * de Bloques y Gráficos, grupos de Fundamentos, estado de las Iniciativas) llevan un título por grupo.
  */
 export default async function SectionPage({ params }: { params: Promise<{ system: string; section: string }> }) {
   const { system: id, section: sectionId } = await params;

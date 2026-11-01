@@ -1,6 +1,6 @@
 ---
 name: nueva-ficha
-description: Crea o completa una ficha del sistema de diseño (componente, bloque, gráfico, fundamento, token o iniciativa) enlazada a producción. Úsala cuando pidan documentar una pieza, «añade el componente X» o «documenta esta sección».
+description: Crea o completa una ficha del sistema de diseño (componente, bloque, gráfico, fundamento con sus tokens, o iniciativa) enlazada a producción. Úsala cuando pidan documentar una pieza, «añade el componente X» o «documenta esta sección».
 ---
 
 # Crear una ficha
@@ -13,8 +13,7 @@ Lee primero la metodología del kit (ruta en `npx ds info --json` → `kit.metod
 
 | Qué es | Sección | Campos clave |
 | --- | --- | --- |
-| Criterio (cómo y cuándo) | `fundamentos` | `relacionados` a sus tokens |
-| Valores con nombre | `tokens` | `grupo`, `tokens: [{nombre, rol}]` |
+| Criterio y valores con nombre (color, tipografía, espaciado…) | `fundamentos` | `grupo`, `tokens: [{nombre, rol}]` con los que documenta; su tabla, en `## Tokens` |
 | Pieza reutilizable | `componentes` | `funcion` (acciones, navegacion, formularios, feedback, contenido, superposiciones), `nivel` (atomo, molecula, organismo), `usa` si compone otros |
 | Composición | `bloques` | `categoria` (seccion, pantalla, flujo), `usa` con los componentes que compone |
 | Presentación de datos | `graficos` | `categoria` (area, barras, lineas, circular, radar, radial, tooltip), `tokens` de color |
@@ -35,7 +34,7 @@ Archivo único `content/<sección>/<slug>.md`, o carpeta `<slug>/index.md` + `we
 
 Estado `exploracion`. Si necesita estilos, van en `experimental/<slug>.css`. Si forma parte de un proyecto mayor, añade `iniciativa: <slug>`.
 
-Si son tokens y la persona quiere elegir sus valores, que los ajuste en el Lab de primitivos (`/<id>/lab` con `npx ds dev`) y sigue el apartado «Aplicar un preset del Lab» de la skill `montar-sistema`. Si no, escríbelos en `experimental/tokens.css`. La ficha enseña los valores de `experimental/` en su columna «Experimental».
+Si son tokens (van en la lista `tokens` de su fundamento) y la persona quiere elegir sus valores, que los ajuste en el Lab de primitivos (`/<id>/lab` con `npx ds dev`) y sigue el apartado «Aplicar un preset del Lab» de la skill `montar-sistema`. Si no, escríbelos en `experimental/tokens.css`. La tabla del fundamento enseña los valores de `experimental/` en su columna «Experimental».
 
 ## 4. Contenido
 
