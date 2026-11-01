@@ -3,7 +3,7 @@ import { CodeBlock } from '@/components/CodeBlock';
 import { CopyPromptButton } from '@/components/CopyPromptButton';
 import { EntryGrid, type CardItem, type CardKind } from '@/components/docs/EntryCard';
 import { SECTIONS, loadEntries, loadSystem } from '@/lib/core.mjs';
-import { buildNav, surfacesAttr, type Entry, type NavItem } from '@/lib/nav';
+import { buildNav, sortGroups, surfacesAttr, type Entry, type NavItem } from '@/lib/nav';
 import { firstPreview } from '@/lib/previews';
 import { previewSurfaces } from '@/lib/surfaces';
 
@@ -46,10 +46,8 @@ export default async function SectionPage({ params }: { params: Promise<{ system
   const kind = KINDS[section.id] ?? 'componente';
   const prompt = section.accion.prompt.replaceAll('{sistema}', id);
 
-  // Las fichas en el orden de la barra lateral: por grupo y, dentro, por nombre.
+  // Las fichas de la barra lateral, por orden alfabético.
   const navItems = nav.groups.find((g) => g.id === section.id)?.items ?? [];
-  // Si todas las fichas son recientes (un sistema recién montado), el aviso de «Nuevo» no distingue ninguna.
-  const allNew = navItems.every((i) => i.nuevo);
   const card = (item: NavItem): CardItem => {
     const entry = entries.find((e) => e.href === item.href);
     const live = entry && kind !== 'texto' ? firstPreview(entry, surfaces) : null;
@@ -59,14 +57,15 @@ export default async function SectionPage({ params }: { params: Promise<{ system
       resumen: item.resumen,
       estado: item.estado,
       sync: item.sync,
-      nuevo: item.nuevo && !allNew,
+      nuevo: item.nuevo,
       superficies: item.superficies,
       preview: live ? { html: live.preview.html, surface: live.surface, background: live.preview.fondo ?? undefined, mode: live.preview.modo } : null,
       meta: entry && section.id === 'iniciativas' ? initiativeMeta(entry, entries) : undefined,
       sinEstado: section.id === 'metodologia',
     };
   };
-  const labels = [...new Set(navItems.map((i) => i.grupo ?? ''))];
+  // Los grupos, en el orden de `categorias` (la barra lateral no agrupa); dentro, por nombre.
+  const labels = sortGroups(section, [...new Set(navItems.map((i) => i.grupo ?? ''))].map((label) => ({ label }))).map((g) => g.label);
   const grouped = 'agrupar' in section && (labels.length > 1 || section.agrupar === 'estado');
   const groups = grouped ? labels.map((label) => ({ label, items: navItems.filter((i) => (i.grupo ?? '') === label) })) : [{ label: '', items: navItems }];
 
