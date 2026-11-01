@@ -1,4 +1,5 @@
-// Ejemplos en vivo de una ficha, para la home y las galerías (Bloques, Gráficos).
+// Ejemplos en vivo de una ficha, para la home y las tarjetas de los índices.
+import type { PreviewSurface } from '@/components/Preview';
 import { parseFence } from './core.mjs';
 import type { Entry } from './nav';
 
@@ -23,4 +24,11 @@ export function entryPreviews(entry: Entry): EntryPreview[] {
     }
   }
   return out;
+}
+
+/** Primer ejemplo de una ficha con la superficie que lo pinta (la suya o la primera), o null si no tiene. */
+export function firstPreview(entry: Entry, surfaces: Record<string, PreviewSurface>) {
+  const preview = entryPreviews(entry)[0];
+  const surface = preview && (surfaces[preview.superficie ?? ''] ?? Object.values(surfaces)[0]);
+  return preview && surface ? { preview, surface } : null;
 }

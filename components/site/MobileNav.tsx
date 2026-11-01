@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useSurface, useSurfaceGroups } from './SurfaceFilter';
 
-/** Menú a pantalla completa de ui.shadcn.com en móvil: navegación, secciones y fichas. */
+/** Menú a pantalla completa de ui.shadcn.com en móvil: el inicio, la superficie y los grupos de la barra lateral. */
 export function MobileNav({ nav, className }: { nav: Nav; className?: string }) {
   const [open, setOpen] = useState(false);
   const groups = useSurfaceGroups(nav);
@@ -41,10 +41,7 @@ export function MobileNav({ nav, className }: { nav: Nav; className?: string }) 
         sideOffset={14}
       >
         <div className="flex flex-col gap-12 overflow-auto px-6 py-6">
-          <div className="flex flex-col gap-4">
-            <div className="text-sm font-medium text-muted-foreground">Menú</div>
-            <div className="flex flex-col gap-3">{nav.top.map((item) => link(item.href, item.label))}</div>
-          </div>
+          <div className="flex flex-col gap-3">{link(`/${nav.system.id}`, 'Inicio')}</div>
           {surfaces.length > 1 && (
             <div className="flex flex-col gap-4">
               <div className="text-sm font-medium text-muted-foreground">Superficie</div>
@@ -57,15 +54,14 @@ export function MobileNav({ nav, className }: { nav: Nav; className?: string }) 
               </div>
             </div>
           )}
-          <div className="flex flex-col gap-4">
-            <div className="text-sm font-medium text-muted-foreground">Secciones</div>
-            <div className="flex flex-col gap-3">{nav.sections.filter((s) => !nav.top.some((t) => t.href === s.href)).map((item) => link(item.href, item.label))}</div>
-          </div>
           <div className="flex flex-col gap-8">
             {groups.map((g) => (
               <div key={g.id} className="flex flex-col gap-4">
                 <div className="text-sm font-medium text-muted-foreground">{g.label}</div>
-                <div className="flex flex-col gap-3">{g.items.map((item) => link(item.href, item.titulo, item.nuevo))}</div>
+                <div className="flex flex-col gap-3">
+                  {g.href && link(g.href, 'Vista general')}
+                  {g.items.map((item) => link(item.href, item.titulo, item.nuevo))}
+                </div>
               </div>
             ))}
           </div>

@@ -23,7 +23,7 @@ export type NavItem = {
   superficies: string[];
 };
 export type SurfaceSummary = { id: string; nombre: string };
-export type NavLink = { href: string; label: string };
+/** Un grupo de la barra lateral. `href`: el índice de la sección, que la barra abre con «Vista general». */
 export type NavGroup = { id: string; label: string; href: string | null; items: NavItem[] };
 export type SystemSummary = {
   id: string;
@@ -40,11 +40,7 @@ export type Nav = {
   systems: SystemSummary[];
   /** Superficies de producción. Con dos o más, la cabecera lleva el selector que filtra las fichas. */
   superficies: SurfaceSummary[];
-  /** Navegación de la cabecera. */
-  top: NavLink[];
-  /** Primer grupo de la barra lateral de Docs: las secciones. */
-  sections: NavLink[];
-  /** Un grupo por sección con sus páginas. */
+  /** La barra lateral: «Empezar» con las páginas de Docs y un grupo por sección con sus fichas. */
   groups: NavGroup[];
   /** Todas las páginas, en el orden de lectura (anterior/siguiente y ⌘K). */
   items: NavItem[];
@@ -62,9 +58,21 @@ type Section = (typeof SECTIONS)[number];
 
 export { KIT_PAGES };
 
-/** Una ficha creada en los últimos 30 días lleva el punto de «Nuevo». */
-const NEW_DAYS = 30;
-const isNew = (creado?: string | null) => Boolean(creado) && Date.now() - Date.parse(creado as string) < NEW_DAYS * 864e5;
+/**
+ * Una ficha lleva el punto de «Nuevo» si se creó en las dos últimas semanas, pero no en la primera semana del
+ * sistema: lo que entró al montarlo no es novedad, y marcarlo todo no informa de nada.
+ */
+const NEW_DAYS = 14;
+const LAUNCH_DAYS = 7;
+const DAY = 864e5;
+const newRule = (dates: (string | null | undefined)[]) => {
+  const times = dates.map((d) => (d ? Date.parse(d) : NaN)).filter((t) => !Number.isNaN(t));
+  const launch = times.length ? Math.min(...times) + LAUNCH_DAYS * DAY : Infinity;
+  return (creado?: string | null) => {
+    const t = creado ? Date.parse(creado) : NaN;
+    return t >= launch && Date.now() - t < NEW_DAYS * DAY;
+  };
+};
 
 /** Raíz del repo de código a partir de la URL base para ver archivos (`…/blob/main/`). */
 const repoUrl = (codigo?: string | null) => codigo?.match(/^(https:\/\/[^/]+\/[^/]+\/[^/]+)/)?.[1] ?? null;
@@ -82,7 +90,7 @@ const summary = (s: System): SystemSummary => ({
 
 /**
  * Superficies de una ficha: las que declaran sus plataformas (`plataformas.<p>.superficies[].id`) y las que pintan
- * sus ejemplos (`superficie=`). Sin ninguna, la ficha es común (tokens, principios, una pieza aún sin fuente).
+ * sus ejemplos (`superficie=`). Sin ninguna, la ficha es común (fundamentos, una pieza aún sin fuente).
  */
 export function entrySurfaces(entry: Entry): string[] {
   const declared = Object.values(entry.platforms).flatMap((p) => p.superficies.map((s) => s.id));
@@ -126,6 +134,7 @@ export function buildNav(systemId: string): Nav {
   // La metodología es documentación interna: solo la ven los sistemas que la activan.
   const docs = system.metodologia ? loadDocs() : [];
   const base = `/${system.id}`;
+  const isNew = newRule(entries.map((e) => e.data.creado));
 
   const toItem = (entry: Entry): NavItem => {
     const source = Object.values(entry.platforms).flatMap((p) => p.superficies)[0];
@@ -165,13 +174,12 @@ export function buildNav(systemId: string): Nav {
   ];
   const docItems = docs.map((d) => page(`${base}/metodologia/${d.slug}`, d.titulo, d.resumen, `/metodologia/${d.slug}.md`, 'metodologia'));
 
-  const groups: NavGroup[] = [];
-  // «Empezar»: las páginas propias del sistema, sin la Introducción, que ya está en «Secciones».
-  if (pageItems.length > 1) groups.push({ id: 'docs', label: 'Empezar', href: null, items: pageItems.slice(1) });
+  // Una sola barra, con grupos fijos: «Empezar» (la Introducción y las demás páginas de Docs) y una sección por
+  // grupo. Dentro, las fichas por orden alfabético y sin subgrupos: las categorías se ven en el índice de cada sección.
+  const groups: NavGroup[] = [{ id: 'docs', label: 'Empezar', href: null, items: pageItems }];
   for (const section of CONTENT_SECTIONS) {
     const list = entries.filter((e) => e.section === section.id).map(toItem);
-    const order = sortGroups(section, [...new Set(list.map((i) => i.grupo ?? ''))].map((label) => ({ label }))).map((g) => g.label);
-    list.sort((a, b) => order.indexOf(a.grupo ?? '') - order.indexOf(b.grupo ?? '') || a.titulo.localeCompare(b.titulo, 'es'));
+    list.sort((a, b) => a.titulo.localeCompare(b.titulo, 'es'));
     groups.push({ id: section.id, label: section.label, href: `${base}/${section.id}`, items: list });
   }
   if (docItems.length) groups.push({ id: 'metodologia', label: 'Metodología', href: `${base}/metodologia`, items: docItems });
@@ -181,17 +189,8 @@ export function buildNav(systemId: string): Nav {
     system: summary(system),
     systems: listSystems().map(summary),
     superficies: Object.entries((system.produccion?.superficies ?? {}) as Record<string, { nombre?: string }>).map(([sid, s]) => ({ id: sid, nombre: s?.nombre ?? sid })),
-    top: [
-      { href: base, label: 'Inicio' },
-      { href: `${base}/docs`, label: 'Docs' },
-      { href: `${base}/componentes`, label: 'Componentes' },
-      { href: `${base}/bloques`, label: 'Bloques' },
-      { href: `${base}/graficos`, label: 'Gráficos' },
-      { href: `${base}/iniciativas`, label: 'Iniciativas' },
-    ],
-    sections: [{ href: `${base}/docs`, label: 'Introducción' }, ...visible.map((s) => ({ href: `${base}/${s.id}`, label: s.label }))],
     groups,
-    items: [pageItems[0], ...groups.flatMap((g) => g.items)],
+    items: groups.flatMap((g) => g.items),
     acciones: [
       ...visible.map((s) => ({ label: s.accion.label, prompt: s.accion.prompt.replaceAll('{sistema}', system.id) })),
       { label: 'Pedir un cambio', prompt: CAMBIO_PROMPT.replaceAll('{sistema}', system.id) },
