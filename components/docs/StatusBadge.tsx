@@ -3,7 +3,6 @@
 import { PLATFORMS, STATUSES, SYNC_STATES } from '@/lib/meta.mjs';
 import type { NavItem } from '@/lib/nav';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
 type Toned = Pick<NavItem, 'estado' | 'sync'>;
@@ -35,7 +34,10 @@ export function StatusDot({ item, className }: { item: Toned; className?: string
 
 const label = (map: Record<string, { label: string }>, key: string | null) => (key ? map[key]?.label ?? key : null);
 
-/** Insignia de estado junto a la descripción. Al pasar el ratón, el detalle: estado, sync, plataformas y fuentes. */
+/**
+ * Estado de la ficha en la fila discreta bajo la descripción: punto y texto, sin píldora. Al pasar el ratón o con el
+ * foco, el detalle: estado, sync, plataformas y fuentes.
+ */
 export function StatusBadge({ item }: { item: Pick<NavItem, 'estado' | 'sync' | 'plataformas' | 'fuentes'> }) {
   const status = STATUSES[item.estado as keyof typeof STATUSES];
   const sync = item.sync ? SYNC_STATES[item.sync as keyof typeof SYNC_STATES] : null;
@@ -43,11 +45,11 @@ export function StatusBadge({ item }: { item: Pick<NavItem, 'estado' | 'sync' | 
   return (
     <HoverCard openDelay={100} closeDelay={100}>
       <HoverCardTrigger asChild>
-        <Badge variant="secondary" className="cursor-default rounded-full" tabIndex={0}>
+        <span className="inline-flex cursor-default items-center gap-1.5 rounded-sm text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50" tabIndex={0}>
           <StatusDot item={item} className="size-1.5" />
           {status?.label ?? item.estado}
           {sync && item.sync !== 'ok' && <span className="text-muted-foreground">· {sync.label}</span>}
-        </Badge>
+        </span>
       </HoverCardTrigger>
       <HoverCardContent align="start" className="w-80 text-sm">
         <dl className="grid gap-3">

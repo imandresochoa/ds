@@ -13,13 +13,14 @@ import { CopyButton } from './CodeBlock';
 import { Preview, PreviewModeToggle, previewModes, type PreviewSurface } from './Preview';
 
 /**
- * Visor de un bloque, como el de la página Blocks de shadcn: barra con Vista/Código, el título que lleva a la ficha,
- * los anchos de escritorio, tablet y móvil, y el botón que copia lo que necesita un agente para usarlo.
+ * Visor de un bloque, como el de la página Blocks de shadcn: barra con Vista/Código, los anchos de escritorio, tablet
+ * y móvil, el conmutador de modo y el botón que copia lo que necesita un agente para usarlo. Vive en la ficha del
+ * bloque, donde el título del ejemplo es el de su apartado; con `href`, la barra lleva además el título enlazado.
  */
 export function BlockViewer({ id, title, href, md, html, code, codeHtml, surface, background, vista, mode: initialMode }: {
-  id: string;
+  id?: string;
   title: string;
-  href: string;
+  href?: string;
   md: string;
   html: string;
   code: string;
@@ -36,7 +37,7 @@ export function BlockViewer({ id, title, href, md, html, code, codeHtml, surface
   const [mode, setMode] = useState(initialMode && modes.includes(initialMode) ? initialMode : modes[0]);
 
   return (
-    <div id={id} data-view={view} className="group/block-view-wrapper flex min-w-0 scroll-mt-24 flex-col-reverse items-stretch gap-4 overflow-hidden md:flex-col">
+    <div id={id} data-slot="block-viewer" data-view={view} className="group/block-view-wrapper flex min-w-0 scroll-mt-24 flex-col-reverse items-stretch gap-4 overflow-hidden md:flex-col">
       <div className="flex w-full items-center gap-2 pl-2 md:pr-6">
         <Tabs value={view} onValueChange={setView} className="hidden lg:flex">
           <TabsList className="h-7 items-center rounded-md p-0 px-[calc(--spacing(1)_-_2px)] py-(--spacing(1))">
@@ -45,7 +46,7 @@ export function BlockViewer({ id, title, href, md, html, code, codeHtml, surface
           </TabsList>
         </Tabs>
         <Separator orientation="vertical" className="mx-2 hidden h-4! lg:flex" />
-        <Link href={href} className="flex-1 text-center text-sm font-medium underline-offset-2 hover:underline md:flex-auto md:text-left">{title}</Link>
+        {href ? <Link href={href} className="flex-1 text-center text-sm font-medium underline-offset-2 hover:underline md:flex-auto md:text-left">{title}</Link> : <span className="flex-1" />}
         <div className="ml-auto flex items-center gap-2">
           <div className="hidden h-8 items-center gap-1.5 rounded-md border p-[2px] shadow-none lg:flex">
             <ToggleGroup type="single" value={width} onValueChange={(value) => value && setWidth(value)} className="gap-1 *:data-[slot=toggle-group-item]:size-6! *:data-[slot=toggle-group-item]:rounded-sm!">

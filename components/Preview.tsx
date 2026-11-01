@@ -157,14 +157,14 @@ export function applyMode(frame: HTMLIFrameElement, modos: Record<string, string
 /**
  * Ejemplo en vivo: un iframe que carga las hojas de estilo de producción (instantánea del último sync)
  * y pinta el HTML del ejemplo tal cual. Lo que se ve aquí es lo que hay en producción.
- * La altura se ajusta al contenido; `minHeight` fija un mínimo (las vistas previas de componente usan 18 rem).
+ * La altura se ajusta al contenido; `minHeight` fija un mínimo y `padding`, el margen alrededor del ejemplo (32 px por defecto).
  * `vista` fija el alto de la vista (lo que vale 100vh): `true` usa el de la superficie. Sin ella, el marco crece con
  * el contenido salvo que el contenido dependa del alto de la vista. `mode` es el modo de la superficie que se ve.
  */
-export function Preview({ html, surface, background, align = 'center', className, minHeight, vista, mode }: { html: string; surface: PreviewSurface; background?: string; align?: 'center' | 'start'; className?: string; minHeight?: number; vista?: number | boolean; mode?: string }) {
+export function Preview({ html, surface, background, align = 'center', className, minHeight, padding, vista, mode }: { html: string; surface: PreviewSurface; background?: string; align?: 'center' | 'start'; className?: string; minHeight?: number; padding?: number; vista?: number | boolean; mode?: string }) {
   const id = useId();
   const ref = useRef<Frame>(null);
-  const doc = useMemo(() => previewDocument({ html, surface, background, align, id }), [html, surface, background, align, id]);
+  const doc = useMemo(() => previewDocument({ html, surface, background, align, id, padding }), [html, surface, background, align, id, padding]);
   const height = typeof vista === 'number' ? vista : surface.altoVista ?? ALTO_VISTA;
   const fixed = vista !== undefined && vista !== false;
   const modos = surface.modos;

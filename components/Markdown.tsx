@@ -1,6 +1,7 @@
 import { codeToHtml } from 'shiki';
 import { createSlugger, prepareMarkdown, type MarkdownPart, type Slugger } from '@/lib/markdown';
 import { SITE_ROUTE } from '@/lib/site';
+import { BlockViewer } from './BlockViewer';
 import { CodeBlock } from './CodeBlock';
 import { ComponentPreview } from './ComponentPreview';
 import type { PreviewSurface } from './Preview';
@@ -23,11 +24,31 @@ export async function highlight(code: string, lang: string): Promise<string | nu
 // con ruta de publicación, se la ponen delante.
 const withRouteInHtml = (html: string) => (SITE_ROUTE ? html.replace(/(\s(?:href|src)=")\/(?!\/)/g, `$1${SITE_ROUTE}/`) : html);
 
-async function Part({ part, surfaces, index }: { part: MarkdownPart; surfaces?: Record<string, PreviewSurface>; index: number }) {
+/** En la ficha de un bloque, los ejemplos van en el visor ancho: necesita el título y el .md del bloque para su prompt. */
+type BlockInfo = { title: string; md: string };
+
+async function Part({ part, surfaces, block }: { part: MarkdownPart; surfaces?: Record<string, PreviewSurface>; block?: BlockInfo }) {
   if (part.type === 'html') return <div className="contents" dangerouslySetInnerHTML={{ __html: withRouteInHtml(part.html) }} />;
   const { lang, meta, code } = part;
   const surfaceId = typeof meta.superficie === 'string' ? meta.superficie : Object.keys(surfaces ?? {})[0];
   const surface = surfaceId ? surfaces?.[surfaceId] : undefined;
+  if (meta.preview && lang === 'html' && surface && block) {
+    return (
+      <div className="mt-4">
+        <BlockViewer
+          title={block.title}
+          md={block.md}
+          html={code}
+          code={code}
+          codeHtml={await highlight(code, 'html')}
+          surface={surface}
+          background={typeof meta.fondo === 'string' ? meta.fondo : undefined}
+          vista={fenceViewport(meta.vista)}
+          mode={typeof meta.modo === 'string' ? meta.modo : undefined}
+        />
+      </div>
+    );
+  }
   if (meta.preview && lang === 'html' && surface) {
     return (
       <ComponentPreview
@@ -40,7 +61,6 @@ async function Part({ part, surfaces, index }: { part: MarkdownPart; surfaces?: 
         mode={typeof meta.modo === 'string' ? meta.modo : undefined}
         code={code}
         codeHtml={await highlight(code, 'html')}
-        priority={index === 0}
       />
     );
   }
@@ -49,13 +69,14 @@ async function Part({ part, surfaces, index }: { part: MarkdownPart; surfaces?: 
 
 /**
  * Pinta Markdown con el estilo de las páginas de documentación. Los bloques ```html preview``` se convierten en un
- * ejemplo en vivo con su código debajo; el resto de bloques de código, en código resaltado con botón de copiar.
+ * ejemplo en vivo con su código plegado debajo (con `block`, en el visor ancho de bloques); el resto de bloques de
+ * código, en código resaltado con botón de copiar.
  */
-export async function Markdown({ source, surfaces, slug = createSlugger(), prepared }: { source?: string; surfaces?: Record<string, PreviewSurface>; slug?: Slugger; prepared?: MarkdownPart[] }) {
+export async function Markdown({ source, surfaces, slug = createSlugger(), prepared, block }: { source?: string; surfaces?: Record<string, PreviewSurface>; slug?: Slugger; prepared?: MarkdownPart[]; block?: BlockInfo }) {
   const parts = prepared ?? prepareMarkdown(source ?? '', slug).parts;
   return (
     <div className="ds-prose">
-      {parts.map((part, i) => <Part key={i} part={part} surfaces={surfaces} index={i} />)}
+      {parts.map((part, i) => <Part key={i} part={part} surfaces={surfaces} block={block} />)}
     </div>
   );
 }

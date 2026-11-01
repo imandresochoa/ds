@@ -7,6 +7,7 @@ import type { Entry, Nav, System } from '@/lib/nav';
 import { sitePath } from '@/lib/site';
 import { previewSurfaces } from '@/lib/surfaces';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import { CodeBlock } from './CodeBlock';
 import { DocsArticle } from './docs/DocsArticle';
 import { StatusBadge, StatusDot } from './docs/StatusBadge';
@@ -21,8 +22,9 @@ function Heading({ id, children }: { id: string; children: React.ReactNode }) {
 }
 
 /**
- * Ficha con la anatomía de una página de componente de shadcn: cabecera, insignias, conmutador de plataforma,
- * ejemplos en vivo con su código y, después, lo que el sistema añade (tokens, enlace con producción, relacionados).
+ * Ficha con el ritmo de una página de componente de Geist: cabecera corta (título, una línea, insignias discretas),
+ * conmutador de plataforma si hay más de una, ejemplos compactos con el código plegado y, al final, lo que añade el
+ * sistema (tokens, enlace con producción, usa y relacionados), en formato compacto para que no pese más que los ejemplos.
  * Un fundamento lleva además la tabla de los tokens que documenta, en su apartado «Tokens».
  */
 export function EntryPage({ system, entry, platform, nav }: { system: System; entry: Entry; platform: string; nav: Nav }) {
@@ -43,6 +45,8 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   const related = byIds(entry.data.relacionados as string[]).filter((r) => !uses.includes(r));
   const item = nav.items.find((i) => i.href === entry.href)!;
   const sources = ((sync?.fuentes ?? []) as Source[]).filter((f) => f.superficie !== 'tokens');
+  // Un bloque enseña sus ejemplos en el visor ancho (anchos de escritorio, tablet y móvil), no en la tarjeta compacta.
+  const block = entry.section === 'bloques' ? { title: entry.titulo, md: `${entry.href}.md` } : undefined;
   const startPrompt = `Implementa «${entry.titulo}» para ${PLATFORMS[platform as keyof typeof PLATFORMS]} en el sistema ${system.id}. Lee ${sitePath(entry.href)}.md y docs/metodologia/06-plataformas.md. Crea ${entry.file.replace(/index\.md$|\.md$/, '')}/${platform}.md con estado exploracion y no toques producción.`;
 
   // Un solo generador de ids para toda la página: los títulos repetidos («Reglas» en web.md y en index.md) no chocan.
@@ -63,26 +67,20 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   const usesHeading = uses.length > 0 ? extra('Usa') : null;
   const relatedHeading = related.length > 0 ? extra('Relacionados') : null;
   const pieceLists = [{ heading: usesHeading, list: uses }, { heading: relatedHeading, list: related }].filter((g): g is { heading: TocItem; list: Entry[] } => g.heading !== null);
-  const toc = [...(platformMd?.toc ?? []), ...(commonMd?.toc ?? []), ...(tableHeading ? [tableHeading, ...(tableIntroMd?.toc ?? [])] : []), ...(afterMd?.toc ?? []), ...[tokensHeading, productionHeading, usesHeading, relatedHeading].filter((t): t is TocItem => t !== null)];
+  const extras = [tokensHeading, productionHeading, usesHeading, relatedHeading].filter((t): t is TocItem => t !== null);
+  const toc = [...(platformMd?.toc ?? []), ...(commonMd?.toc ?? []), ...(tableHeading ? [tableHeading, ...(tableIntroMd?.toc ?? [])] : []), ...(afterMd?.toc ?? []), ...extras];
 
+  const badgeLink = 'inline-flex items-center gap-1 transition-colors hover:text-foreground [&_svg]:size-3';
   const badges = (
     <>
       <StatusBadge item={item} />
-      {item.fuente && (
-        <Badge asChild variant="secondary" className="rounded-full">
-          <a href={item.fuente} target="_blank" rel="noreferrer">Código <ArrowUpRightIcon /></a>
-        </Badge>
-      )}
-      {item.iniciativa && (
-        <Badge asChild variant="secondary" className="rounded-full">
-          <Link href={item.iniciativa.href}>Iniciativa: {item.iniciativa.titulo}</Link>
-        </Badge>
-      )}
+      {item.fuente && <a href={item.fuente} target="_blank" rel="noreferrer" className={badgeLink}>Código <ArrowUpRightIcon /></a>}
+      {item.iniciativa && <Link href={item.iniciativa.href} className={badgeLink}>Iniciativa: {item.iniciativa.titulo}</Link>}
     </>
   );
 
   return (
-    <DocsArticle nav={nav} href={entry.href} title={entry.titulo} description={entry.resumen} md={`${entry.href}.md`} badges={badges} toc={toc}>
+    <DocsArticle nav={nav} href={entry.href} title={entry.titulo} description={entry.resumen} md={`${entry.href}.md`} badges={badges} toc={toc} wide={Boolean(block)}>
       {showPlatforms && available.length > 1 && (
         <nav aria-label="Plataforma" className="mb-4 inline-flex w-full items-center gap-6">
           {available.map(([id, label]) => {
@@ -113,9 +111,9 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
         </div>
       )}
 
-      {platformMd && <Markdown prepared={platformMd.parts} surfaces={surfaces} />}
+      {platformMd && <Markdown prepared={platformMd.parts} surfaces={surfaces} block={block} />}
 
-      {commonMd && <div className={platformMd ? 'mt-12' : undefined}><Markdown prepared={commonMd.parts} surfaces={surfaces} /></div>}
+      {commonMd && <div className={platformMd ? 'mt-12' : undefined}><Markdown prepared={commonMd.parts} surfaces={surfaces} block={block} /></div>}
 
       {/* Cada envoltorio .ds-prose quita el margen a su primer hijo: el apartado lleva el suyo. */}
       {tableHeading && (
@@ -127,11 +125,11 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
       )}
       {afterMd && <div className="mt-14"><Markdown prepared={afterMd.parts} surfaces={surfaces} /></div>}
 
-      <div className="ds-prose">
+      <div className={cn('ds-prose', extras.length > 0 && 'mt-12')}>
         {tokensHeading && (
           <>
             <Heading id={tokensHeading.id}>{tokensHeading.title}</Heading>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-1.5">
               {tokenRows.map((t) => {
                 const id = surfaceIds.find((s) => tokens[s]?.[t.nombre] !== undefined);
                 const list = id ? (modes[id].length ? modes[id] : [undefined]).map((mode) => ({ mode, raw: tokenValue(tokens[id][t.nombre], mode), color: resolvedTokenValue(tokens[id], t.nombre, mode) })) : [];
@@ -150,60 +148,52 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
         {productionHeading && report && (
           <>
             <Heading id={productionHeading.id}>{productionHeading.title}</Heading>
-            <div className="ds-table-scroll">
-              <table>
-                <thead>
-                  <tr><th>Superficie</th><th>Fuente</th><th>Estado</th><th>Huella</th><th>Revisada en</th></tr>
-                </thead>
-                <tbody>
-                  {sources.map((f) => (
-                    <tr key={f.clave}>
-                      <td>{surfaceNames[f.superficie] ?? f.superficie}</td>
-                      <td>
-                        <a href={`${system.produccion?.codigo ?? ''}${f.fuente}`} target="_blank" rel="noreferrer" className="font-mono text-[0.8rem]">{f.fuente}</a>
-                        {f.clases.length > 0 && <div className="mt-1 font-mono text-xs text-muted-foreground">{f.clases.map((c) => `.${c}`).join('  ')}</div>}
-                        {f.motivo && <div className="mt-1 text-xs text-muted-foreground">{f.motivo}</div>}
-                      </td>
-                      <td>
-                        <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-                          <StatusDot item={{ estado: 'produccion', sync: f.estado }} className="size-1.5" />
-                          {SYNC_STATES[f.estado as keyof typeof SYNC_STATES]?.label ?? f.estado}
-                        </span>
-                      </td>
-                      <td className="font-mono text-[0.8rem]">{f.huella ?? '—'}</td>
-                      <td className="font-mono text-[0.8rem]">{f.commitRevisado ?? '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="text-sm text-muted-foreground">
+            <ul data-slot="production-sources" className="mt-3 divide-y border-y text-sm">
+              {sources.map((f) => (
+                <li key={f.clave} className="flex flex-col gap-0.5 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <StatusDot item={{ estado: 'produccion', sync: f.estado }} className="size-1.5" />
+                    <a href={`${system.produccion?.codigo ?? ''}${f.fuente}`} target="_blank" rel="noreferrer" className="min-w-0 truncate font-mono text-[0.8rem] hover:underline">{f.fuente}</a>
+                    <span className="ml-auto shrink-0 text-xs text-muted-foreground">
+                      {surfaceNames[f.superficie] ?? f.superficie} · {SYNC_STATES[f.estado as keyof typeof SYNC_STATES]?.label ?? f.estado}
+                    </span>
+                  </div>
+                  <div className="pl-3.5 font-mono text-xs leading-relaxed text-muted-foreground">
+                    {f.clases.length > 0 && <span className="mr-3">{f.clases.map((c) => `.${c}`).join('  ')}</span>}
+                    {f.huella && <span className="mr-3" title="Huella de la fuente en el último sync">huella {f.huella}</span>}
+                    {f.commitRevisado && <span title="Commit de producción en el que se revisó la ficha">revisada en {f.commitRevisado}</span>}
+                  </div>
+                  {f.motivo && <div className="pl-3.5 text-xs text-muted-foreground">{f.motivo}</div>}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-xs text-muted-foreground">
               Producción en el commit <code>{report.commit}</code> ({report.fechaCommit}). Sync del {report.generado.slice(0, 10)}.
               {report.sinCommit?.length > 0 && ' La instantánea incluye cambios de producción aún sin commit.'}
             </p>
-            {sync.avisos.map((a: string) => <p key={a} className="text-sm text-muted-foreground">Aviso: {a}</p>)}
+            {sync.avisos.map((a: string) => <p key={a} className="mt-1 text-xs text-muted-foreground">Aviso: {a}</p>)}
           </>
         )}
 
         {pieceLists.map(({ heading, list }) => (
           <Fragment key={heading.id}>
             <Heading id={heading.id}>{heading.title}</Heading>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {list.map((r) => (
-                <Link key={r.id} href={r.href} data-slot="card" className="flex flex-col gap-1 rounded-xl border p-4 text-sm transition-colors hover:bg-accent/50">
-                  <span className="text-xs text-muted-foreground">{SECTIONS.find((x) => x.id === r.section)?.label}</span>
-                  <span className="flex items-center gap-2 font-medium">
-                    {r.titulo}
+                <Link key={r.id} href={r.href} data-slot="card" title={r.resumen} className="flex min-w-0 flex-col rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-accent/50">
+                  <span className="flex items-center gap-2">
+                    <span className="truncate font-medium">{r.titulo}</span>
                     {r.estado !== 'produccion' && <StatusDot item={{ estado: r.estado, sync: null }} className="size-1.5" />}
+                    <span className="ml-auto shrink-0 text-xs text-muted-foreground">{SECTIONS.find((x) => x.id === r.section)?.label}</span>
                   </span>
-                  <span className="line-clamp-2 text-muted-foreground">{r.resumen}</span>
+                  <span className="truncate text-[0.8rem] text-muted-foreground">{r.resumen}</span>
                 </Link>
               ))}
             </div>
           </Fragment>
         ))}
 
-        <p className="mt-16 text-xs text-muted-foreground">
+        <p className="mt-12 text-xs text-muted-foreground">
           <code>{entry.id}</code>
           {entry.data.actualizado && <> · Actualizado el {entry.data.actualizado}</>}
         </p>
