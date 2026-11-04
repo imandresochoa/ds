@@ -9,6 +9,7 @@ export function AgentsPage({ system }: { system: System }) {
     { href: sitePath('/llms.txt'), title: 'llms.txt', text: 'Índice de todas las fichas en Markdown, de todos los sistemas.' },
     { href: sitePath(`/${system.id}/registry.json`), title: 'registry.json', text: 'Índice de piezas. Cada una tiene su JSON en r/ con lo que usa, sus fuentes y su sync.' },
     { href: sitePath(`/${system.id}/llms-full.txt`), title: 'llms-full.txt', text: 'Todas las fichas del sistema en un solo archivo.' },
+    { href: sitePath(`/${system.id}/agents.md`), title: 'agents.md', text: 'Bloque corto para el AGENTS.md del repo de producción: la regla, los enlaces y lo que está «En producción». Se lleva con un PR (npx ds contexto).' },
   ];
   return (
     <div className="ds-prose">

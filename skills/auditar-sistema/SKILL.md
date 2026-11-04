@@ -47,6 +47,8 @@ El check no ve lo visual. Con `npx ds dev`, abre las fichas que cambiaron y las 
 
 `hallazgos` lista lo que producción hace a mano (valores que ya son tokens, copias de tokens, hojas que no se cargan). Tampoco es un error del sistema. Si cambió desde la última auditoría, actualiza `docs/RECOMENDACIONES.md` con `recomendar-produccion`: quita lo que producción ya arregló y añade lo nuevo.
 
+`contexto` dice si el `AGENTS.md` (o `CLAUDE.md`) de producción lleva el bloque de `npx ds contexto` al día: `ok`, `desactualizado` o `sin-bloque`. Si no está en `ok`, genera el bloque y propónselo a la persona para que lo lleve con un PR. Tú no escribes en producción.
+
 ## 5. Cerrar
 
 1. `npx ds check` pasa.

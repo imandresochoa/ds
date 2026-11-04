@@ -17,6 +17,7 @@ import postcss from 'postcss';
 import { PLATFORM_SECTIONS, documentedTokens, legacyTokenFiles, listSystems, loadEntries, loadLock, previewClasses, tokenName } from '../lib/core.mjs';
 import { buildTokens, readModeTokens, readThemeTokens } from '../lib/css-tokens.mjs';
 import { codeTexts, findHallazgos } from '../lib/hallazgos.mjs';
+import { compareContexto, contextoBlock } from '../lib/contexto.mjs';
 
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
@@ -355,6 +356,11 @@ for (const system of listSystems()) {
     report.cobertura[`tokens:${surfaceId}`] = { total: names.length, documentadas: names.filter(isDocumented).length, sinDocumentar: names.filter((n) => !isDocumented(n)) };
   }
 
+  // Contexto para agentes: ¿el AGENTS.md (o CLAUDE.md) de producción lleva el bloque de ds contexto al día?
+  // Solo se lee; si falta o está atrás, se avisa. check no falla por esto.
+  const contextFiles = ['AGENTS.md', 'CLAUDE.md'].map((rel) => [rel, path.join(src, rel)]).filter(([, file]) => fs.existsSync(file)).map(([rel, file]) => [rel, fs.readFileSync(file, 'utf8')]);
+  report.contexto = compareContexto(system, contextFiles, contextoBlock(system));
+
   // 5. Hallazgos: lo que producción podría hacer mejor con su propio sistema (skill recomendar-produccion).
   // Son observaciones, no fallos: check no los mira.
   report.hallazgos = findHallazgos(src, prod.superficies, tokens, tokenInfo);
@@ -381,6 +387,8 @@ for (const system of listSystems()) {
     if (modes.length > 1) log(`modos de ${id}: ${modes.map(([mode, sels]) => `${mode} (${sels.join(', ')})`).join(' · ')}`);
   }
   for (const [id, c] of Object.entries(report.cobertura)) log(`cobertura ${id}: ${c.documentadas}/${c.total}`);
+  if (report.contexto.estado === 'sin-bloque') log('aviso: el AGENTS.md de producción no lleva el contexto del sistema. Genéralo con npx ds contexto y llévalo con un PR.');
+  if (report.contexto.estado === 'desactualizado') log(`aviso: el contexto del sistema en ${report.contexto.archivo} de producción está desactualizado. Regenéralo con npx ds contexto y llévalo con un PR.`);
   for (const [id, h] of Object.entries(report.hallazgos.superficies)) {
     const parts = [[h.valoresSueltos.length, 'valores sueltos'], [h.copiasDeTokens.length, 'copias de tokens'], [h.tokensSinUso.length, 'tokens sin uso']].filter(([n]) => n);
     if (parts.length) log(`hallazgos ${id}: ${parts.map(([n, what]) => `${n} ${what}`).join(' · ')}`);

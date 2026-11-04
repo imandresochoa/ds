@@ -44,6 +44,22 @@ En este orden, omitiendo lo que no aplique:
 
 Los títulos `## Reglas` y `## Antipatrones` pasan tal cual al JSON de la pieza (`reglas` y `antipatrones`): no los renombres. `## Rechaza estos reflejos`, el nombre anterior, se sigue leyendo como antipatrones.
 
+Un antipatrón puede llevar el error en código al lado de la forma buena: un bloque con `incorrecto` en su línea de apertura y, a continuación, otro con `correcto`. Pasan al JSON de la pieza como `pares` (`lenguaje`, `incorrecto`, `correcto`). Es lo que más ayuda a un agente: ve el error concreto que comete un modelo y qué escribir en su lugar. El bloque `correcto` puede llevar también `preview` para verse en vivo (y entonces el sync comprueba sus clases); el `incorrecto`, nunca.
+
+````md
+- **Dos principales juntos.** Si todo es importante, nada lo es.
+
+```html incorrecto
+<button class="boton boton--principal">Guardar</button>
+<button class="boton boton--principal">Publicar</button>
+```
+
+```html correcto
+<button class="boton boton--secundario">Guardar</button>
+<button class="boton boton--principal">Publicar</button>
+```
+````
+
 ## Cuerpo por plataforma (`web.md`)
 
 - Un apartado por superficie (Landing, Portal).

@@ -2,6 +2,15 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+- **`ds contexto`**, nuevo: imprime un bloque de 8 KB como mucho para el `AGENTS.md` (o `CLAUDE.md`) del repo de producción. Lleva la regla de consultar el sistema antes de escribir, los enlaces a `design.md`, las fichas y `llms.txt`, las piezas «En producción» con sus clases, los fundamentos con sus tokens y una lista de comprobación final. Lo lleva una persona con un PR. Con `--json`, el bloque y su huella. El sitio lo publica en `/<id>/agents.md`.
+- **`ds sync` mira el contexto de producción**, sin escribir: `sync-report.json` → `contexto` dice si el bloque está al día (`ok`), atrás (`desactualizado`) o no está (`sin-bloque`), y lo avisa. `check` no falla por esto.
+- **`publicacion.url`** en `system.json`, opcional: el dominio del sitio, para que los enlaces del bloque sean absolutos.
+- **Pares incorrecto/correcto.** En `## Antipatrones`, un bloque ` ```html incorrecto ` seguido de uno ` ```html correcto ` pasa al JSON de la pieza como `pares`, y en la ficha cada bloque lleva su etiqueta («Incorrecto», «Correcto»). Migración: ninguna; las fichas sin pares llevan `pares: []`.
+- **`nueva-ficha` termina con una lista de comprobación** (resumen, reglas observables, antipatrones con nombre y par, clases que existen, estado, «Pendiente», `ds check`). `auditar-sistema` revisa el contexto de producción.
+- **Descubrimiento.** `design.md` empieza su apéndice con los enlaces a `llms.txt`, al registry y a `agents.md`; `llms.txt` enlaza `agents.md`; la página «Para agentes» también. La metodología explica cómo servir Markdown por `Accept: text/markdown` desde el hosting (un sitio estático no puede hacerlo solo).
+
 ## 2.0.0 · 2026-11-01
 
 Versión mayor: cambia dónde viven los tokens. Una ficha de `content/tokens/` deja de leerse hasta que se migra con `npx ds migrar --aplicar` (ver «Migración desde la 1.x», abajo). Además, la interfaz se reordena con la navegación de Geist: una sola barra lateral, índices con los ejemplos en vivo y fichas más densas.

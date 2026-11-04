@@ -41,8 +41,19 @@ Si son tokens (van en la lista `tokens` de su fundamento) y la persona quiere el
 - Una frase de `resumen`: qué es y cuándo se usa.
 - Reglas **observables** (que se puedan comprobar mirando la interfaz).
 - `## Antipatrones`: los errores habituales, con nombre en negrita. `## Reglas` y `## Antipatrones` pasan tal cual al JSON de la pieza: no les cambies el título.
+- Si un antipatrón se ve en código, añade el par: un bloque ` ```html incorrecto ` y, detrás, uno ` ```html correcto ` (metodología, «Anatomía de una ficha»).
 - Lo que no sepas: «Pendiente».
 
 ## 5. Cierra
 
-Reinicia `npx ds dev` (las rutas son estáticas), revisa la página y ejecuta `npx ds check`.
+Reinicia `npx ds dev` (las rutas son estáticas) y revisa la página. La ficha está terminada cuando se cumple todo esto; si algo no, arréglalo o dilo:
+
+- [ ] `resumen` en una frase: qué es y cuándo se usa.
+- [ ] Cada regla es observable y dice cómo se comprueba.
+- [ ] Cada antipatrón tiene nombre en negrita; los que se ven en código, su par incorrecto/correcto.
+- [ ] Los ejemplos usan solo clases que existen en producción o en `experimental/`, y textos reales.
+- [ ] El `estado` cuadra: «produccion» solo con fuentes declaradas que existen.
+- [ ] Lo que no sabes pone «Pendiente».
+- [ ] `npx ds check` pasa.
+
+Si la ficha está «En producción», el bloque de contexto del repo de producción cambia: díselo a la persona (`npx ds contexto` lo regenera; se lleva con un PR).
