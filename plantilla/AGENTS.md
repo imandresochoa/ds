@@ -39,6 +39,7 @@ npx ds migrar        # tras una versión mayor del kit: enseña la migración (-
 npx ds info --json   # sistema, secciones, producción, skills y rutas del kit
 npx ds search boton  # busca fichas antes de crear una
 npx ds ver boton     # una pieza en JSON: lo que usa, quién la usa y su sync
+npx ds contexto      # bloque para el AGENTS.md de producción (se lleva con un PR; ds sync avisa si se queda atrás)
 npx ds preset ver "<enlace del Lab>"      # lee un preset del Lab de primitivos: valores y contraste
 npx ds preset aplicar "<enlace del Lab>"  # lo escribe en experimental/, nunca en producción
 npx ds preset resolver                    # el enlace para reabrir en el Lab lo que hay en experimental/

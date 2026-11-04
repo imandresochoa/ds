@@ -110,6 +110,31 @@ Cuándo hace falta la ruta:
 | Dentro de otro sitio, con rewrites, y ese sitio no usa `/_next`, `/_ds`, `/llms.txt`, `/directorio.json` ni `/<id>`. | Ninguna: se puede montar en la raíz. |
 | Dentro de otro sitio que también es Next (un prototipo, la web del producto). | Sí: su `/_next` choca con el del sistema. |
 
+### La URL del sitio
+
+Para que los enlaces de `npx ds contexto` y de `/<id>/agents.md` lleven dominio (el agente del repo de producción no sabe dónde está el sitio), declara la URL publicada:
+
+```json
+"publicacion": { "url": "https://ds.producto.com" }
+```
+
+Sin ella, los enlaces son rutas del sitio (`/<id>/design.md`). La ruta de publicación, si la hay, se añade igual que en el resto.
+
+### Markdown por negociación
+
+Algunas documentaciones (Vercel, Nuxt UI, Polaris) responden con Markdown cuando la petición lleva `Accept: text/markdown`, en la misma URL de la página. Un sitio estático no puede hacerlo por sí mismo: lo hace el hosting. Si el sistema se publica en Vercel, basta un rewrite en el `vercel.json` del despliegue:
+
+```json
+{
+  "rewrites": [
+    { "source": "/:path((?!.*\\.).*)", "has": [{ "type": "header", "key": "accept", "value": ".*text/markdown.*" }], "destination": "/:path.md" }
+  ],
+  "headers": [{ "source": "/:path*", "headers": [{ "key": "Vary", "value": "Accept" }] }]
+}
+```
+
+En otros hostings, la regla equivalente (Cloudflare tiene una opción que convierte el HTML a Markdown en el borde). No es imprescindible: cada página ya anuncia su `.md` con `<link rel="alternate" type="text/markdown">`, y `design.md`, `llms.txt` y el bloque de contexto enlazan las versiones Markdown.
+
 Con rewrites, la ruta es la misma en los dos lados: el sistema se exporta con `/ds` y el sitio que lo aloja lleva `/ds/:path*` al despliegue del sistema sin la ruta (`https://<despliegue del sistema>/:path*`). Cualquier control de acceso o `noindex` lo pone el sitio que lo aloja; el sistema no lo sabe.
 
 ## Decisiones escritas

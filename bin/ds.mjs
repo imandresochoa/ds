@@ -9,6 +9,8 @@
 //   ds info [--json]          sistema, secciones, producción, último sync, skills y rutas del kit
 //   ds search <texto> [--seccion <id>] [--limite 10] [--json]   busca fichas antes de crear una (con --json, como en registry.json)
 //   ds ver <pieza>            el JSON de una pieza, igual que /<sistema>/r/<sección>/<slug>.json (id o slug)
+//   ds contexto [--url <sitio>] [--json]   bloque corto para el AGENTS.md de producción: regla, enlaces y lo que está
+//        «En producción». Lo lleva una persona con un PR; ds sync avisa si la copia de producción se queda atrás
 //   ds dev [--port 4100]      servidor de desarrollo con el contenido de este repo
 //   ds build                  exporta el sitio estático a ./out (bajo publicacion.ruta o DS_RUTA, si la hay)
 //   ds preset ver <preset>    lee un preset del Lab (código, enlace o JSON): valores y contraste
@@ -476,6 +478,20 @@ const commands = {
     const { entry, candidatos } = core.findEntry(entries, query);
     if (!entry) fail(candidatos?.length ? `«${query}» es ambiguo: ${candidatos.join(', ')}` : `no hay ninguna pieza «${query}». Búscala con ds search.`);
     console.log(JSON.stringify(piece(entry), null, 2));
+  },
+  async contexto() {
+    requireSystem();
+    const core = await loadCore();
+    const { contextoBlock } = await import('../lib/contexto.mjs');
+    const [system] = core.listSystems();
+    const url = option('--url') ?? system.publicacion?.url;
+    const block = contextoBlock(system, { url, route: core.publicationRoute() });
+    if (JSON_OUT) return console.log(JSON.stringify({ sistema: system.id, huella: block.huella, bytes: block.bytes, compacto: block.compacto, piezas: block.piezas, url: url ?? null, bloque: block.texto }, null, 2));
+    process.stdout.write(block.texto);
+    // Las indicaciones van a stderr: `ds contexto > bloque.md` deja solo el bloque.
+    if (!url) console.error('\nAviso: sin publicacion.url en system.json (ni --url), los enlaces son rutas del sitio sin dominio.');
+    if (block.compacto) console.error(`Aviso: con clases y tokens pasaba de ${8192} bytes; va sin ellos (están en design.md).`);
+    console.error(`\n${block.bytes} bytes · huella ${block.huella}. Pégalo en el AGENTS.md (o CLAUDE.md) de producción con un PR: el kit no escribe en producción. Si ya está, sustituye el bloque entre las marcas ds:contexto.`);
   },
   async dev() {
     requireSite();

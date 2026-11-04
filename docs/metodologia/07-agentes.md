@@ -12,10 +12,20 @@ resumen: Qué lee un agente, en qué orden, y cómo se mejora la guía con evalu
 | `/<sistema>/registry.json` | Índice del registry: cada pieza con su tipo, estado, categorías y el enlace a su JSON. También los tokens de producción y sus modos. |
 | `/<sistema>/r/<sección>/<slug>.json` | Una pieza: estado por plataforma, lo que usa y quién la usa, fuentes, sync, reglas y antipatrones. |
 | `/<sistema>/llms-full.txt` | Todas las fichas en un solo archivo. |
+| `/<sistema>/agents.md` | El bloque de `npx ds contexto`, para el `AGENTS.md` del repo de producción. |
 | `/directorio.json` | Solo en un directorio: cada sistema con su cobertura y el enlace a su registry. |
 | `<ruta de la ficha>.md` | Cada página en Markdown, en la misma ruta. |
 
 En la interfaz, «Copiar página» copia cada página en Markdown y su menú (o ⌘K) tiene «Copiar contexto para agentes», un contexto listo para pegar. Desde la terminal, `npx ds info --json`, `npx ds search <texto> --json` y `npx ds ver <pieza>` dan lo mismo a un agente sin abrir la web ni hacer build: `search` devuelve piezas con la forma del índice y `ver`, el JSON de una pieza. `npx ds patrones --json` agrupa las clases de producción que comparten forma aunque tengan prefijos distintos. El Lab de primitivos pasa sus cambios con un enlace: `npx ds preset ver` lo lee y `npx ds preset aplicar` lo escribe en `experimental/`.
+
+## Contexto en el repo de producción
+
+Quien más necesita el sistema es el agente que construye interfaz en el repo de producción, y ese agente no lee este repo. Vercel midió que un índice corto siempre presente en `AGENTS.md` acierta más que una skill que el agente tiene que decidir cargar (100 % frente a 79 % en sus evaluaciones de Next.js). Por eso el sistema da ese índice:
+
+- `npx ds contexto` imprime un bloque de 8 KB como mucho: la regla de consultar el sistema antes de escribir, los enlaces a `design.md`, a las fichas `.md` y a `llms.txt`, las piezas «En producción» con sus clases, los fundamentos con sus tokens y una lista de comprobación final. Si con clases y tokens pasa de 8 KB, va sin ellos (siguen en `design.md`). Lo mismo se publica en `/<sistema>/agents.md`.
+- Lo lleva una persona al `AGENTS.md` (o `CLAUDE.md`) de producción con un PR. El kit no escribe en producción.
+- El bloque va entre marcas `<!-- ds:contexto <id> huella=… -->` y `<!-- /ds:contexto -->`. `ds sync` lee producción y anota en `sync-report.json` → `contexto` si está al día (`ok`), atrás (`desactualizado`) o no está (`sin-bloque`), y lo avisa. `check` no falla por esto. La huella solo cambia cuando cambian las piezas en producción, sus clases o sus tokens; no cuando cambian los valores.
+- Los enlaces llevan dominio si `system.json` declara `publicacion.url`.
 
 ## Orden de lectura para un agente
 

@@ -4,6 +4,7 @@
 //   /<sistema>/<sección>/<ficha>.md  cada ficha en Markdown (misma ruta que su página)
 //   /<sistema>/docs.md, /<sistema>/docs/<página>.md  las páginas de Docs del sistema (content/docs/)
 //   /<sistema>/design.md          guía para agentes: DESIGN.md escrito a mano + apéndice generado
+//   /<sistema>/agents.md          el bloque de ds contexto, para el AGENTS.md del repo de producción
 //   /<sistema>/registry.json      índice del registry: lo justo de cada pieza para elegirla
 //   /<sistema>/r/<sección>/<slug>.json  cada pieza: estado, grafo (usa), fuentes, sync, reglas y antipatrones
 //   /llms.txt                     índice para agentes de todos los sistemas
@@ -17,6 +18,7 @@ import path from 'node:path';
 import YAML from 'yaml';
 import { CONTENT_SECTIONS, FUNCIONES, KIT_PAGES, PLATFORM_SECTIONS, PLATFORMS, ROOT, STATUSES, SYNC_STATES, documentedTokens, legacyTokenFiles, listSystems, loadDocs, loadExperimentalTokens, loadPages, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
 import { categoria, loadDirectoryIndex, loadRegistry } from '../lib/registry.mjs';
+import { contextoBlock } from '../lib/contexto.mjs';
 
 const PUBLIC = path.join(ROOT, 'public');
 const ROUTE = process.argv.includes('--exportar') ? publicationRoute() : '';
@@ -140,6 +142,8 @@ for (const system of listSystems()) {
     '',
     '<!-- Todo lo que sigue se genera desde las fichas y el sync. No se edita a mano. -->',
     '',
+    `Cada página del sistema tiene su versión en Markdown (la misma ruta terminada en \`.md\`). Índice de todo: ${at('/llms.txt')}. Datos de cada pieza: ${at(`/${system.id}/registry.json`)}. Para el AGENTS.md del repo de producción: ${at(`/${system.id}/agents.md`)}.`,
+    '',
     '## Estados',
     '',
     ...Object.values(STATUSES).map((s) => `- **${s.label}:** ${s.descripcion}`),
@@ -160,9 +164,10 @@ for (const system of listSystems()) {
     '',
   ].join('\n');
   write(`${system.id}/design.md`, `${handwritten}\n\n${generated}`);
+  write(`${system.id}/agents.md`, contextoBlock(system, { route: ROUTE }).texto);
   write(`${system.id}/llms-full.txt`, entries.map((e) => entryMarkdown(system, e, report, tokens)).join('\n\n---\n\n'));
 
-  llms.push(`## ${system.nombre}`, '', `- [design.md](${at(`/${system.id}/design.md`)}): reglas, API de clases, tokens y estados`, `- [registry.json](${at(`/${system.id}/registry.json`)}): índice de piezas; cada una en \`${at(`/${system.id}/r/<sección>/<slug>.json`)}\` con su estado, lo que usa, sus fuentes y su sync`, `- [llms-full.txt](${at(`/${system.id}/llms-full.txt`)}): todas las fichas en un archivo`, '');
+  llms.push(`## ${system.nombre}`, '', `- [design.md](${at(`/${system.id}/design.md`)}): reglas, API de clases, tokens y estados`, `- [registry.json](${at(`/${system.id}/registry.json`)}): índice de piezas; cada una en \`${at(`/${system.id}/r/<sección>/<slug>.json`)}\` con su estado, lo que usa, sus fuentes y su sync`, `- [llms-full.txt](${at(`/${system.id}/llms-full.txt`)}): todas las fichas en un archivo`, `- [agents.md](${at(`/${system.id}/agents.md`)}): bloque para el AGENTS.md del repo de producción (lo mismo que \`npx ds contexto\`)`, '');
   llms.push('### Docs', '', ...pages.map((p) => `- [${p.titulo}](${at(`/${system.id}/${p.slug ? `docs/${p.slug}` : 'docs'}.md`)})${p.resumen ? `: ${p.resumen}` : ''}`), '');
   const line = (e) => `- [${e.titulo}](${at(e.href)}.md): ${statusLabel(e.estado)}. ${e.resumen}`;
   for (const section of CONTENT_SECTIONS) {

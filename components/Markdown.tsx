@@ -27,7 +27,22 @@ const withRouteInHtml = (html: string) => (SITE_ROUTE ? html.replace(/(\s(?:href
 /** En la ficha de un bloque, los ejemplos van en el visor ancho: necesita el título y el .md del bloque para su prompt. */
 type BlockInfo = { title: string; md: string };
 
-async function Part({ part, surfaces, block }: { part: MarkdownPart; surfaces?: Record<string, PreviewSurface>; block?: BlockInfo }) {
+type PartProps = { part: MarkdownPart; surfaces?: Record<string, PreviewSurface>; block?: BlockInfo };
+
+/** Los pares de un antipatrón (```html incorrecto / ```html correcto) llevan su etiqueta encima. */
+async function Part(props: PartProps) {
+  const { part } = props;
+  const verdict = part.type === 'code' ? (part.meta.incorrecto ? 'Incorrecto' : part.meta.correcto ? 'Correcto' : null) : null;
+  if (!verdict) return <PartContent {...props} />;
+  return (
+    <div data-slot="code-verdict" className="mt-4 [&>*:last-child]:mt-1.5">
+      <p className={verdict === 'Incorrecto' ? 'text-sm font-medium text-destructive' : 'text-sm font-medium text-muted-foreground'}>{verdict}</p>
+      <PartContent {...props} />
+    </div>
+  );
+}
+
+async function PartContent({ part, surfaces, block }: PartProps) {
   if (part.type === 'html') return <div className="contents" dangerouslySetInnerHTML={{ __html: withRouteInHtml(part.html) }} />;
   const { lang, meta, code } = part;
   const surfaceId = typeof meta.superficie === 'string' ? meta.superficie : Object.keys(surfaces ?? {})[0];

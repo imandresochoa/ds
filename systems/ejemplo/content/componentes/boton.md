@@ -30,3 +30,12 @@ Ficha de ejemplo del kit. Sustitúyela por un componente real de tu producto (ve
 ## Antipatrones
 
 - **Dos principales juntos.** Si todo es importante, nada lo es.
+
+```html incorrecto
+<button class="ejemplo-boton">Guardar</button>
+<button class="ejemplo-boton">Publicar</button>
+```
+
+```html correcto
+<button class="ejemplo-boton">Publicar</button>
+```
