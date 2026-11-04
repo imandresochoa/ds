@@ -12,10 +12,31 @@ resumen: Qué lee un agente, en qué orden, y cómo se mejora la guía con evalu
 | `/<sistema>/registry.json` | Índice del registry: cada pieza con su tipo, estado, categorías y el enlace a su JSON. También los tokens de producción y sus modos. |
 | `/<sistema>/r/<sección>/<slug>.json` | Una pieza: estado por plataforma, lo que usa y quién la usa, fuentes, sync, reglas y antipatrones. |
 | `/<sistema>/llms-full.txt` | Todas las fichas en un solo archivo. |
+| `/<sistema>/revisar.json` | Lo que necesita `ds revisar` para comprobar código de producción: tokens con sus valores, clases de producción y piezas con su estado. |
 | `/directorio.json` | Solo en un directorio: cada sistema con su cobertura y el enlace a su registry. |
 | `<ruta de la ficha>.md` | Cada página en Markdown, en la misma ruta. |
 
 En la interfaz, «Copiar página» copia cada página en Markdown y su menú (o ⌘K) tiene «Copiar contexto para agentes», un contexto listo para pegar. Desde la terminal, `npx ds info --json`, `npx ds search <texto> --json` y `npx ds ver <pieza>` dan lo mismo a un agente sin abrir la web ni hacer build: `search` devuelve piezas con la forma del índice y `ver`, el JSON de una pieza. `npx ds patrones --json` agrupa las clases de producción que comparten forma aunque tengan prefijos distintos. El Lab de primitivos pasa sus cambios con un enlace: `npx ds preset ver` lo lee y `npx ds preset aplicar` lo escribe en `experimental/`.
+
+## Comprobar el código: `ds revisar`
+
+Un agente que escribe interfaz en producción la comprueba antes de terminar, sin modelo: escribe, ejecuta `ds revisar`, corrige y repite. Es lo que hacen el linter de Salesforce, el `code_audit` de Carbon o el `lint_css` de Primer.
+
+| Regla | Nivel | Qué detecta |
+| --- | --- | --- |
+| `valor-suelto` | error | Un color o un valor compuesto (sombra, pila de fuentes) que ya es un token. |
+| `token-inexistente` | error | `var(--x)` que no es un token ni se declara en el repo. Propone el más parecido. |
+| `clase-inventada` | error | Una clase del bloque de una pieza documentada que no existe en producción (`.boton--xl`). |
+| `pieza-obsoleta` | error | Clases de una pieza «Obsoleto». |
+| `pieza-no-en-produccion` | aviso | Clases de una pieza en exploración o desarrollo. |
+| `color-fuera-de-paleta` | aviso | Un color que no es ningún token. |
+
+- **Contra qué compara.** Contra lo que sabe el sistema tras el último sync, no contra el CSS del repo: una variante que el agente define en su propio CSS sigue siendo una variante fuera del sistema. Las clases que no son de ninguna pieza documentada no se revisan.
+- **Qué revisa.** Por defecto, solo las líneas que el cambio añade respecto a `origin/<rama>` (lo commiteado, lo pendiente y los archivos nuevos): lo que ya había lo recogen los hallazgos y `recomendar-produccion`. Con `--todo`, todo el repo; con rutas, esos archivos enteros. Sin tests ni compilados.
+- **Desde dónde.** Desde el repo del sistema, `npx ds revisar` revisa su `produccion.repo`. Desde el repo de producción, sin instalar nada: `npx @imandresochoa/ds@<versión> revisar --sistema <url>/<id>/revisar.json` (o la ruta al repo del sistema). `design.md` lleva el comando con la versión fijada.
+- **Salida.** `archivo:línea`, nivel, regla, mensaje y el siguiente paso; `--json` con los mismos campos. Sale con 1 si hay errores; los avisos no fallan.
+- **Excepciones.** Un comentario `ds-revisar-ignorar` en la línea. Se acepta en la revisión del PR, no la decide el agente.
+- Solo lee: no corrige el código.
 
 ## Orden de lectura para un agente
 
