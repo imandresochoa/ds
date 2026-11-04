@@ -4,13 +4,21 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { CONTENT_SECTIONS, legacyTokenFiles, listSystems, loadEntries, normalizeRoute } from '../lib/core.mjs';
 
+// Con --json, stdout lleva solo el resultado: { ok, sistemas: [{ id, comprobaciones: [{ nivel, mensaje }] }] }.
+const JSON_OUT = process.argv.includes('--json');
+const out = (msg) => (JSON_OUT ? console.error : console.log)(msg);
+const result = { ok: true, sistemas: [] };
+let current = { id: null, comprobaciones: [] };
 let errors = 0;
-const ok = (msg) => console.log(`  ✓ ${msg}`);
-const warn = (msg) => console.log(`  ! ${msg}`);
-const bad = (msg) => (errors++, console.log(`  ✗ ${msg}`));
+const record = (nivel, mark) => (msg) => (current.comprobaciones.push({ nivel, mensaje: msg }), out(`  ${mark} ${msg}`));
+const ok = record('ok', '✓');
+const warn = record('aviso', '!');
+const bad = (msg) => (errors++, record('error', '✗')(msg));
 
 for (const system of listSystems()) {
-  console.log(`${system.nombre} (${system.id}) — ${system.dir}`);
+  current = { id: system.id, comprobaciones: [] };
+  result.sistemas.push(current);
+  out(`${system.nombre} (${system.id}) — ${system.dir}`);
   for (const key of ['id', 'nombre', 'descripcion', 'plataformas']) (system[key] ? ok : bad)(`system.json: ${key}`);
   if (/NOMBRE_DEL_SISTEMA|ID_DEL_SISTEMA/.test(JSON.stringify(system))) bad('system.json conserva textos de la plantilla');
   try {
@@ -46,10 +54,12 @@ for (const system of listSystems()) {
     const n = entries.filter((e) => e.section === section.id).length;
     (n ? ok : warn)(`${section.label}: ${n} fichas`);
   }
-  console.log('');
+  out('');
 }
 // DS_RUTA gana a publicacion.ruta en ds build.
 if (process.env.DS_RUTA !== undefined) {
+  current = { id: null, comprobaciones: [] };
+  result.sistemas.push(current);
   try {
     const ruta = normalizeRoute(process.env.DS_RUTA, 'DS_RUTA');
     ok(`DS_RUTA: ds build publica ${ruta ? `bajo ${ruta}` : 'en la raíz del dominio'}, sin mirar publicacion.ruta`);
@@ -57,6 +67,8 @@ if (process.env.DS_RUTA !== undefined) {
     bad(error.message);
   }
 }
+result.ok = errors === 0;
+if (JSON_OUT) console.log(JSON.stringify(result, null, 2));
 if (errors) {
   console.error(`${errors} problema(s).`);
   process.exit(1);

@@ -15,7 +15,16 @@ resumen: Qué lee un agente, en qué orden, y cómo se mejora la guía con evalu
 | `/directorio.json` | Solo en un directorio: cada sistema con su cobertura y el enlace a su registry. |
 | `<ruta de la ficha>.md` | Cada página en Markdown, en la misma ruta. |
 
-En la interfaz, «Copiar página» copia cada página en Markdown y su menú (o ⌘K) tiene «Copiar contexto para agentes», un contexto listo para pegar. Desde la terminal, `npx ds info --json`, `npx ds search <texto> --json` y `npx ds ver <pieza>` dan lo mismo a un agente sin abrir la web ni hacer build: `search` devuelve piezas con la forma del índice y `ver`, el JSON de una pieza. `npx ds patrones --json` agrupa las clases de producción que comparten forma aunque tengan prefijos distintos. El Lab de primitivos pasa sus cambios con un enlace: `npx ds preset ver` lo lee y `npx ds preset aplicar` lo escribe en `experimental/`.
+En la interfaz, «Copiar página» copia cada página en Markdown y su menú (o ⌘K) tiene «Copiar contexto para agentes», un contexto listo para pegar. Desde la terminal, `npx ds info --json`, `npx ds search <texto> --json` y `npx ds ver <pieza>` dan lo mismo a un agente sin abrir la web ni hacer build: `search` devuelve piezas con la forma del índice y `ver`, el JSON de una pieza (o un array, si se le pasan varias). `npx ds patrones --json` agrupa las clases de producción que comparten forma aunque tengan prefijos distintos. El Lab de primitivos pasa sus cambios con un enlace: `npx ds preset ver` lo lee y `npx ds preset aplicar` lo escribe en `experimental/`.
+
+## Salidas que guían el siguiente paso
+
+Como el CLI de Atlassian, cada salida le dice al agente qué hacer después, para que no tenga que releer la ayuda:
+
+- Cada resultado de `ds search` acaba con el comando que da su detalle (`→ npx ds ver componentes/boton`; en JSON, `siguiente`).
+- Sin resultados no se adivina: «¿Quisiste decir?» con hasta tres piezas parecidas.
+- `ds check --json`, `ds sync --json` y `ds doctor --json` devuelven lo que falla y, en `check` y `sync`, el siguiente paso de cada problema. Los mensajes van a stderr.
+- Códigos de salida: 0 bien, 1 error (de uso, de configuración o un `check` que falla), 2 pieza ambigua, 3 sin resultados.
 
 ## Orden de lectura para un agente
 
