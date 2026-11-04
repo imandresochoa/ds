@@ -20,6 +20,8 @@ import { codeTexts, findHallazgos } from '../lib/hallazgos.mjs';
 
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
+// Con --json, stdout lleva solo un resumen en JSON (lo que falla y cómo arreglarlo); los mensajes van a stderr.
+const JSON_OUT = args.includes('--json');
 const LOCAL = args.includes('--local');
 const acceptAt = args.indexOf('--accept');
 const ACCEPT = acceptAt >= 0 ? args[acceptAt + 1] ?? 'all' : null;
@@ -31,6 +33,8 @@ const hexes = (text) => [...new Set([...text.matchAll(/#([0-9a-fA-F]{8}|[0-9a-fA
 const classPattern = (name) => new RegExp(`\\.${name.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}(?![\\w-])`);
 
 let failed = false;
+// Para --json: por sistema, lo que hace fallar a check, con el siguiente paso.
+const results = [];
 
 /**
  * Resuelve un @import de paquete («tw-animate-css», «shadcn/tailwind.css», «@fontsource-variable/inter»)
@@ -116,10 +120,15 @@ for (const system of listSystems()) {
   const prod = system.produccion;
   if (!prod) continue;
   const repo = path.resolve(system.dir, prod.repo);
-  const log = (msg) => console.log(`[${system.id}] ${msg}`);
+  const log = (msg) => (JSON_OUT ? console.error : console.log)(`[${system.id}] ${msg}`);
+  const problemas = [];
+  const problema = (tipo, mensaje, siguiente, ficha) => problemas.push({ tipo, ...(ficha ? { ficha } : {}), mensaje, siguiente });
+  const result = { id: system.id, commit: null, fichas: {}, problemas };
+  results.push(result);
 
   if (!fs.existsSync(repo)) {
     log(`repo de producción no encontrado en ${repo}; se conserva la última instantánea`);
+    problema('repo', `Repo de producción no encontrado en ${repo}.`, 'Corrige produccion.repo en system.json y ejecuta npx ds doctor.');
     if (CHECK) failed = true;
     continue;
   }
@@ -128,6 +137,7 @@ for (const system of listSystems()) {
     git(repo, 'rev-parse', '--verify', '--quiet', 'HEAD');
   } catch {
     log(`el repo de producción aún no tiene commits; se conserva la última instantánea`);
+    problema('repo', 'El repo de producción aún no tiene commits.', 'Espera al primer commit de producción.');
     if (CHECK) failed = true;
     continue;
   }
@@ -155,7 +165,11 @@ for (const system of listSystems()) {
   }
   const commit = git(repo, 'rev-parse', '--short', ref);
   const commitDate = git(repo, 'log', '-1', '--format=%cs', ref);
-  if (ref === 'HEAD' && !LOCAL) failed = failed || CHECK;
+  result.commit = commit;
+  if (ref === 'HEAD' && !LOCAL) {
+    failed = failed || CHECK;
+    problema('rama', `No existe origin/${rama}: se leyó la copia local.`, 'Comprueba produccion.rama en system.json, o usa --local a propósito.');
+  }
   const snapshotDir = path.join(system.dir, 'produccion');
   fs.rmSync(snapshotDir, { recursive: true, force: true });
 
@@ -177,6 +191,7 @@ for (const system of listSystems()) {
         // La superficie apunta a una hoja que ya no existe: el sistema documenta una versión vieja.
         log(`falta ${rel}: revisa produccion.superficies.${surfaceId}.estilos en system.json`);
         estilosAusentes.push(rel);
+        problema('hoja', `Falta la hoja ${rel} de la superficie ${surfaceId}.`, `Revisa produccion.superficies.${surfaceId}.estilos en system.json.`);
         if (CHECK) failed = true;
         continue;
       }
@@ -227,6 +242,7 @@ for (const system of listSystems()) {
   const legacy = legacyTokenFiles(system);
   if (legacy.length) {
     log(`content/tokens/ ya no se lee (${legacy.length} ficha(s)): pasa sus tokens a su fundamento con npx ds migrar`);
+    problema('migracion', `content/tokens/ ya no se lee (${legacy.length} ficha(s)).`, 'npx ds migrar --aplicar');
     if (CHECK) failed = true;
   }
   // Si producción tiene cambios sin commit, la instantánea los incluye: se avisa para no confundirlo con main.
@@ -327,6 +343,15 @@ for (const system of listSystems()) {
     }
 
     report.entradas[entry.id] = { estado, fuentes, avisos, clasesInventadas: invented, coloresAusentes };
+    const fichaFile = entry.file;
+    if (estado === 'desajuste') problema('desajuste', 'Producción cambió desde la última revisión.', `Revisa el cambio, actualiza ${fichaFile} y ejecuta npx ds sync --accept ${entry.id}.`, entry.id);
+    if (estado === 'ausente') {
+      const ausentes = fuentes.filter((f) => f.estado === 'ausente');
+      const soloTokens = ausentes.every((f) => f.clave === 'tokens');
+      problema('ausente', ausentes.map((f) => f.motivo).join(' '), soloTokens ? `Quita de \`tokens\` en ${fichaFile} los que no existen, o deja la ficha fuera de «produccion» hasta que existan.` : `Corrige las fuentes de ${fichaFile} (plataformas.*.superficies).`, entry.id);
+    }
+    if (invented.length) problema('clases-inventadas', `Clases de los ejemplos que no existen: ${invented.join(', ')}`, `Usa en los ejemplos de ${fichaFile} clases de producción o de experimental/.`, entry.id);
+    if (coloresFallan) problema('colores', avisos.find((a) => /colores/i.test(a)), `Revisa los colores y el estado de ${fichaFile}.`, entry.id);
     if (CHECK && (['ausente', 'desajuste'].includes(estado) || invented.length || coloresFallan)) failed = true;
   }
 
@@ -363,6 +388,7 @@ for (const system of listSystems()) {
   fs.writeFileSync(path.join(system.dir, 'sync-report.json'), JSON.stringify(report, null, 2) + '\n');
 
   const counts = Object.values(report.entradas).reduce((acc, e) => ((acc[e.estado ?? 'sin-fuente'] = (acc[e.estado ?? 'sin-fuente'] ?? 0) + 1), acc), {});
+  result.fichas = counts;
   log(`producción ${ref} @ ${commit} (${commitDate}) · fichas: ${JSON.stringify(counts)}`);
   if (src === repo && !LOCAL) {
     let atras = 0;
@@ -388,6 +414,7 @@ for (const system of listSystems()) {
   if (report.hallazgos.hojasSinCargar.length) log(`hallazgos: ${report.hallazgos.hojasSinCargar.length} hojas que ninguna superficie carga`);
 }
 
+if (JSON_OUT) console.log(JSON.stringify({ ok: !failed, check: CHECK, sistemas: results }, null, 2));
 if (failed) {
   console.error('check:sync falló: hay hojas de producción que faltan o fichas desajustadas, ausentes, con clases inventadas o con colores que no cuadran.');
   process.exit(1);

@@ -31,14 +31,14 @@ Repo del sistema de diseño de NOMBRE_DEL_SISTEMA. Aquí solo vive el **contenid
 ```bash
 npx ds dev           # http://localhost:4100
 npx ds sync          # lee producción: instantánea CSS, tokens, huellas e informe
-npx ds check         # falla si hay fichas desajustadas, ausentes o con clases inventadas
+npx ds check         # falla si hay fichas desajustadas, ausentes o con clases inventadas (--json: qué falla y el siguiente paso)
 npx ds patrones      # clases de hojas y prefijos distintos con la misma forma (piezas candidatas)
 npx ds build         # exporta el sitio estático a out/ (bajo publicacion.ruta, si la hay)
 npx ds doctor        # comprueba la configuración
 npx ds migrar        # tras una versión mayor del kit: enseña la migración (--aplicar la escribe)
 npx ds info --json   # sistema, secciones, producción, skills y rutas del kit
-npx ds search boton  # busca fichas antes de crear una
-npx ds ver boton     # una pieza en JSON: lo que usa, quién la usa y su sync
+npx ds search boton  # busca fichas antes de crear una; cada resultado acaba con el comando siguiente
+npx ds ver boton     # una pieza en JSON: lo que usa, quién la usa y su sync (varias: ds ver boton icono)
 npx ds preset ver "<enlace del Lab>"      # lee un preset del Lab de primitivos: valores y contraste
 npx ds preset aplicar "<enlace del Lab>"  # lo escribe en experimental/, nunca en producción
 npx ds preset resolver                    # el enlace para reabrir en el Lab lo que hay en experimental/
@@ -47,6 +47,8 @@ npx ds feedback --texto "<sugerencias>"   # sugerencias anónimas para el kit: e
 ```
 
 Al crear una ficha nueva, reinicia `ds dev`: las rutas son estáticas.
+
+Códigos de salida: 0 bien, 1 error, 2 pieza ambigua (usa el id completo), 3 sin resultados (mira las sugerencias de «¿Quisiste decir?»). No adivines una pieza que el CLI no encuentra.
 
 Antes de terminar una tarea: `npx ds sync` y `npx ds check`.
 

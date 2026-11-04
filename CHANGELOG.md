@@ -2,6 +2,14 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+- **El CLI guía al agente.** Cada resultado de `ds search` acaba con el comando siguiente (`→ npx ds ver <id>`; en JSON, el campo `siguiente`). Sin resultados, propone hasta tres piezas parecidas («¿Quisiste decir?»), igual que `ds ver` con una pieza que no existe.
+- **Códigos de salida:** 0 bien, 1 error, 2 pieza ambigua, 3 sin resultados. Migración: `ds search` sin resultados salía con 0 y ahora sale con 3 (con `--json` sigue escribiendo `[]`). Si un script lo trataba como éxito, mira el código.
+- **`ds ver a b c`** acepta varias piezas y devuelve un array. Con una sola, el JSON no cambia.
+- **`--json` en `ds check`, `ds sync` y `ds doctor`.** `check` y `sync` devuelven por sistema lo que falla, la ficha y el siguiente paso; `doctor`, cada comprobación con su nivel. Los mensajes van a stderr.
+- **`ds check` acepta `--local`,** como `ds sync`. Antes lo ignoraba.
+
 ## 2.0.0 · 2026-11-01
 
 Versión mayor: cambia dónde viven los tokens. Una ficha de `content/tokens/` deja de leerse hasta que se migra con `npx ds migrar --aplicar` (ver «Migración desde la 1.x», abajo). Además, la interfaz se reordena con la navegación de Geist: una sola barra lateral, índices con los ejemplos en vivo y fichas más densas.

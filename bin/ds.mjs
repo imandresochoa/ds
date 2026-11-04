@@ -7,20 +7,21 @@
 //        [--carpeta <ruta>] [--desde repo|web|figma|cero] [--produccion <ruta>] [--url <url>] [--kit <paquete>] [--json]
 //   ds init --directorio ["<Nombre>"] [--carpeta <ruta>] [--sistemas <ruta>,<ruta>]   crea un repo de directorio
 //   ds info [--json]          sistema, secciones, producción, último sync, skills y rutas del kit
-//   ds search <texto> [--seccion <id>] [--limite 10] [--json]   busca fichas antes de crear una (con --json, como en registry.json)
-//   ds ver <pieza>            el JSON de una pieza, igual que /<sistema>/r/<sección>/<slug>.json (id o slug)
+//   ds search <texto> [--seccion <id>] [--limite 10] [--json]   busca fichas antes de crear una (con --json, como en registry.json,
+//        más `archivo` y `siguiente`); sin resultados, propone piezas parecidas y sale con 3
+//   ds ver <pieza> [<pieza>…]  el JSON de una pieza, igual que /<sistema>/r/<sección>/<slug>.json (id o slug); con varias, un array
 //   ds dev [--port 4100]      servidor de desarrollo con el contenido de este repo
 //   ds build                  exporta el sitio estático a ./out (bajo publicacion.ruta o DS_RUTA, si la hay)
 //   ds preset ver <preset>    lee un preset del Lab (código, enlace o JSON): valores y contraste
 //   ds preset aplicar <preset> [--solo color,texto,espaciado,radios,sombras,movimiento] [--archivo tokens.css]
 //        [--sobrescribir] [--aceptar-contraste]   escribe el preset en experimental/, nunca en producción
 //   ds preset resolver        el preset de experimental/tokens.css y el enlace para abrirlo en el Lab (--port si ds dev usa otro)
-//   ds sync [--accept <id>]   lee producción: instantánea CSS, tokens, huellas e informe
-//   ds check                  falla si algo está desajustado, ausente o inventado
+//   ds sync [--accept <id>] [--json]   lee producción: instantánea CSS, tokens, huellas e informe
+//   ds check [--json]         falla si algo está desajustado, ausente o inventado (con --json, qué falla y el siguiente paso)
 //   ds patrones [--min-hojas 2] [--min-rasgos 1] [--limite 20] [--todos] [--json]   clases de hojas y prefijos distintos con la misma forma
 //        (radio, sombra, fondo, borde, relleno y tokens), leídas de la instantánea de ds sync: piezas candidatas
 //   ds skills                 copia (o actualiza) las skills del kit en .claude/skills/ y .agents/skills/
-//   ds doctor                 comprueba la configuración del sistema
+//   ds doctor [--json]        comprueba la configuración del sistema
 //   ds migrar [--aplicar] [--json]   migra el contenido a esta versión del kit (2.0: content/tokens/ → su fundamento);
 //        sin --aplicar, solo enseña lo que haría
 //   ds feedback [--texto "<texto>" | --texto - | --archivo <ruta>] [--agente <id>] [--desde <origen>] [--stack a,b]
@@ -28,6 +29,8 @@
 //   ds version                versión del kit instalada
 //   ds enlazar <ruta-al-kit>  usa un checkout local del kit (para pulir la interfaz con datos reales)
 //   ds desenlazar             vuelve a la versión del kit fijada en package.json
+//
+// Códigos de salida: 0 bien, 1 error (uso, configuración o check que falla), 2 pieza ambigua, 3 sin resultados.
 //
 // El motor (Next + scripts) vive en el kit. Si el kit está instalado dentro de node_modules,
 // se copia a .ds/kit para ejecutarlo; si está enlazado (npm link), se ejecuta en su sitio y
@@ -68,10 +71,46 @@ const JSON_OUT = flag('--json');
 // Con --json, la salida estándar es solo el JSON: los mensajes van a stderr.
 const log = (...msg) => (JSON_OUT ? console.error : console.log)(...msg);
 
-const fail = (msg) => {
+// Códigos de salida, para que un agente sepa qué hacer sin leer el texto.
+const EXIT = { ok: 0, error: 1, ambiguo: 2, sinResultados: 3 };
+const fail = (msg, code = EXIT.error) => {
   console.error(`ds: ${msg}`);
-  process.exit(1);
+  process.exit(code);
 };
+const normText = (text = '') => String(text).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+function distance(a, b) {
+  const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0];
+    row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const next = row[j];
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = next;
+    }
+  }
+  return row[b.length];
+}
+/**
+ * «¿Quisiste decir?»: hasta tres piezas parecidas a `query`. Primero las que se escriben casi igual (id, slug o
+ * título con una o dos letras de diferencia); después, las que contienen alguna de las palabras buscadas.
+ */
+function suggestEntries(entries, query, max = 3) {
+  const q = normText(query).trim();
+  const words = q.split(/[\s/]+/).filter((w) => w.length > 1);
+  const scored = entries.map((e) => {
+    const names = [e.id, e.slug, e.titulo].map(normText);
+    const close = Math.min(...names.map((n) => distance(q, n)), ...words.flatMap((w) => normText(e.titulo).split(/\s+/).concat(e.slug).map((n) => distance(w, n))));
+    const partial = words.filter((w) => names.some((n) => n.includes(w)) || normText(e.resumen).includes(w)).length;
+    return { id: e.id, close, partial };
+  });
+  const limit = Math.max(2, Math.floor(q.length * 0.4));
+  return scored
+    .filter((s) => s.close <= limit || s.partial)
+    .sort((a, b) => (a.close <= limit ? 0 : 1) - (b.close <= limit ? 0 : 1) || a.close - b.close || b.partial - a.partial)
+    .slice(0, max)
+    .map((s) => s.id);
+}
 const readJson = (file) => (fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null);
 const slugify = (text) => text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 /** `child` está dentro de `parent` (o es la misma carpeta). */
@@ -440,7 +479,7 @@ const commands = {
     const core = await loadCore();
     const [system] = core.listSystems();
     const { entries, indexEntry } = core.loadRegistry(system);
-    const norm = (text = '') => String(text).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const norm = normText;
     const words = norm(query).split(/\s+/).filter(Boolean);
     const section = option('--seccion');
     const limit = Number(option('--limite') ?? 10);
@@ -461,21 +500,44 @@ const commands = {
       .sort((a, b) => b.score - a.score || a.entry.titulo.localeCompare(b.entry.titulo, 'es'))
       .slice(0, limit)
       // La misma forma que las piezas de registry.json, más el archivo de la ficha en este repo.
-      .map(({ entry: e }) => ({ ...indexEntry(e), archivo: e.file }));
+      // `siguiente`: el comando que da el detalle de la pieza.
+      .map(({ entry: e }) => ({ ...indexEntry(e), archivo: e.file, siguiente: `npx ds ver ${e.id}` }));
+    if (!results.length) {
+      // Sin resultados no se adivina: se proponen piezas parecidas y se sale con 3.
+      const parecidas = suggestEntries(section ? entries.filter((e) => e.section === section) : entries, query);
+      if (JSON_OUT) console.log('[]');
+      console.error(`Ninguna ficha coincide con «${query}».${parecidas.length ? ` ¿Quisiste decir: ${parecidas.join(', ')}?` : ' Si no existe, créala con la skill nueva-ficha.'}`);
+      for (const id of parecidas) console.error(`  → npx ds ver ${id}`);
+      process.exit(EXIT.sinResultados);
+    }
     if (JSON_OUT) return console.log(JSON.stringify(results, null, 2));
-    if (!results.length) return console.log(`Ninguna ficha coincide con «${query}».`);
-    for (const r of results) console.log(`${r.id} · ${r.estado}\n  ${r.titulo}: ${r.resumen}\n  ${r.archivo}`);
+    for (const r of results) console.log(`${r.id} · ${r.estado}\n  ${r.titulo}: ${r.resumen}\n  ${r.archivo}\n  → ${r.siguiente}`);
   },
   async ver() {
     requireSystem();
-    const query = positional[0];
-    if (!query) fail('uso: ds ver <pieza> (id, como componentes/boton, o slug)');
+    if (!positional.length) fail('uso: ds ver <pieza> [<pieza>…] (id, como componentes/boton, o slug)');
     const core = await loadCore();
     const [system] = core.listSystems();
     const { entries, piece } = core.loadRegistry(system);
-    const { entry, candidatos } = core.findEntry(entries, query);
-    if (!entry) fail(candidatos?.length ? `«${query}» es ambiguo: ${candidatos.join(', ')}` : `no hay ninguna pieza «${query}». Búscala con ds search.`);
-    console.log(JSON.stringify(piece(entry), null, 2));
+    // Varias piezas en una llamada: un array con las que se encuentran; las demás se explican en stderr.
+    const found = [];
+    let code = EXIT.ok;
+    for (const query of positional) {
+      const { entry, candidatos } = core.findEntry(entries, query);
+      if (entry) found.push(piece(entry));
+      else if (candidatos?.length) {
+        console.error(`ds: «${query}» es ambiguo: ${candidatos.join(', ')}. Usa el id completo.`);
+        code = Math.max(code, EXIT.ambiguo);
+      } else {
+        const parecidas = suggestEntries(entries, query);
+        console.error(`ds: no hay ninguna pieza «${query}».${parecidas.length ? ` ¿Quisiste decir: ${parecidas.join(', ')}?` : ' Búscala con npx ds search.'}`);
+        code = Math.max(code, EXIT.sinResultados);
+      }
+    }
+    if (positional.length === 1) {
+      if (found.length) console.log(JSON.stringify(found[0], null, 2));
+    } else console.log(JSON.stringify(found, null, 2));
+    process.exit(code);
   },
   async dev() {
     requireSite();
@@ -635,7 +697,7 @@ const commands = {
   },
   async check() {
     requireSystem();
-    process.exit(await node(runtimeDir(), 'scripts/sync-production.mjs', ['--check']));
+    process.exit(await node(runtimeDir(), 'scripts/sync-production.mjs', ['--check', ...args]));
   },
   async patrones() {
     requireSystem();
@@ -661,7 +723,7 @@ const commands = {
   },
   async doctor() {
     requireSite();
-    process.exit(await node(runtimeDir(), 'scripts/doctor.mjs'));
+    process.exit(await node(runtimeDir(), 'scripts/doctor.mjs', JSON_OUT ? ['--json'] : []));
   },
   async migrar() {
     requireSystem();
