@@ -102,6 +102,9 @@ Tareas:
 
 - [ ] Sistema `base` con los tokens neutros del shell y herencia (`extiende`).
 - [ ] `ds check` en el CI del repo de producción (cuando haya staging; ver «Entornos»).
+- [x] `ds revisar`: comprueba que el código de producción usa bien el sistema, sin modelo (ver `DECISIONES.md`, 2026-11-04).
+- [ ] `ds revisar` en el CI del repo de producción: primero avisa, luego bloquea.
+- [ ] El bloque de `ds contexto` con el comando de `ds revisar` en «Antes de terminar» (cuando estén los dos en `main`).
 - [ ] Evaluaciones de `design.md` con escenarios fijos (`evals/`).
 - [x] Ejemplos en vivo en cada modo: conmutador claro/oscuro en el marco del ejemplo, con el selector del informe (`tokens.<superficie>.modos`). Va con `modo=` en el bloque y el marco que aguanta `100vh` (`vista=`, `altoVista`).
 - [ ] Publicación: `ds build` + despliegue estático con `ds check` antes de cada despliegue.

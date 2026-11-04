@@ -2,6 +2,12 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+- **`ds revisar`**, nuevo: comprueba que el código de producción usa bien el sistema, sin modelo y sin escribir. Errores: valores sueltos que ya son tokens, tokens que no existen, clases inventadas en el bloque de una pieza y piezas obsoletas. Avisos: piezas en exploración o desarrollo y colores fuera de paleta. Por defecto revisa las líneas que el cambio añade respecto a `origin/<rama>`; `--todo`, todo el repo; con rutas, esos archivos. Sale con 1 si hay errores; `--json`. Una línea con `ds-revisar-ignorar` no se revisa.
+- **`/<id>/revisar.json`**, nuevo en el sitio: tokens, clases de producción del último sync y piezas con su estado. Con él, `npx @imandresochoa/ds@<versión> revisar --sistema <url>` funciona desde el repo de producción sin instalar el kit. `design.md` lleva el comando.
+- Migración: ninguna.
+
 ## 2.0.0 · 2026-11-01
 
 Versión mayor: cambia dónde viven los tokens. Una ficha de `content/tokens/` deja de leerse hasta que se migra con `npx ds migrar --aplicar` (ver «Migración desde la 1.x», abajo). Además, la interfaz se reordena con la navegación de Geist: una sola barra lateral, índices con los ejemplos en vivo y fichas más densas.

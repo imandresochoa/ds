@@ -5,6 +5,7 @@
 //   /<sistema>/docs.md, /<sistema>/docs/<página>.md  las páginas de Docs del sistema (content/docs/)
 //   /<sistema>/design.md          guía para agentes: DESIGN.md escrito a mano + apéndice generado
 //   /<sistema>/registry.json      índice del registry: lo justo de cada pieza para elegirla
+//   /<sistema>/revisar.json       lo que necesita `ds revisar` desde producción: tokens, clases de producción y piezas
 //   /<sistema>/r/<sección>/<slug>.json  cada pieza: estado, grafo (usa), fuentes, sync, reglas y antipatrones
 //   /llms.txt                     índice para agentes de todos los sistemas
 //   /directorio.json              con varios sistemas (repo de directorio): una tarjeta por sistema con su cobertura
@@ -14,9 +15,13 @@
 // (publicacion.ruta o DS_RUTA), igual que las páginas: /ds/<sistema>/design.md. Sin ella, nada cambia.
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import YAML from 'yaml';
-import { CONTENT_SECTIONS, FUNCIONES, KIT_PAGES, PLATFORM_SECTIONS, PLATFORMS, ROOT, STATUSES, SYNC_STATES, documentedTokens, legacyTokenFiles, listSystems, loadDocs, loadExperimentalTokens, loadPages, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
+import { CONTENT_SECTIONS, FUNCIONES, KIT_PAGES, PLATFORM_SECTIONS, PLATFORMS, ROOT, STATUSES, SYNC_STATES, documentedTokens, legacyTokenFiles, listSystems, loadDocs, loadEntries, loadProductionTokens, loadExperimentalTokens, loadPages, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
 import { categoria, loadDirectoryIndex, loadRegistry } from '../lib/registry.mjs';
+import { revisarData } from '../lib/revisar.mjs';
+
+const KIT_VERSION = JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'package.json'), 'utf8')).version;
 
 const PUBLIC = path.join(ROOT, 'public');
 const ROUTE = process.argv.includes('--exportar') ? publicationRoute() : '';
@@ -144,6 +149,10 @@ for (const system of listSystems()) {
     '',
     ...Object.values(STATUSES).map((s) => `- **${s.label}:** ${s.descripcion}`),
     '',
+    '## Comprueba tu código',
+    '',
+    `Antes de terminar un cambio en producción: \`npx ${'@imandresochoa/ds'}@${KIT_VERSION} revisar --sistema <este sitio>${at(`/${system.id}/revisar.json`)}\`. Revisa las líneas que añade el cambio (valores sueltos que ya son tokens, tokens que no existen, clases inventadas, piezas obsoletas o sin producción) y sale con 1 si hay errores. Solo lee.`,
+    '',
     '## API pública de clases (solo «En producción»)',
     '',
     'Usa exactamente estos nombres. No inventes sinónimos.',
@@ -160,6 +169,7 @@ for (const system of listSystems()) {
     '',
   ].join('\n');
   write(`${system.id}/design.md`, `${handwritten}\n\n${generated}`);
+  write(`${system.id}/revisar.json`, JSON.stringify(revisarData(system, { loadEntries, loadProductionTokens, loadSyncReport }, KIT_VERSION)) + '\n');
   write(`${system.id}/llms-full.txt`, entries.map((e) => entryMarkdown(system, e, report, tokens)).join('\n\n---\n\n'));
 
   llms.push(`## ${system.nombre}`, '', `- [design.md](${at(`/${system.id}/design.md`)}): reglas, API de clases, tokens y estados`, `- [registry.json](${at(`/${system.id}/registry.json`)}): índice de piezas; cada una en \`${at(`/${system.id}/r/<sección>/<slug>.json`)}\` con su estado, lo que usa, sus fuentes y su sync`, `- [llms-full.txt](${at(`/${system.id}/llms-full.txt`)}): todas las fichas en un archivo`, '');

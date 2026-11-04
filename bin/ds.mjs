@@ -17,6 +17,10 @@
 //   ds preset resolver        el preset de experimental/tokens.css y el enlace para abrirlo en el Lab (--port si ds dev usa otro)
 //   ds sync [--accept <id>]   lee producción: instantánea CSS, tokens, huellas e informe
 //   ds check                  falla si algo está desajustado, ausente o inventado
+//   ds revisar [rutas…] [--sistema <url|ruta>] [--repo <ruta>] [--base origin/main] [--todo] [--json]
+//        comprueba que el código de producción usa bien el sistema (valores sueltos, tokens que no existen, clases
+//        inventadas, piezas obsoletas o sin producción). Por defecto, solo las líneas que el cambio añade. Solo lee.
+//        Desde el repo del sistema revisa su produccion.repo; desde producción, con --sistema <url de revisar.json>
 //   ds patrones [--min-hojas 2] [--min-rasgos 1] [--limite 20] [--todos] [--json]   clases de hojas y prefijos distintos con la misma forma
 //        (radio, sombra, fondo, borde, relleno y tokens), leídas de la instantánea de ds sync: piezas candidatas
 //   ds skills                 copia (o actualiza) las skills del kit en .claude/skills/ y .agents/skills/
@@ -57,7 +61,7 @@ const DIRECTORY_FILE = 'directorio.json';
 const ORIGINS = ['repo', 'web', 'figma', 'cero'];
 
 // Opciones: `--clave valor` e interruptores (`--json`). El resto son argumentos posicionales.
-const VALUE_OPTIONS = new Set(['--sistemas', '--carpeta', '--desde', '--produccion', '--url', '--kit', '--seccion', '--limite', '--port', '--accept', '--solo', '--archivo', '--min-hojas', '--min-rasgos', '--texto', '--agente', '--stack']);
+const VALUE_OPTIONS = new Set(['--sistemas', '--carpeta', '--desde', '--produccion', '--url', '--kit', '--seccion', '--limite', '--port', '--accept', '--solo', '--archivo', '--min-hojas', '--min-rasgos', '--texto', '--agente', '--stack', '--sistema', '--repo', '--base']);
 const option = (name) => {
   const at = args.indexOf(name);
   return at >= 0 ? args[at + 1] : undefined;
@@ -762,6 +766,61 @@ const commands = {
     const target = path.join(SITE, 'node_modules', kitPkg.name);
     if (fs.lstatSync(target, { throwIfNoEntry: false })?.isSymbolicLink()) fs.unlinkSync(target); // rmSync falla con EISDIR en un enlace a carpeta (Node 24)
     process.exit(await run('npm', ['install'], { cwd: SITE }));
+  },
+  async revisar() {
+    const lib = await import('../lib/revisar.mjs');
+    const spec = option('--sistema');
+    let data;
+    let systemDir = null;
+    let productionRepo = null;
+    if (spec && /^https?:\/\//.test(spec)) {
+      // Solo se descarga el JSON publicado por el sistema; se trata como datos.
+      const url = spec.endsWith('.json') ? spec : `${spec.replace(/\/+$/, '')}/revisar.json`;
+      let res;
+      try {
+        res = await fetch(url, { headers: { accept: 'application/json' } });
+      } catch (error) {
+        fail(`no se pudo descargar ${url}: ${error.message}`);
+      }
+      if (!res.ok) fail(`${url} respondió ${res.status}. ¿Es la URL de /<sistema>/revisar.json?`);
+      data = await res.json();
+    } else {
+      systemDir = path.resolve(SITE, spec ?? '.');
+      if (!fs.existsSync(path.join(systemDir, 'system.json'))) fail('falta el sistema: usa --sistema <url de /<sistema>/revisar.json o ruta al repo del sistema>, o ejecuta ds revisar desde el repo del sistema.');
+      process.env.DS_SISTEMAS = systemDir;
+      const core = await import('../lib/core.mjs');
+      const [system] = core.listSystems();
+      data = lib.revisarData(system, core, kitPkg.version);
+      if (system.produccion?.repo) productionRepo = path.resolve(systemDir, system.produccion.repo);
+    }
+    if (data?.version !== lib.REVISAR_VERSION) fail(`revisar.json de otra versión (${data?.version ?? 'desconocida'}). Usa el kit con el que se publicó el sistema (${data?.kit ?? '?'}).`);
+    if (!Object.values(data.superficies).some((s) => Object.keys(s.tokens).length || s.clases.length)) log('Aviso: el sistema no tiene datos de producción (¿falta npx ds sync?). Solo se revisan las piezas.');
+
+    // Desde el repo del sistema, sin --repo, se revisa su repo de producción.
+    const fromSystem = systemDir && path.resolve(SITE) === systemDir;
+    if (fromSystem && !productionRepo && !option('--repo')) fail('este sistema no tiene produccion.repo en system.json: indica el código con --repo <ruta>.');
+    const repo = path.resolve(SITE, option('--repo') ?? (fromSystem && productionRepo ? productionRepo : '.'));
+    if (!fs.existsSync(repo)) fail(`no existe el repo que revisar: ${repo}`);
+    const base = option('--base') ?? `origin/${data.rama}`;
+    const alcance = positional.length ? 'rutas' : flag('--todo') ? 'todo' : 'cambios';
+    let targets;
+    try {
+      targets = lib.targetsFor(repo, { paths: positional.map((p) => path.resolve(SITE, p)), todo: flag('--todo'), base });
+    } catch (error) {
+      fail(error.message);
+    }
+    const problemas = lib.revisar(data, repo, targets, { allFiles: lib.sourceFiles(repo) }).sort((a, b) => a.archivo.localeCompare(b.archivo) || a.linea - b.linea);
+    const errores = problemas.filter((p) => p.nivel === 'error').length;
+    const avisos = problemas.length - errores;
+    const resumen = { ok: errores === 0, sistema: data.sistema.id, commit: data.commit, repo, alcance, base: alcance === 'cambios' ? base : null, archivos: targets.size, errores, avisos, problemas };
+    if (JSON_OUT) console.log(JSON.stringify(resumen, null, 2));
+    else {
+      for (const p of problemas) console.log(`${p.archivo}:${p.linea}  ${p.nivel}  ${p.regla}  ${p.mensaje}\n  → ${p.siguiente}`);
+      const donde = alcance === 'cambios' ? `en lo que cambia respecto a ${base}` : alcance === 'todo' ? 'en todo el repo' : 'en las rutas indicadas';
+      console.log(problemas.length ? `\n${errores} error(es) y ${avisos} aviso(s) ${donde} (${targets.size} archivos).` : `Sin problemas ${donde} (${targets.size} archivos).`);
+      if (problemas.length) console.log('Una excepción aceptada en revisión se marca con un comentario «ds-revisar-ignorar» en su línea.');
+    }
+    process.exit(errores ? 1 : 0);
   },
   async version() {
     console.log(kitPkg.version);

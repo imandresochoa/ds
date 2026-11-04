@@ -76,16 +76,17 @@ Es la situación de partida de muchos productos: lo que entra en `main` sale a p
 Cuando el producto tiene staging y CI, el sistema se engancha a esa CI:
 
 ```
-Rama + PR ──▶ CI: tests + ds check ──▶ merge: main → staging ──▶ probar ──▶ promoción → producción
+Rama + PR ──▶ CI: tests + ds check + ds revisar ──▶ merge: main → staging ──▶ probar ──▶ promoción → producción
 ```
 
 1. **`ds check` en cada PR de producción.** La CI descarga el repo del sistema junto al de producción y ejecuta `npx ds sync` y `npx ds check`. Al principio solo **avisa**: la ficha desajustada se actualiza en un PR del sistema. Cuando las fichas estén completas, **bloquea** el merge.
-2. **Staging para revisar diseño en real.** Los cambios de diseño se miran en staging, con datos de demo, antes de promocionar. Con previews por PR, la revisión de diseño y de textos se hace sobre el enlace del preview, antes del merge.
-3. **Iniciativas.** Una pieza de una iniciativa llega a producción por el mismo camino: PR en producción, staging y promoción. Su ficha pasa de «En desarrollo» a «En producción» cuando la versión llega a producción, no al hacer merge en staging.
+2. **`ds revisar` en cada PR de producción.** Comprueba que lo que añade el PR usa bien el sistema: `npx @imandresochoa/ds@<versión> revisar --sistema <url>/<id>/revisar.json --base origin/main`. No necesita el repo del sistema ni instalar el kit en producción. Igual que `check`: al principio solo avisa (el paso no bloquea aunque salga con 1) y, cuando el equipo lo haya adoptado, bloquea.
+3. **Staging para revisar diseño en real.** Los cambios de diseño se miran en staging, con datos de demo, antes de promocionar. Con previews por PR, la revisión de diseño y de textos se hace sobre el enlace del preview, antes del merge.
+4. **Iniciativas.** Una pieza de una iniciativa llega a producción por el mismo camino: PR en producción, staging y promoción. Su ficha pasa de «En desarrollo» a «En producción» cuando la versión llega a producción, no al hacer merge en staging.
 
 ## Publicar el sistema
 
-`npx ds build` exporta el sitio a `out/`: las páginas en HTML, su versión `.md` (también las de Docs: `/<sistema>/docs.md` y `/<sistema>/docs/<página>.md`), `design.md`, `llms.txt`, `llms-full.txt`, `registry.json` con una pieza por archivo en `r/` y, en un directorio, `/directorio.json`. También la instantánea de producción que cargan los ejemplos en vivo (`/_ds/`). Es un sitio estático: lo sirve cualquier hosting de archivos que resuelva `/x` a `x.html`.
+`npx ds build` exporta el sitio a `out/`: las páginas en HTML, su versión `.md` (también las de Docs: `/<sistema>/docs.md` y `/<sistema>/docs/<página>.md`), `design.md`, `llms.txt`, `llms-full.txt`, `registry.json` con una pieza por archivo en `r/`, `revisar.json` (lo que necesita `ds revisar`) y, en un directorio, `/directorio.json`. También la instantánea de producción que cargan los ejemplos en vivo (`/_ds/`). Es un sitio estático: lo sirve cualquier hosting de archivos que resuelva `/x` a `x.html`.
 
 ### En la raíz o bajo una ruta
 
