@@ -80,7 +80,7 @@ Desde el repo del sistema:
 
 ```bash
 npm install
-npm run dev          # usa el sistema de ejemplo de systems/ejemplo
+npm run dev          # usa systems/ejemplo: «ds», el sistema de la propia interfaz
 ```
 
 Para trabajar con datos reales, enlaza el kit desde un sistema (ver [`docs/metodologia/09-kit.md`](docs/metodologia/09-kit.md)).
@@ -94,7 +94,7 @@ Para trabajar con datos reales, enlaza el kit desde un sistema (ver [`docs/metod
 | `scripts/` | Sync con producción, publicación para agentes y diagnóstico. |
 | `plantilla/` | Lo que `ds init` copia en un repo de sistema nuevo. |
 | `skills/` | Skills para agentes que se instalan en cada sistema. |
-| `systems/ejemplo/` | Sistema de ejemplo para desarrollar el kit. |
+| `systems/ejemplo/` | «ds», el sistema de diseño de la interfaz del kit, enlazado con este repo. |
 | `docs/metodologia/` | La metodología. Va en el paquete; el sitio de cada sistema la muestra solo si la activa. |
 | `docs/DECISIONES.md`, `docs/TAREAS.md` | Decisiones con fecha y tareas del kit. |
 

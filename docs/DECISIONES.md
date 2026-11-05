@@ -337,6 +337,16 @@ La referencia es la página de un componente de Geist (`vercel.com/geist/button`
 - **Lo que añade el sistema, compacto.** «Enlace con producción» deja la tabla de cinco columnas, que se salía del ancho, por una línea por fuente (punto de estado, ruta, superficie y estado) con una segunda línea pequeña con las clases, la huella y el commit revisado. Se descartó plegarla: es lo que dice si la ficha sigue siendo verdad y tiene que verse. «Usa» y «Relacionados» pasan a tarjetas de dos líneas. Entre el último apartado de la ficha y «Tokens que usa» hay ahora el mismo aire que entre dos apartados (antes se pegaban).
 - **Un bloque, en el visor ancho y en su ficha.** Con la galería ancha de Bloques fuera (los índices pasan a tarjetas en vivo), el visor (`BlockViewer`: Vista y Código, anchos, modo y prompt) solo vive en la ficha del bloque. Sus ejemplos se pintan con él y no con la tarjeta compacta: un bloque es una pantalla o una sección, y a 640 px se vería en su versión estrecha. En esa ficha la columna llega a `max-w-6xl` y el texto sigue a 640 px para que se lea bien. Se descartó ensanchar todas las fichas: la de un componente se lee mejor estrecha.
 
+## 2026-11-05 · El sistema de ejemplo es el de la propia interfaz
+
+`systems/ejemplo` tenía un botón y una sección provisionales con el nombre «Sistema de ejemplo». Publicado en `ds.aochoa.fyi/ejemplo`, enseñaba una web casi vacía con un nombre que no dice nada. Ahora documenta la interfaz del kit: se llama «ds» y su `produccion.repo` es el propio repo (`../..`), con una superficie Tailwind que lee `app/globals.css`.
+
+- **Por qué la interfaz y no la landing.** La landing vive en otro repo; el build de Vercel del kit no lo ve, así que habría que copiar una instantánea a mano. La interfaz está en este repo: el sync es 1:1 de verdad y lo que se documenta es lo que se ve alrededor del ejemplo.
+- **El id no cambia.** Las URLs (`/ejemplo`), los rewrites de la landing y `DS_RUTA` siguen igual. Solo cambian el nombre, la descripción y el contenido.
+- **Sigue sin haber producto.** La regla 1 se cumple: el sistema documenta el kit, no a un cliente.
+- **Las fuentes en los ejemplos.** `next/font` no llega al iframe; la superficie carga Geist de Google Fonts con `cssExtra` y define `--font-geist-sans` y `--font-geist-mono`. El fondo del marco es `var(--background)`, así que cambia con el modo.
+- Salieron dos fallos del sync que cualquier producto con shadcn habría encontrado: `@import "tailwindcss" source(none)` dejaba basura en la instantánea, y los ejemplos sin `superficie=` en una primera superficie Tailwind contaban como clases inventadas.
+
 ## 2026-11-05 · Directorio con repos git
 
 El Directorio solo leía carpetas locales: había que clonar a mano cada sistema al lado del directorio, y no se podía compilar en CI ni en Vercel. Para una organización con muchas aplicaciones, cada una con su sistema en su repo, eso no escala. Ahora una entrada de `sistemas` puede ser un repo git, `{ "git": "github:org/x-design-system", "ref": "v1.4.0" }`, además de una ruta.
