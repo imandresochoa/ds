@@ -39,10 +39,10 @@ Cada sitio publica para agentes `llms.txt`, `design.md` y un registry de solo le
 ### Varios sistemas en un sitio
 
 ```bash
-npx @imandresochoa/ds init --directorio "Nuestros sistemas" --carpeta ../directorio --sistemas ../a-design-system,../b-design-system
+npx @imandresochoa/ds init --directorio "Nuestros sistemas" --carpeta ../directorio --sistemas ../a-design-system,github:org/b-design-system#v1.4.0
 ```
 
-El repo de directorio sirve juntos los sistemas de su `directorio.json`. La portada es el Directorio, con una tarjeta por sistema, y se publica `/directorio.json` para agentes. Ver [`docs/metodologia/09-kit.md`](docs/metodologia/09-kit.md).
+El repo de directorio sirve juntos los sistemas de su `directorio.json`: carpetas locales o repos git (`{ "git": "github:org/b-design-system", "ref": "v1.4.0" }`). `ds dev`, `ds build` y `ds doctor` clonan cada repo en una caché de solo lectura (`.ds/fuentes/`), con tu acceso de `gh` o SSH y sin guardar tokens, así que el directorio también se compila en CI o en Vercel. Fija la ref en un commit o una etiqueta: con una rama, `ds` avisa. La portada es el Directorio, con una tarjeta por sistema, y se publica `/directorio.json` para agentes. Ver [`docs/metodologia/09-kit.md`](docs/metodologia/09-kit.md).
 
 ## Comandos
 
@@ -52,7 +52,7 @@ Fuera de un sistema:
 | --- | --- |
 | `npx @imandresochoa/ds instalar` | Instala la skill `montar-sistema` en tu usuario, para Claude Code y Codex. |
 | `npx @imandresochoa/ds init "<Nombre>"` | Crea el repo del sistema: plantilla, kit y skills. Con `--json` y parámetros, lo usa el agente. |
-| `npx @imandresochoa/ds init --directorio` | Crea un repo de directorio, que sirve juntos varios sistemas. |
+| `npx @imandresochoa/ds init --directorio` | Crea un repo de directorio, que sirve juntos varios sistemas, de carpetas locales o de repos git. |
 
 Desde el repo del sistema:
 

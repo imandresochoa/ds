@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 // CLI del kit. Salvo `instalar` e `init`, se ejecuta desde el repo de un sistema de diseño (la carpeta con system.json).
-// `dev`, `build` y `doctor` también funcionan en un repo de directorio (directorio.json), que sirve juntos varios sistemas.
+// `dev`, `build` y `doctor` también funcionan en un repo de directorio (directorio.json), que sirve juntos varios sistemas,
+// de carpetas locales o de otros repos git (que se leen desde la caché .ds/fuentes/, de solo lectura).
 //
 //   ds instalar [--aqui] [--quitar]  instala la skill de montaje para Claude Code y Codex (en tu usuario; con --aqui, en esta carpeta)
 //   ds init "<Nombre>" [id]   crea el repo del sistema: plantilla, kit y skills (sin nombre, pregunta en la terminal)
 //        [--carpeta <ruta>] [--desde repo|web|figma|cero] [--produccion <ruta>] [--url <url>] [--kit <paquete>] [--json]
-//   ds init --directorio ["<Nombre>"] [--carpeta <ruta>] [--sistemas <ruta>,<ruta>]   crea un repo de directorio
+//   ds init --directorio ["<Nombre>"] [--carpeta <ruta>] [--sistemas <ruta>,github:org/repo#<ref>]   crea un repo de directorio
+//        (rutas locales o repos git; un repo sin #ref se fija en el último commit de su rama por defecto)
 //   ds info [--json]          sistema, secciones, producción, último sync, skills y rutas del kit
 //   ds search <texto> [--seccion <id>] [--limite 10] [--json]   busca fichas antes de crear una (con --json, como en registry.json)
 //   ds ver <pieza>            el JSON de una pieza, igual que /<sistema>/r/<sección>/<slug>.json (id o slug)
@@ -86,28 +88,56 @@ function requireSystem() {
   if (!fs.existsSync(path.join(SITE, 'system.json'))) fail('no hay system.json en esta carpeta. Ejecuta «ds init "<Nombre>"» o entra en el repo del sistema.');
 }
 
-/** El directorio.json de esta carpeta con las rutas de sus sistemas ya resueltas, o null. */
-function readDirectory() {
+let directoryCache;
+/**
+ * El directorio.json de esta carpeta con las carpetas de sus sistemas ya resueltas, o null. Una entrada es una ruta
+ * relativa o una fuente git ({ git, ref }), que se clona o se actualiza en .ds/fuentes/<id> (ver lib/fuentes.mjs).
+ */
+async function readDirectory() {
+  if (directoryCache !== undefined) return directoryCache;
   const config = readJson(path.join(SITE, DIRECTORY_FILE));
-  if (!config) return null;
-  const sistemas = (config.sistemas ?? []).map((rel) => path.resolve(SITE, rel));
-  if (!sistemas.length) fail(`${DIRECTORY_FILE} no lista ningún sistema. Añade sus carpetas: "sistemas": ["../mi-design-system"].`);
+  if (!config) return (directoryCache = null);
+  const entries = config.sistemas ?? [];
+  if (!entries.length) fail(`${DIRECTORY_FILE} no lista ningún sistema. Añade sus carpetas o sus repos: "sistemas": ["../mi-design-system", { "git": "github:org/otro-design-system", "ref": "v1.0.0" }].`);
+  const { isGitSource, normalizeSource, syncSource } = await import('../lib/fuentes.mjs');
+  const ids = new Set();
+  const fuentes = [];
+  const sistemas = entries.map((entry) => {
+    if (!isGitSource(entry)) {
+      if (typeof entry !== 'string') fail(`${DIRECTORY_FILE}: entrada no válida en "sistemas": ${JSON.stringify(entry)}. Usa una ruta o { "git": …, "ref": … }.`);
+      return path.resolve(SITE, entry);
+    }
+    try {
+      const { id } = normalizeSource(entry);
+      if (ids.has(id)) fail(`${DIRECTORY_FILE}: el repo ${id} está dos veces en "sistemas"`);
+      ids.add(id);
+      const source = syncSource(SITE, entry);
+      for (const aviso of source.avisos) log(`Aviso: ${aviso}`);
+      log(`Fuente git: ${source.git}@${source.ref ?? 'HEAD'} (${source.tipo}, ${source.sha.slice(0, 7)}) en ${path.relative(SITE, source.dir)}`);
+      fuentes.push({ dir: source.dir, git: source.git, ref: source.ref, tipo: source.tipo, sha: source.sha, avisos: source.avisos });
+      return source.dir;
+    } catch (error) {
+      return fail(`${DIRECTORY_FILE}: ${error.message}`);
+    }
+  });
   const missing = sistemas.filter((dir) => !fs.existsSync(path.join(dir, 'system.json')));
   if (missing.length) fail(`${DIRECTORY_FILE}: no hay system.json en ${missing.join(', ')}`);
-  return { ...config, sistemas };
+  return (directoryCache = { ...config, sistemas, fuentes });
 }
 
 /** dev, build y doctor: el repo de un sistema o el de un directorio. */
-function requireSite() {
+async function requireSite() {
   if (fs.existsSync(path.join(SITE, 'system.json'))) return;
-  if (readDirectory()) return;
+  if (await readDirectory()) return;
   fail(`no hay system.json ni ${DIRECTORY_FILE} en esta carpeta. Entra en el repo de un sistema o de un directorio.`);
 }
 
 /** Qué sistemas lee el motor: el de esta carpeta o, en un directorio, todos los que lista. */
-function siteEnv() {
-  if (fs.existsSync(path.join(SITE, 'system.json')) || !fs.existsSync(path.join(SITE, DIRECTORY_FILE))) return { DS_SISTEMAS: SITE, DS_DIRECTORIO: '' };
-  return { DS_SISTEMAS: readDirectory().sistemas.join(path.delimiter), DS_DIRECTORIO: path.join(SITE, DIRECTORY_FILE) };
+// DS_FUENTES: las fuentes git ya leídas (carpeta, ref, commit y avisos), para ds doctor.
+async function siteEnv() {
+  if (fs.existsSync(path.join(SITE, 'system.json')) || !fs.existsSync(path.join(SITE, DIRECTORY_FILE))) return { DS_SISTEMAS: SITE, DS_DIRECTORIO: '', DS_FUENTES: '' };
+  const directory = await readDirectory();
+  return { DS_SISTEMAS: directory.sistemas.join(path.delimiter), DS_DIRECTORIO: path.join(SITE, DIRECTORY_FILE), DS_FUENTES: JSON.stringify(directory.fuentes) };
 }
 
 /**
@@ -143,9 +173,10 @@ function runtimeDir() {
   return target;
 }
 
-function run(cmd, cmdArgs, { cwd, env = {} } = {}) {
+async function run(cmd, cmdArgs, { cwd, env = {} } = {}) {
+  const site = await siteEnv();
   return new Promise((resolve) => {
-    const child = spawn(cmd, cmdArgs, { cwd, stdio: 'inherit', env: { ...process.env, ...siteEnv(), ...env } });
+    const child = spawn(cmd, cmdArgs, { cwd, stdio: 'inherit', env: { ...process.env, ...site, ...env } });
     child.on('exit', (code) => resolve(code ?? 1));
   });
 }
@@ -245,7 +276,7 @@ async function askInTerminal() {
 }
 
 /** `ds init --directorio`: un repo que sirve juntos varios sistemas, con el Directorio en la portada. */
-function initDirectory() {
+async function initDirectory() {
   const nombre = positional[0] ?? 'Sistemas de diseño';
   const target = path.resolve(SITE, option('--carpeta') ?? '.');
   const extra = foreignFiles(target);
@@ -258,14 +289,32 @@ function initDirectory() {
   fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2) + '\n');
   const spec = installKit(target);
   const file = path.join(target, DIRECTORY_FILE);
-  // Las rutas a los sistemas son relativas a este repo, como produccion.repo en system.json.
-  const sistemas = (option('--sistemas') ?? '').split(',').map((s) => s.trim()).filter(Boolean).map((s) => path.relative(target, path.resolve(SITE, s)).split(path.sep).join('/'));
+  // Las rutas a los sistemas son relativas a este repo, como produccion.repo en system.json. Una fuente git
+  // («github:org/x#v1.2.0») va como { git, ref }; sin ref, se fija el commit al que apunta ahora su rama por defecto.
+  const { normalizeSource, parseSourceArg, resolveRemoteRef } = await import('../lib/fuentes.mjs');
+  const sistemas = (option('--sistemas') ?? '').split(',').map((s) => s.trim()).filter(Boolean).map((s) => {
+    const source = parseSourceArg(s);
+    if (!source) return path.relative(target, path.resolve(SITE, s)).split(path.sep).join('/');
+    try {
+      normalizeSource(source);
+    } catch (error) {
+      return fail(error.message);
+    }
+    if (source.ref) return source;
+    const sha = resolveRemoteRef(source.git);
+    if (!sha) {
+      log(`Aviso: no se pudo leer ${source.git}; queda sin "ref" (se leerá su rama por defecto). Fíjala en ${DIRECTORY_FILE}.`);
+      return source;
+    }
+    log(`${source.git}: fijado en ${sha.slice(0, 7)}, el último commit de su rama por defecto.`);
+    return { ...source, ref: sha };
+  });
   if (!fs.existsSync(file)) fs.writeFileSync(file, JSON.stringify({ nombre, descripcion: '', sistemas }, null, 2) + '\n');
   if (!fs.existsSync(path.join(target, '.gitignore'))) fs.writeFileSync(path.join(target, '.gitignore'), 'node_modules/\n.ds/\nout/\n');
   const result = { directorio: { nombre, carpeta: target, sistemas }, kit: spec };
   if (JSON_OUT) return console.log(JSON.stringify(result, null, 2));
   console.log(`\nDirectorio «${nombre}» en ${target}.`);
-  console.log(sistemas.length ? `Sistemas: ${sistemas.join(', ')}. Siguiente paso: npx ds dev.` : `Siguiente paso: añade las carpetas de los sistemas a "sistemas" en ${DIRECTORY_FILE} y ejecuta npx ds dev.`);
+  console.log(sistemas.length ? `Sistemas: ${sistemas.map((s) => (typeof s === 'string' ? s : `${s.git}@${s.ref ?? 'HEAD'}`)).join(', ')}. Siguiente paso: npx ds dev.` : `Siguiente paso: añade las carpetas de los sistemas a "sistemas" en ${DIRECTORY_FILE} y ejecuta npx ds dev.`);
 }
 
 /**
@@ -478,7 +527,7 @@ const commands = {
     console.log(JSON.stringify(piece(entry), null, 2));
   },
   async dev() {
-    requireSite();
+    await requireSite();
     const dir = runtimeDir();
     const portAt = args.indexOf('--port');
     const port = portAt >= 0 ? args[portAt + 1] : '4100';
@@ -486,7 +535,7 @@ const commands = {
     process.exit(await run(process.execPath, [nextBin(dir), 'dev', '--port', port], { cwd: dir }));
   },
   async build() {
-    requireSite();
+    await requireSite();
     const dir = runtimeDir();
     // --exportar: los enlaces de los .md, design.md y llms.txt llevan la ruta de publicación, si la hay.
     if ((await node(dir, 'scripts/build-public.mjs', ['--exportar'])) !== 0) process.exit(1);
@@ -660,7 +709,7 @@ const commands = {
     installSkills();
   },
   async doctor() {
-    requireSite();
+    await requireSite();
     process.exit(await node(runtimeDir(), 'scripts/doctor.mjs'));
   },
   async migrar() {

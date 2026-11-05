@@ -4,9 +4,15 @@ Versiones del kit. Los sistemas fijan una versión exacta con `npm install @iman
 
 ## Sin publicar
 
+Versión menor.
+
 - **El sistema de ejemplo documenta la interfaz del kit.** `systems/ejemplo` pasa a llamarse «ds» y su producción es el propio repo del kit: tokens de `app/globals.css` en cuatro fundamentos (Color, Estados, Tipografía y Forma), seis componentes de `components/ui/` y `components/docs/`, y dos bloques del sitio, con los ejemplos en vivo sobre el CSS real. El id y las URLs (`/ejemplo`) no cambian. Migración: ninguna.
 - **Sync con `@import "tailwindcss" source(…)`.** La instantánea de una superficie Tailwind quitaba solo `@import "tailwindcss";` y dejaba ` source(none);` suelto; ahora quita el `@import` con lo que lleve y los `@source`, que apuntan a carpetas del repo de producción.
 - **Clases inventadas en la primera superficie.** Un ejemplo sin `superficie=` lo pinta la primera superficie; si era Tailwind, el sync contaba sus utilidades como clases inventadas y `ds check` fallaba.
+- **El Directorio lee repos git.** En `directorio.json`, una entrada de `sistemas` puede ser una ruta (como hasta ahora) o `{ "git": "github:org/x-design-system", "ref": "<commit o etiqueta>" }` (también `git@…`, `ssh://…` y `https://…`). `ds dev`, `ds build` y `ds doctor` clonan o actualizan cada repo en `.ds/fuentes/<id>`, una caché de solo lectura, con el acceso de `gh` o SSH de quien lo ejecuta y sin guardar tokens. Así el directorio se compila en CI o en Vercel sin clonar nada a mano. Con una rama o sin `ref`, `ds` avisa: fija un commit o una etiqueta.
+- **`ds init --directorio --sistemas`** acepta repos git: `--sistemas ../a-design-system,github:org/b-design-system#v1.4.0`. Sin `#ref`, fija el último commit de la rama por defecto.
+- **`ds doctor`** en un directorio enseña cada fuente git con su ref y su commit, comprueba que `.ds/` está en el `.gitignore` y no exige el repo de producción de un sistema que llega por git.
+- Migración: ninguna.
 
 ## 2.0.0 · 2026-11-01
 

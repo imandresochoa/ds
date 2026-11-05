@@ -85,6 +85,7 @@ Tareas:
 - [x] Propuesta y preguntas.
 - [x] `/r/<pieza>.json` e índice en `ds build`, `ds search` con la misma forma y `ds ver`.
 - [x] Directorio.
+- [x] Directorio con repos git: `{ "git", "ref" }` en `sistemas`, caché de solo lectura en `.ds/fuentes/` (ver `DECISIONES.md`, 2026-11-05).
 
 ### Fase 5 · Metodología, plantilla y 1.0.0
 

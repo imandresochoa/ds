@@ -9,8 +9,20 @@ const ok = (msg) => console.log(`  ✓ ${msg}`);
 const warn = (msg) => console.log(`  ! ${msg}`);
 const bad = (msg) => (errors++, console.log(`  ✗ ${msg}`));
 
+// En un directorio, ds pasa las fuentes git ya leídas (ver lib/fuentes.mjs): carpeta de la caché, ref, commit y avisos.
+const fuentes = JSON.parse(process.env.DS_FUENTES || '[]');
+if (fuentes.length) {
+  console.log(`Fuentes git del directorio (${fuentes.length})`);
+  const ignore = path.join(path.dirname(process.env.DS_DIRECTORIO ?? ''), '.gitignore');
+  const ignored = fs.existsSync(ignore) && fs.readFileSync(ignore, 'utf8').split('\n').some((line) => /^\/?\.ds\/?$/.test(line.trim()));
+  (ignored ? ok : bad)(ignored ? '.ds/ está en el .gitignore: la caché no entra en el repo' : 'añade .ds/ al .gitignore del directorio: la caché de las fuentes no se sube');
+  for (const f of fuentes) (f.tipo === 'rama' ? warn : ok)(`${f.git}@${f.ref ?? 'HEAD'}: ${f.tipo}${f.tipo === 'rama' ? ' (fija un commit o una etiqueta)' : ''}, commit ${f.sha.slice(0, 7)}`);
+  console.log('');
+}
+
 for (const system of listSystems()) {
-  console.log(`${system.nombre} (${system.id}) — ${system.dir}`);
+  const fuente = fuentes.find((f) => f.dir === system.dir);
+  console.log(`${system.nombre} (${system.id}) — ${fuente ? `${fuente.git}@${fuente.ref ?? 'HEAD'}` : system.dir}`);
   for (const key of ['id', 'nombre', 'descripcion', 'plataformas']) (system[key] ? ok : bad)(`system.json: ${key}`);
   if (/NOMBRE_DEL_SISTEMA|ID_DEL_SISTEMA/.test(JSON.stringify(system))) bad('system.json conserva textos de la plantilla');
   try {
@@ -23,7 +35,9 @@ for (const system of listSystems()) {
   if (!prod) warn('sin produccion: el sistema no se puede enlazar con el código');
   else {
     const repo = path.resolve(system.dir, prod.repo);
-    if (!fs.existsSync(repo)) bad(`repo de producción no encontrado: ${prod.repo}`);
+    // Una fuente git se lee sola, sin su repo de producción al lado: el directorio enseña su último sync.
+    if (!fs.existsSync(repo) && fuente) ok('repo de producción: no hace falta en el directorio (se enseña el último sync del sistema)');
+    else if (!fs.existsSync(repo)) bad(`repo de producción no encontrado: ${prod.repo}`);
     else {
       ok(`repo de producción: ${repo}`);
       for (const [id, surface] of Object.entries(prod.superficies ?? {})) {
@@ -33,7 +47,7 @@ for (const system of listSystems()) {
         if (cobertura === 'componentes') for (const dir of [surface.componentes ?? 'src/components'].flat()) (fs.existsSync(path.join(repo, dir)) ? ok : warn)(`superficie ${id}: componentes en ${dir}`);
       }
     }
-    if (!fs.existsSync(path.join(system.dir, 'sync-report.json'))) warn('aún no hay sync: ejecuta ds sync');
+    if (!fs.existsSync(path.join(system.dir, 'sync-report.json'))) warn(fuente ? 'aún no hay sync en esta ref: ejecuta ds sync en el repo del sistema' : 'aún no hay sync: ejecuta ds sync');
   }
   const design = path.join(system.dir, 'DESIGN.md');
   if (!fs.existsSync(design)) bad('falta DESIGN.md');

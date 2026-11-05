@@ -346,3 +346,16 @@ La referencia es la página de un componente de Geist (`vercel.com/geist/button`
 - **Sigue sin haber producto.** La regla 1 se cumple: el sistema documenta el kit, no a un cliente.
 - **Las fuentes en los ejemplos.** `next/font` no llega al iframe; la superficie carga Geist de Google Fonts con `cssExtra` y define `--font-geist-sans` y `--font-geist-mono`. El fondo del marco es `var(--background)`, así que cambia con el modo.
 - Salieron dos fallos del sync que cualquier producto con shadcn habría encontrado: `@import "tailwindcss" source(none)` dejaba basura en la instantánea, y los ejemplos sin `superficie=` en una primera superficie Tailwind contaban como clases inventadas.
+
+## 2026-11-05 · Directorio con repos git
+
+El Directorio solo leía carpetas locales: había que clonar a mano cada sistema al lado del directorio, y no se podía compilar en CI ni en Vercel. Para una organización con muchas aplicaciones, cada una con su sistema en su repo, eso no escala. Ahora una entrada de `sistemas` puede ser un repo git, `{ "git": "github:org/x-design-system", "ref": "v1.4.0" }`, además de una ruta.
+
+- **Fuentes git, no federación.** Se descartó juntar por URL los registries ya publicados de cada sistema: cada uno tendría su versión del kit, el Directorio dependería de que todos los sitios estén en línea y la cobertura se pediría por red. Con fuentes git hay un solo build y una sola versión del kit, como hasta ahora (ver «Directorio», 2026-10-30). Se puede añadir la federación más adelante si un sistema necesita publicarse aparte.
+- **Caché de solo lectura en `.ds/fuentes/<id>`.** `ds dev`, `ds build` y `ds doctor` clonan o actualizan cada repo ahí, en el `.gitignore` del directorio, y lo leen como una carpeta. Los archivos no tienen permiso de escritura, el remoto no tiene URL de push y un cambio local se descarta en la siguiente lectura. El kit sigue sin escribir en ningún repo.
+- **La ref se fija.** Un commit completo o una etiqueta; con eso, el sitio solo cambia cuando un PR del directorio sube la ref, y una persona lo revisa. Una rama o la falta de `ref` funcionan, pero se avisa. Con la ref ya descargada no se usa la red. Se descartó aceptar commits cortos: `git fetch` no los resuelve en el remoto.
+- **El acceso es el de la persona o el del CI.** Con `github:` se usa `gh` como asistente de credenciales solo para esa orden, y si no hay `gh`, https (el asistente de git o un repo público) y luego SSH. Con `git@…`, SSH. El kit no pide, no guarda ni escribe tokens, y desactiva la pregunta de usuario y contraseña de git: si falta acceso, el error dice cómo darlo.
+- **Solo URLs `github:`, ssh, https y `file:`.** Se rechazan los transportes que ejecutan órdenes (`ext::`) y lo que empieza por `-`.
+- **Sin repo de producción al lado.** Un sistema de un repo git se lee sin su producción: `ds doctor` no lo marca como error y el Directorio enseña el último sync que el sistema tenga en esa ref.
+- **Sigue la regla de la lista.** Solo salen los sistemas de `directorio.json`. Un repo git es otra forma de nombrar un sistema propio, no un registry de terceros.
+- **Versión menor.** Las rutas siguen valiendo igual y no cambia la forma de lo que se publica para agentes.
