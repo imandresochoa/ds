@@ -25,7 +25,7 @@ El kit contiene la interfaz (con la estructura de ui.shadcn.com), el CLI `ds`, l
 | `scripts/` | `sync-production.mjs`, `build-public.mjs`, `doctor.mjs`. |
 | `plantilla/` | Lo que `ds init` copia a un repo de sistema. Usa `NOMBRE_DEL_SISTEMA` e `ID_DEL_SISTEMA`. |
 | `skills/` | Skills que `ds init` y `ds skills` instalan en cada sistema (`.claude/skills/` y `.agents/skills/`). `montar-sistema` es la de entrada: `ds instalar` la deja en la carpeta de usuario. |
-| `systems/ejemplo/` | Sistema de ejemplo para desarrollar sin datos reales. Con dos carpetas o más en `systems/`, `npm run dev` enseña el Directorio. |
+| `systems/ejemplo/` | «ds», el sistema de diseño de la propia interfaz del kit: su producción es este repo (`app/globals.css`, `components/`). Sirve para desarrollar sin datos de ningún producto y es lo que se publica en `ds.aochoa.fyi/ejemplo`. Con dos carpetas o más en `systems/`, `npm run dev` enseña el Directorio. |
 | `docs/metodologia/` | La metodología. `docs/DECISIONES.md`, `docs/TAREAS.md`. |
 
 ## Reglas

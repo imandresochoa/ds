@@ -1,0 +1,60 @@
+{
+  "entradas": {
+    "componentes/boton": {
+      "web:web:components/ui/button.tsx": {
+        "huella": "557e27d5d3159c33",
+        "commit": "25b8a73",
+        "revisado": "2026-11-05"
+      }
+    },
+    "componentes/campo-de-texto": {
+      "web:web:components/ui/input.tsx": {
+        "huella": "7bfd0eff6c53a38c",
+        "commit": "25b8a73",
+        "revisado": "2026-11-05"
+      }
+    },
+    "componentes/etiqueta": {
+      "web:web:components/ui/badge.tsx": {
+        "huella": "0311bb21a5dc8c1e",
+        "commit": "25b8a73",
+        "revisado": "2026-11-05"
+      }
+    },
+    "componentes/pestanas": {
+      "web:web:components/ui/tabs.tsx": {
+        "huella": "bc6b1c115fcc9d63",
+        "commit": "25b8a73",
+        "revisado": "2026-11-05"
+      }
+    },
+    "componentes/punto-de-estado": {
+      "web:web:components/docs/StatusBadge.tsx": {
+        "huella": "2d8bc5c047a2b8f8",
+        "commit": "25b8a73",
+        "revisado": "2026-11-05"
+      }
+    },
+    "componentes/tecla": {
+      "web:web:components/ui/kbd.tsx": {
+        "huella": "6088c3a5432338b1",
+        "commit": "25b8a73",
+        "revisado": "2026-11-05"
+      }
+    },
+    "bloques/cabecera-de-pagina": {
+      "web:web:components/site/PageHeader.tsx": {
+        "huella": "b486d4bc7b9ecdee",
+        "commit": "25b8a73",
+        "revisado": "2026-11-05"
+      }
+    },
+    "bloques/rejilla-de-fichas": {
+      "web:web:components/docs/EntryCard.tsx": {
+        "huella": "4f5e6c2da6d55b23",
+        "commit": "25b8a73",
+        "revisado": "2026-11-05"
+      }
+    }
+  }
+}

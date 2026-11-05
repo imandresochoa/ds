@@ -2,6 +2,12 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+- **El sistema de ejemplo documenta la interfaz del kit.** `systems/ejemplo` pasa a llamarse «ds» y su producción es el propio repo del kit: tokens de `app/globals.css` en cuatro fundamentos (Color, Estados, Tipografía y Forma), seis componentes de `components/ui/` y `components/docs/`, y dos bloques del sitio, con los ejemplos en vivo sobre el CSS real. El id y las URLs (`/ejemplo`) no cambian. Migración: ninguna.
+- **Sync con `@import "tailwindcss" source(…)`.** La instantánea de una superficie Tailwind quitaba solo `@import "tailwindcss";` y dejaba ` source(none);` suelto; ahora quita el `@import` con lo que lleve y los `@source`, que apuntan a carpetas del repo de producción.
+- **Clases inventadas en la primera superficie.** Un ejemplo sin `superficie=` lo pinta la primera superficie; si era Tailwind, el sync contaba sus utilidades como clases inventadas y `ds check` fallaba.
+
 ## 2.0.0 · 2026-11-01
 
 Versión mayor: cambia dónde viven los tokens. Una ficha de `content/tokens/` deja de leerse hasta que se migra con `npx ds migrar --aplicar` (ver «Migración desde la 1.x», abajo). Además, la interfaz se reordena con la navegación de Geist: una sola barra lateral, índices con los ejemplos en vivo y fichas más densas.

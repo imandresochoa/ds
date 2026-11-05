@@ -194,7 +194,9 @@ for (const system of listSystems()) {
         fs.copyFileSync(asset, target);
         return `url(${quote}assets${url}${quote})`;
       });
-      if (surface.tailwind) css = css.replace(/@import\s+["']tailwindcss["'];?/, '');
+      // En el iframe, Tailwind lo pone el compilador del navegador: fuera el @import (con source(…) o lo que lleve)
+      // y los @source, que apuntan a carpetas del repo de producción.
+      if (surface.tailwind) css = css.replace(/@import\s+["']tailwindcss["'][^;]*;/, '').replace(/^\s*@source\s+[^;]+;\s*$/gm, '');
       const target = path.join(snapshotDir, surfaceId, path.basename(rel));
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.writeFileSync(target, css);
@@ -296,7 +298,7 @@ for (const system of listSystems()) {
     const experimental = path.join(system.dir, 'experimental');
     const expCss = fs.existsSync(experimental) ? fs.readdirSync(experimental).filter((f) => f.endsWith('.css')).map((f) => fs.readFileSync(path.join(experimental, f), 'utf8')).join('\n') : '';
     const tailwindSurfaces = Object.entries(prod.superficies).filter(([, s]) => s.tailwind).map(([id]) => id);
-    const used = previewClasses([entry.body, ...Object.values(entry.platforms).map((p) => p.body)].join('\n'), tailwindSurfaces);
+    const used = previewClasses([entry.body, ...Object.values(entry.platforms).map((p) => p.body)].join('\n'), tailwindSurfaces, Object.keys(prod.superficies)[0]);
     const allDefined = new Set(Object.values(definedClasses).flatMap((s) => [...s]));
     const invented = used.filter((name) => !allDefined.has(name) && !classPattern(name).test(expCss));
 
