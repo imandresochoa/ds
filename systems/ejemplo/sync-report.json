@@ -1,0 +1,408 @@
+{
+  "generado": "2026-11-05T11:44:05.039Z",
+  "origen": "origin/main",
+  "commit": "25b8a73",
+  "fechaCommit": "2026-11-01",
+  "sinCommit": [],
+  "estilosAusentes": [],
+  "paquetesAusentes": [],
+  "tokens": {
+    "web": {
+      "modos": {
+        "light": [
+          ":root"
+        ],
+        "dark": [
+          ".dark"
+        ]
+      },
+      "theme": {
+        "font-sans": "var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif",
+        "font-heading": "var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif",
+        "font-mono": "var(--font-geist-mono), ui-monospace, monospace",
+        "radius-sm": "calc(var(--radius) * 0.6)",
+        "radius-md": "calc(var(--radius) * 0.8)",
+        "radius-lg": "var(--radius)",
+        "radius-xl": "calc(var(--radius) * 1.4)",
+        "radius-2xl": "calc(var(--radius) * 1.8)",
+        "radius-3xl": "calc(var(--radius) * 2.2)",
+        "color-background": "var(--background)",
+        "color-foreground": "var(--foreground)",
+        "color-card": "var(--card)",
+        "color-card-foreground": "var(--card-foreground)",
+        "color-popover": "var(--popover)",
+        "color-popover-foreground": "var(--popover-foreground)",
+        "color-primary": "var(--primary)",
+        "color-primary-foreground": "var(--primary-foreground)",
+        "color-secondary": "var(--secondary)",
+        "color-secondary-foreground": "var(--secondary-foreground)",
+        "color-muted": "var(--muted)",
+        "color-muted-foreground": "var(--muted-foreground)",
+        "color-accent": "var(--accent)",
+        "color-accent-foreground": "var(--accent-foreground)",
+        "color-destructive": "var(--destructive)",
+        "color-border": "var(--border)",
+        "color-input": "var(--input)",
+        "color-ring": "var(--ring)",
+        "color-surface": "var(--surface)",
+        "color-surface-foreground": "var(--surface-foreground)",
+        "color-code": "var(--code)",
+        "color-code-foreground": "var(--code-foreground)",
+        "color-selection": "var(--selection)",
+        "color-selection-foreground": "var(--selection-foreground)",
+        "color-estado-ok": "var(--estado-ok)",
+        "color-estado-aviso": "var(--estado-aviso)",
+        "color-estado-error": "var(--estado-error)",
+        "color-estado-desarrollo": "var(--estado-desarrollo)",
+        "color-estado-exploracion": "var(--estado-exploracion)",
+        "color-estado-obsoleto": "var(--estado-obsoleto)",
+        "color-nuevo": "var(--nuevo)"
+      }
+    }
+  },
+  "entradas": {
+    "fundamentos/color": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "fundamentos/estados": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "fundamentos/forma": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "fundamentos/tipografia": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "componentes/boton": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "web:web:components/ui/button.tsx",
+          "plataforma": "web",
+          "superficie": "web",
+          "fuente": "components/ui/button.tsx",
+          "clases": [],
+          "estado": "ok",
+          "huella": "557e27d5d3159c33",
+          "revisada": "557e27d5d3159c33",
+          "commitRevisado": "25b8a73",
+          "cambioDesde": null
+        },
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "componentes/campo-de-texto": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "web:web:components/ui/input.tsx",
+          "plataforma": "web",
+          "superficie": "web",
+          "fuente": "components/ui/input.tsx",
+          "clases": [],
+          "estado": "ok",
+          "huella": "7bfd0eff6c53a38c",
+          "revisada": "7bfd0eff6c53a38c",
+          "commitRevisado": "25b8a73",
+          "cambioDesde": null
+        },
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "componentes/etiqueta": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "web:web:components/ui/badge.tsx",
+          "plataforma": "web",
+          "superficie": "web",
+          "fuente": "components/ui/badge.tsx",
+          "clases": [],
+          "estado": "ok",
+          "huella": "0311bb21a5dc8c1e",
+          "revisada": "0311bb21a5dc8c1e",
+          "commitRevisado": "25b8a73",
+          "cambioDesde": null
+        },
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "componentes/pestanas": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "web:web:components/ui/tabs.tsx",
+          "plataforma": "web",
+          "superficie": "web",
+          "fuente": "components/ui/tabs.tsx",
+          "clases": [],
+          "estado": "ok",
+          "huella": "bc6b1c115fcc9d63",
+          "revisada": "bc6b1c115fcc9d63",
+          "commitRevisado": "25b8a73",
+          "cambioDesde": null
+        },
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "componentes/punto-de-estado": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "web:web:components/docs/StatusBadge.tsx",
+          "plataforma": "web",
+          "superficie": "web",
+          "fuente": "components/docs/StatusBadge.tsx",
+          "clases": [],
+          "estado": "ok",
+          "huella": "2d8bc5c047a2b8f8",
+          "revisada": "2d8bc5c047a2b8f8",
+          "commitRevisado": "25b8a73",
+          "cambioDesde": null
+        },
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "componentes/tecla": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "web:web:components/ui/kbd.tsx",
+          "plataforma": "web",
+          "superficie": "web",
+          "fuente": "components/ui/kbd.tsx",
+          "clases": [],
+          "estado": "ok",
+          "huella": "6088c3a5432338b1",
+          "revisada": "6088c3a5432338b1",
+          "commitRevisado": "25b8a73",
+          "cambioDesde": null
+        },
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "bloques/cabecera-de-pagina": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "web:web:components/site/PageHeader.tsx",
+          "plataforma": "web",
+          "superficie": "web",
+          "fuente": "components/site/PageHeader.tsx",
+          "clases": [],
+          "estado": "ok",
+          "huella": "b486d4bc7b9ecdee",
+          "revisada": "b486d4bc7b9ecdee",
+          "commitRevisado": "25b8a73",
+          "cambioDesde": null
+        },
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "bloques/rejilla-de-fichas": {
+      "estado": "ok",
+      "fuentes": [
+        {
+          "clave": "web:web:components/docs/EntryCard.tsx",
+          "plataforma": "web",
+          "superficie": "web",
+          "fuente": "components/docs/EntryCard.tsx",
+          "clases": [],
+          "estado": "ok",
+          "huella": "4f5e6c2da6d55b23",
+          "revisada": "4f5e6c2da6d55b23",
+          "commitRevisado": "25b8a73",
+          "cambioDesde": null
+        },
+        {
+          "clave": "tokens",
+          "plataforma": "web",
+          "superficie": "tokens",
+          "fuente": "tokens.produccion.json",
+          "clases": [],
+          "estado": "ok"
+        }
+      ],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    },
+    "iniciativas/visor-redimensionable": {
+      "estado": null,
+      "fuentes": [],
+      "avisos": [],
+      "clasesInventadas": [],
+      "coloresAusentes": []
+    }
+  },
+  "cobertura": {
+    "componentes:web": {
+      "total": 19,
+      "documentadas": 5,
+      "sinDocumentar": [
+        "components/ui/command.tsx",
+        "components/ui/dialog.tsx",
+        "components/ui/dropdown-menu.tsx",
+        "components/ui/hover-card.tsx",
+        "components/ui/label.tsx",
+        "components/ui/popover.tsx",
+        "components/ui/scroll-area.tsx",
+        "components/ui/separator.tsx",
+        "components/ui/sheet.tsx",
+        "components/ui/slider.tsx",
+        "components/ui/sonner.tsx",
+        "components/ui/toggle-group.tsx",
+        "components/ui/toggle.tsx",
+        "components/ui/tooltip.tsx"
+      ]
+    },
+    "tokens:web": {
+      "total": 72,
+      "documentadas": 72,
+      "sinDocumentar": []
+    }
+  },
+  "hallazgos": {
+    "superficies": {
+      "web": {
+        "valoresSueltos": [],
+        "copiasDeTokens": [],
+        "tokensSinUso": []
+      }
+    },
+    "hojasSinCargar": [
+      {
+        "archivo": "systems/ejemplo/experimental/boton.css",
+        "referencias": [],
+        "motivo": "Nada la importa."
+      },
+      {
+        "archivo": "systems/ejemplo/experimental/seccion.css",
+        "referencias": [],
+        "motivo": "Nada la importa."
+      }
+    ]
+  }
+}

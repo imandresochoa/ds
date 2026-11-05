@@ -1,11 +1,29 @@
 {
   "id": "ejemplo",
-  "nombre": "Sistema de ejemplo",
-  "iniciales": "SE",
+  "nombre": "ds",
+  "iniciales": "ds",
   "color": "#1a1c1f",
-  "descripcion": "Sistema de ejemplo del kit. Contenido provisional para desarrollar la interfaz sin depender de ningún producto.",
+  "descripcion": "El sistema de diseño de esta web: los tokens, componentes y bloques con los que está hecha la interfaz del kit, enlazados con su código.",
   "extiende": null,
   "metodologia": true,
-  "plataformas": ["web", "ios", "android"],
-  "produccion": null
+  "plataformas": ["web"],
+  "produccion": {
+    "repo": "../..",
+    "rama": "main",
+    "publico": "public",
+    "codigo": "https://github.com/imandresochoa/ds/blob/main/",
+    "web": "https://ds.aochoa.fyi/ejemplo",
+    "superficies": {
+      "web": {
+        "nombre": "Web",
+        "url": "https://ds.aochoa.fyi/ejemplo",
+        "estilos": ["app/globals.css"],
+        "tailwind": "4.3.3",
+        "cobertura": true,
+        "componentes": ["components/ui"],
+        "fondo": "var(--background)",
+        "cssExtra": "@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap'); :root { --font-geist-sans: 'Geist'; --font-geist-mono: 'Geist Mono'; }"
+      }
+    }
+  }
 }
