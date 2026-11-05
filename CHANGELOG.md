@@ -2,6 +2,15 @@
 
 Versiones del kit. Los sistemas fijan una versión exacta con `npm install @imandresochoa/ds@X.Y.Z` o, desde GitHub, `npm install github:imandresochoa/ds#vX.Y.Z`.
 
+## Sin publicar
+
+Versión menor.
+
+- **El Directorio lee repos git.** En `directorio.json`, una entrada de `sistemas` puede ser una ruta (como hasta ahora) o `{ "git": "github:org/x-design-system", "ref": "<commit o etiqueta>" }` (también `git@…`, `ssh://…` y `https://…`). `ds dev`, `ds build` y `ds doctor` clonan o actualizan cada repo en `.ds/fuentes/<id>`, una caché de solo lectura, con el acceso de `gh` o SSH de quien lo ejecuta y sin guardar tokens. Así el directorio se compila en CI o en Vercel sin clonar nada a mano. Con una rama o sin `ref`, `ds` avisa: fija un commit o una etiqueta.
+- **`ds init --directorio --sistemas`** acepta repos git: `--sistemas ../a-design-system,github:org/b-design-system#v1.4.0`. Sin `#ref`, fija el último commit de la rama por defecto.
+- **`ds doctor`** en un directorio enseña cada fuente git con su ref y su commit, comprueba que `.ds/` está en el `.gitignore` y no exige el repo de producción de un sistema que llega por git.
+- Migración: ninguna.
+
 ## 2.0.0 · 2026-11-01
 
 Versión mayor: cambia dónde viven los tokens. Una ficha de `content/tokens/` deja de leerse hasta que se migra con `npx ds migrar --aplicar` (ver «Migración desde la 1.x», abajo). Además, la interfaz se reordena con la navegación de Geist: una sola barra lateral, índices con los ejemplos en vivo y fichas más densas.
