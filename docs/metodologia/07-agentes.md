@@ -10,7 +10,7 @@ resumen: Qué lee un agente, en qué orden, y cómo se mejora la guía con evalu
 | `/llms.txt` | Índice de todos los sistemas y fichas, con enlaces a su Markdown. |
 | `/<sistema>/design.md` | Punto de entrada. Criterio escrito a mano (`DESIGN.md`) y un apéndice generado: estados, API pública de clases, fichas y tokens de producción. |
 | `/<sistema>/registry.json` | Índice del registry: cada pieza con su tipo, estado, categorías y el enlace a su JSON. También los tokens de producción y sus modos. |
-| `/<sistema>/r/<sección>/<slug>.json` | Una pieza: estado por plataforma, lo que usa y quién la usa, fuentes, sync, reglas y antipatrones. |
+| `/<sistema>/r/<sección>/<slug>.json` | Una pieza: estado por plataforma, lo que usa y quién la usa, fuentes, sync, reglas, antipatrones y las decisiones que la afectan. En una decisión, su contexto, lo decidido, sus consecuencias y sus alternativas. |
 | `/<sistema>/llms-full.txt` | Todas las fichas en un solo archivo. |
 | `/directorio.json` | Solo en un directorio: cada sistema con su cobertura y el enlace a su registry. |
 | `<ruta de la ficha>.md` | Cada página en Markdown, en la misma ruta. |
@@ -20,9 +20,14 @@ En la interfaz, «Copiar página» copia cada página en Markdown y su menú (o 
 ## Orden de lectura para un agente
 
 1. `design.md` del sistema.
-2. La ficha concreta (`.md`), o su JSON en `r/` si necesita datos: qué usa, quién la usa y su sync.
-3. Si va a escribir texto, la guía de voz enlazada desde Fundamentos.
-4. Si va a crear algo nuevo, esta metodología.
+2. La ficha concreta (`.md`), o su JSON en `r/` si necesita datos: qué usa, quién la usa, su sync y las decisiones que la afectan (`decisiones`).
+3. Esas decisiones, si va a cambiar la ficha: una aceptada obliga, y un cambio que la contradiga se avisa antes de hacerse (ver «Decisiones»).
+4. Si va a escribir texto, la guía de voz enlazada desde Fundamentos.
+5. Si va a crear algo nuevo, esta metodología.
+
+## Al terminar
+
+Cada tarea acaba con un reporte a la persona, con los mismos cinco apartados: qué cambió, por qué, cómo se comprobó, qué no se hizo y qué necesita de ella. Formato y reglas, en «Reporte al terminar».
 
 ## El registry es de solo lectura
 
@@ -53,8 +58,8 @@ El kit instala skills en cada sistema (`ds init` y `ds skills`): en `.claude/ski
 | `montar-sistema` | Montar un sistema desde el repo, la web o Figma de un producto, o desde cero, y aplicar un preset del Lab. Es la de entrada: `ds instalar` la deja en la carpeta de usuario para usarla antes de que exista el sistema. |
 | `inventariar-produccion` | Planificar qué documentar, con prioridades y tandas. Parte de la lista de la persona y de Figma, y usa `ds patrones` para las piezas repartidas en varias hojas. |
 | `recomendar-produccion` | Recomendar mejoras para producción: valores escritos a mano que ya son tokens, copias de tokens, hojas que no se cargan, foco y contraste. Escribe `docs/RECOMENDACIONES.md`. |
-| `nueva-ficha` | Documentar un componente, bloque, gráfico, fundamento, token o iniciativa. |
-| `auditar-sistema` | Comprobar que todo cuadra con producción y arreglarlo. Antes de publicar, tras cada merge en producción y como rutina diaria programada (apartado «Rutina diaria» de `AGENTS.md`). |
+| `nueva-ficha` | Documentar un componente, bloque, gráfico, fundamento, token, iniciativa o decisión. |
+| `auditar-sistema` | Comprobar que todo cuadra con producción y arreglarlo, y recoger las decisiones pendientes. Antes de publicar, tras cada merge en producción y como rutina diaria programada (apartado «Rutina diaria» de `AGENTS.md`). |
 | `revisar-sync` | Entender qué cambió en producción y actualizar o aceptar fichas. |
 | `actualizar-kit` | Subir de versión el kit en un sistema. |
 | `mejorar-kit` | Llevar al kit una mejora detectada en un sistema. |

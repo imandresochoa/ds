@@ -14,7 +14,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import postcss from 'postcss';
-import { PLATFORM_SECTIONS, documentedTokens, legacyTokenFiles, listSystems, loadEntries, loadLock, previewClasses, tokenName } from '../lib/core.mjs';
+import { checkDecisions } from '../lib/decisiones.mjs';
+import { DECISION_SECTION, PLATFORM_SECTIONS, documentedTokens, legacyTokenFiles, listSystems, loadEntries, loadLock, previewClasses, tokenName } from '../lib/core.mjs';
 import { buildTokens, readModeTokens, readThemeTokens } from '../lib/css-tokens.mjs';
 import { codeTexts, findHallazgos } from '../lib/hallazgos.mjs';
 
@@ -114,9 +115,14 @@ function componentFiles(repo, dirs) {
 
 for (const system of listSystems()) {
   const prod = system.produccion;
+  const log = (msg) => console.log(`[${system.id}] ${msg}`);
+  // Las decisiones no dependen de producción: se comprueban siempre, también sin repo.
+  const decisiones = checkDecisions(loadEntries(system));
+  for (const error of decisiones.errores) log(`error de decisiones: ${error}`);
+  for (const aviso of decisiones.avisos) log(`aviso de decisiones: ${aviso}`);
+  if (CHECK && decisiones.errores.length) failed = true;
   if (!prod) continue;
   const repo = path.resolve(system.dir, prod.repo);
-  const log = (msg) => console.log(`[${system.id}] ${msg}`);
 
   if (!fs.existsSync(repo)) {
     log(`repo de producción no encontrado en ${repo}; se conserva la última instantánea`);
@@ -234,7 +240,7 @@ for (const system of listSystems()) {
   // Si producción tiene cambios sin commit, la instantánea los incluye: se avisa para no confundirlo con main.
   // Sin trim: la primera línea de --porcelain puede empezar por espacio (« M ruta»).
   const sinCommit = src === repo ? execFileSync('git', ['-C', repo, 'status', '--porcelain'], { encoding: 'utf8' }).split('\n').filter(Boolean).map((line) => line.slice(3)) : [];
-  const report = { generado: new Date().toISOString(), origen: ref, commit, fechaCommit: commitDate, sinCommit, estilosAusentes, paquetesAusentes, tokens: tokenInfo, entradas: {}, cobertura: {} };
+  const report = { generado: new Date().toISOString(), origen: ref, commit, fechaCommit: commitDate, sinCommit, estilosAusentes, paquetesAusentes, tokens: tokenInfo, entradas: {}, cobertura: {}, decisiones };
   // Archivos que alguna ficha declara como fuente (para la cobertura por componentes).
   const declaredSources = new Set();
   // Todos los colores escritos en producción: en las hojas y en el código y los datos (un SVG en un .tsx, una paleta
@@ -246,6 +252,8 @@ for (const system of listSystems()) {
   const documented = Object.fromEntries(Object.keys(prod.superficies).map((id) => [id, new Set()]));
 
   for (const entry of entries) {
+    // Una decisión no tiene fuentes ni ejemplos: se comprueba aparte (checkDecisions).
+    if (entry.section === DECISION_SECTION) continue;
     const fuentes = [];
     for (const [platform, info] of Object.entries(entry.platforms)) {
       for (const surface of info.superficies) {
@@ -391,6 +399,6 @@ for (const system of listSystems()) {
 }
 
 if (failed) {
-  console.error('check:sync falló: hay hojas de producción que faltan o fichas desajustadas, ausentes, con clases inventadas o con colores que no cuadran.');
+  console.error('check:sync falló: hay hojas de producción que faltan, fichas desajustadas, ausentes, con clases inventadas o con colores que no cuadran, o decisiones con errores.');
   process.exit(1);
 }

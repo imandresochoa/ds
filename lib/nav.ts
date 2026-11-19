@@ -1,5 +1,5 @@
 // Datos de navegación que el servidor prepara para la interfaz (cabecera, barra lateral, ⌘K y anterior/siguiente).
-import { CAMBIO_PROMPT, CONTENT_SECTIONS, KIT_PAGES, SECTIONS, listSystems, loadDocs, loadEntries, loadPages, loadSyncReport, loadSystem } from './core.mjs';
+import { CAMBIO_PROMPT, CONTENT_SECTIONS, DECISION_SECTION, KIT_PAGES, SECTIONS, listSystems, loadDocs, loadEntries, loadPages, loadSyncReport, loadSystem } from './core.mjs';
 import { entryPreviews } from './previews';
 
 export type NavItem = {
@@ -109,6 +109,7 @@ export function surfacesAttr(lists: string[][]): string | undefined {
 
 /** Etiqueta del grupo de una ficha dentro de su sección. */
 export function groupLabel(section: Section, entry: Entry): string {
+  if ('estados' in section) return (section.estados as Record<string, { grupo: string }>)[entry.estado]?.grupo ?? 'Otras';
   if (section.agrupar === 'estado') return entry.estado === 'produccion' ? 'Publicadas' : 'En curso';
   if (section.agrupar === 'categoria') {
     // `nivel` es el nombre anterior de la categoría de un bloque (seccion, pantalla, flujo).
@@ -122,7 +123,8 @@ export function groupLabel(section: Section, entry: Entry): string {
 /** Orden de los grupos de una sección: primero las categorías conocidas, después el resto por nombre. */
 export function sortGroups<T extends { label: string }>(section: Section, groups: T[]): T[] {
   const known: string[] = Object.values((section.categorias as Record<string, string> | undefined) ?? {});
-  if (section.agrupar === 'estado') known.push('En curso', 'Publicadas');
+  if ('estados' in section) known.push(...new Set(Object.values(section.estados as Record<string, { grupo: string }>).map((s) => s.grupo)));
+  else if (section.agrupar === 'estado') known.push('En curso', 'Publicadas');
   return [...groups].sort((a, b) => (known.indexOf(a.label) + 1 || 99) - (known.indexOf(b.label) + 1 || 99) || a.label.localeCompare(b.label, 'es'));
 }
 
@@ -179,7 +181,8 @@ export function buildNav(systemId: string): Nav {
   const groups: NavGroup[] = [{ id: 'docs', label: 'Empezar', href: null, items: pageItems }];
   for (const section of CONTENT_SECTIONS) {
     const list = entries.filter((e) => e.section === section.id).map(toItem);
-    list.sort((a, b) => a.titulo.localeCompare(b.titulo, 'es'));
+    // Las decisiones van por número (su slug empieza por él); el resto, por orden alfabético.
+    list.sort((a, b) => (section.id === DECISION_SECTION ? a.href.localeCompare(b.href) : a.titulo.localeCompare(b.titulo, 'es')));
     groups.push({ id: section.id, label: section.label, href: `${base}/${section.id}`, items: list });
   }
   if (docItems.length) groups.push({ id: 'metodologia', label: 'Metodología', href: `${base}/metodologia`, items: docItems });

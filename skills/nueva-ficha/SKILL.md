@@ -1,6 +1,6 @@
 ---
 name: nueva-ficha
-description: Crea o completa una ficha del sistema de diseño (componente, bloque, gráfico, fundamento con sus tokens, o iniciativa) enlazada a producción. Úsala cuando pidan documentar una pieza, «añade el componente X» o «documenta esta sección».
+description: Crea o completa una ficha del sistema de diseño (componente, bloque, gráfico, fundamento con sus tokens, iniciativa o decisión) enlazada a producción. Úsala cuando pidan documentar una pieza, «añade el componente X», «documenta esta sección» o «deja escrita esta decisión».
 ---
 
 # Crear una ficha
@@ -19,6 +19,7 @@ Lee primero la metodología del kit (ruta en `npx ds info --json` → `kit.metod
 | Presentación de datos | `graficos` | `categoria` (area, barras, lineas, circular, radar, radial, tooltip), `tokens` de color |
 | Página de documentación | `content/docs/` | `titulo`, `resumen`; orden en `content/docs/meta.json` |
 | Trabajo en curso | `iniciativas` | secciones fijas: Resumen, Referencias, Exploración, Flujos, Handoff, Playground |
+| El porqué de algo (una decisión) | `decisiones` | archivo `NNNN-slug.md`, `estado: propuesta`, `fecha`, `afecta`, `sustituye`; apartados Contexto, Decisión, Consecuencias, Alternativas. Ver el paso 3b |
 
 Archivo único `content/<sección>/<slug>.md`, o carpeta `<slug>/index.md` + `web.md`/`ios.md`/`android.md` si hay varias plataformas.
 
@@ -36,6 +37,15 @@ Estado `exploracion`. Si necesita estilos, van en `experimental/<slug>.css`. Si 
 
 Si son tokens (van en la lista `tokens` de su fundamento) y la persona quiere elegir sus valores, que los ajuste en el Lab de primitivos (`/<id>/lab` con `npx ds dev`) y sigue el apartado «Aplicar un preset del Lab» de la skill `montar-sistema`. Si no, escríbelos en `experimental/tokens.css`. La tabla del fundamento enseña los valores de `experimental/` en su columna «Experimental».
 
+## 3b. Si es una decisión
+
+Sigue `11-decisiones.md` de la metodología.
+
+1. El número es el siguiente libre en `content/decisiones/` (cuatro cifras). No reutilices números de decisiones rechazadas.
+2. `estado: propuesta` y `fecha` de hoy. **Nunca** escribas `aceptada`, `rechazada` ni `decide`: eso lo pone una persona.
+3. `afecta` con los ids de las fichas que cambia (compruébalos con `npx ds search`). Si reemplaza a otra decisión, `sustituye` con su id; la vieja pasa a `sustituida` solo cuando una persona acepte la nueva.
+4. En Contexto, hechos con su fuente (producción, una medición, una iniciativa). En Alternativas, lo descartado y por qué.
+
 ## 4. Contenido
 
 - Una frase de `resumen`: qué es y cuándo se usa.
@@ -45,4 +55,4 @@ Si son tokens (van en la lista `tokens` de su fundamento) y la persona quiere el
 
 ## 5. Cierra
 
-Reinicia `npx ds dev` (las rutas son estáticas), revisa la página y ejecuta `npx ds check`.
+Reinicia `npx ds dev` (las rutas son estáticas), revisa la página y ejecuta `npx ds check`. Termina con el reporte de «Reporte al terminar» (metodología): qué fichas creaste o cambiaste, en qué decisiones te apoyas o cuáles propones, el resultado del check, lo que quedó «Pendiente» y lo que necesita la persona.

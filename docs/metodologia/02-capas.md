@@ -21,7 +21,7 @@ shadcn/ui lista los componentes por orden alfabético y marca los nuevos; nosotr
 
 Bloques y Gráficos son estructura: el kit no trae ninguno. Cada sistema los llena con lo que existe en su producto.
 
-Las **iniciativas** no son una capa: agrupan trabajo en curso que atraviesa capas (ver Estados).
+Las **iniciativas** no son una capa: agrupan trabajo en curso que atraviesa capas (ver Estados). Las **decisiones** tampoco: explican por qué cualquier capa es como es (ver «Decisiones»).
 
 Antes de la 1.0, los bloques se llamaban **patrones** y su categoría iba en `nivel`. Las dos formas se siguen leyendo: `content/patrones/` aparece como Bloques y `nivel: seccion` cuenta como `categoria: seccion`.
 

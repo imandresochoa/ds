@@ -5,7 +5,7 @@ resumen: Qué significa agentic-first y las reglas que no se negocian.
 
 Un sistema de diseño agentic-first es uno que una persona y un agente leen igual de bien. No hay una versión «bonita» para personas y otra para máquinas: la página que ves es Markdown con datos estructurados, y el agente lee ese mismo Markdown.
 
-## Las siete reglas
+## Las ocho reglas
 
 1. **Producción manda.** Lo que está en producción se documenta tal cual es. El sistema no describe un ideal: describe el código. Lo que todavía no existe se marca con su estado.
 2. **Todo tiene estado.** Cada ficha y cada plataforma dicen si están en exploración, en desarrollo, en producción u obsoletas. Un agente solo usa lo que está en producción salvo que se le pida otra cosa.
@@ -14,6 +14,7 @@ Un sistema de diseño agentic-first es uno que una persona y un agente leen igua
 5. **Reglas observables.** Se escribe «un solo botón relleno por grupo», que se puede comprobar, y no «que respire más», que no.
 6. **Los antipatrones tienen nombre.** Nombrar un error frecuente («doble principal», «sinónimos de clase») permite que un agente lo reconozca y lo evite.
 7. **Si no está documentado, no se inventa.** Ante un hueco, el agente lo dice y propone una ficha en exploración. Prefiere dejar algo en blanco a rellenarlo con una suposición.
+8. **El porqué se escribe y cada cambio se cuenta.** Las decisiones que cambian el sistema quedan escritas en él, con su contexto y sus alternativas, y solo una persona las acepta. Cada tarea de un agente acaba con un reporte: qué cambió, por qué, cómo se comprobó, qué no se hizo y qué necesita de la persona.
 
 ## Qué cambia frente a un sistema de diseño clásico
 
@@ -24,7 +25,8 @@ Un sistema de diseño agentic-first es uno que una persona y un agente leen igua
 | Ejemplos recreados a mano | Ejemplos en vivo que cargan el CSS real de producción |
 | Lo nuevo y lo publicado conviven sin distinguirse | Estados por ficha y por plataforma, e iniciativas |
 | Lo lee una persona | Lo leen personas y agentes: `llms.txt`, `design.md`, `registry.json` |
+| El porqué se queda en reuniones y PRs | Decisiones publicadas junto a las fichas que afectan |
 
 ## Origen
 
-Esta metodología nace del primer sistema que construimos con ella (octubre de 2026) y está pensada para replicarse en cualquier producto. Las decisiones y su motivo quedan en las [decisiones del kit](https://github.com/imandresochoa/ds/blob/main/docs/DECISIONES.md).
+Esta metodología nace del primer sistema que construimos con ella (octubre de 2026) y está pensada para replicarse en cualquier producto. Las decisiones y su motivo quedan en las [decisiones del kit](https://github.com/imandresochoa/ds/tree/main/docs/decisiones) (las anteriores al 2026-11-19, en el [histórico](https://github.com/imandresochoa/ds/blob/main/docs/DECISIONES.md)).

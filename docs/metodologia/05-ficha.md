@@ -87,6 +87,10 @@ tokens:
 - **`relacionados`** es «ver también»: otro fundamento del mismo tema, o el sustituto de una pieza obsoleta. No es una dependencia.
 - Un id de `usa` que no existe se avisa en `ds build` y `ds dev`.
 
+## Decisiones
+
+Una decisión es una ficha de `content/decisiones/` con otro frontmatter (`estado` propuesta, aceptada, sustituida o rechazada; `fecha`, `decide`, `afecta` y `sustituye`) y cuatro apartados: Contexto, Decisión, Consecuencias y Alternativas. Una ficha no declara sus decisiones: es la decisión la que dice a qué fichas `afecta`, y el kit las enseña al final de cada una. Todo, en «Decisiones».
+
 ## Escribir para agentes
 
 - Frases cortas y comprobables. Nada de «elegante» o «limpio».

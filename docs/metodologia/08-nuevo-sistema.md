@@ -72,3 +72,5 @@ El resto de `system.json`: `iniciales` y `color` son la marca del sistema en la 
 ## Orden recomendado de relleno
 
 Fundamentos → tokens → átomos → moléculas → organismos → bloques. Cada capa usa la anterior, así que documentarlas en orden evita fichas que hablan de piezas que aún no existen. Si hay prisa por enseñar algo, empieza por el componente más usado (normalmente el botón) y completa sus tokens.
+
+Las decisiones no tienen turno: se escriben cuando se toman. La plantilla trae la primera, `decisiones/0001-registrar-las-decisiones`, en estado propuesta; aceptarla es lo primero que decide el equipo (ver «Decisiones»).

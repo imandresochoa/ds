@@ -21,4 +21,6 @@ description: Interpreta el informe del sync con producción y propone qué ficha
 
 Acepta ficha a ficha: `npx ds sync --accept <id>`. Usa `--accept all` solo si la persona lo pide y has revisado todas.
 
-Termina con `npx ds check` y un resumen: qué cambió en producción, qué fichas actualizaste y qué queda pendiente.
+Si una ficha que actualizas tiene decisiones aceptadas (`npx ds ver <id>` → `decisiones`) y el cambio de producción las contradice, no cambies la decisión: avísalo.
+
+Termina con `npx ds check` y el reporte de «Reporte al terminar»: qué cambió en producción, qué fichas actualizaste y aceptaste, qué queda pendiente y qué necesita la persona.

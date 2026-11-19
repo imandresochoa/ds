@@ -13,6 +13,8 @@ Las tareas de cada sistema viven en su propio repo. Aquí solo lo que afecta al 
 - [x] Kit separado: CLI `ds`, contenido en repos externos, plantilla, `ds doctor`.
 - [x] Modos (claro, oscuro…) y variables de `@theme` como tokens; cobertura por componentes en superficies Tailwind.
 - [x] Ruta de publicación (`publicacion.ruta`, `DS_RUTA`): el sitio exportado se sirve bajo una carpeta de otro sitio.
+- [x] Decisiones (ADR) como sección de cada sistema, con estados propios, `afecta` y `sustituye`, comprobadas por `ds check`; las del kit, en `docs/decisiones/` (ver `docs/decisiones/0001`).
+- [x] Reporte al terminar: cinco apartados fijos en la metodología, `AGENTS.md` y las skills (ver `docs/decisiones/0002`).
 
 ## Interfaz
 
