@@ -1,0 +1,21 @@
+# Dependabot abre los PRs de actualización; no se mergean solos.
+# Cada PR pasa «Comprobar» (comprobar.yml) y una persona hace el merge:
+# una versión mayor de Next puede romper el export estático.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # Next y sus paquetes van juntos en un solo PR.
+      next:
+        patterns:
+          - next
+          - eslint-config-next
+          - "@next/*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
