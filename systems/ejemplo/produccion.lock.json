@@ -30,9 +30,9 @@
     },
     "componentes/punto-de-estado": {
       "web:web:components/docs/StatusBadge.tsx": {
-        "huella": "2d8bc5c047a2b8f8",
-        "commit": "25b8a73",
-        "revisado": "2026-11-05"
+        "huella": "5c71214a0a994b3c",
+        "commit": "0385c46",
+        "revisado": "2026-11-19"
       }
     },
     "componentes/tecla": {
@@ -51,9 +51,9 @@
     },
     "bloques/rejilla-de-fichas": {
       "web:web:components/docs/EntryCard.tsx": {
-        "huella": "4f5e6c2da6d55b23",
-        "commit": "25b8a73",
-        "revisado": "2026-11-05"
+        "huella": "764ca047f5936a17",
+        "commit": "0385c46",
+        "revisado": "2026-11-19"
       }
     }
   }
