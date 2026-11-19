@@ -1,8 +1,9 @@
 ---
 titulo: Registrar las decisiones como ADR publicados
 resumen: Las decisiones del kit y de cada sistema se escriben una por archivo, numeradas, con contexto, decisión, consecuencias y alternativas. En los sistemas se publican como una sección más.
-estado: propuesta
+estado: aceptada
 fecha: 2026-11-19
+decide: Andrés
 ---
 
 ## Contexto

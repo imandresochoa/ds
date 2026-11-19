@@ -1,8 +1,9 @@
 ---
 titulo: Cada tarea de un agente acaba con un reporte
 resumen: Cinco apartados fijos (qué cambió, por qué, cómo se comprobó, qué no se hizo y qué necesita de la persona), con evidencia y no con valoraciones.
-estado: propuesta
+estado: aceptada
 fecha: 2026-11-19
+decide: Andrés
 ---
 
 ## Contexto
