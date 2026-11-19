@@ -1,8 +1,8 @@
 {
-  "generado": "2026-11-05T11:44:05.039Z",
+  "generado": "2026-11-19T10:58:59.927Z",
   "origen": "origin/main",
-  "commit": "25b8a73",
-  "fechaCommit": "2026-11-01",
+  "commit": "0385c46",
+  "fechaCommit": "2026-11-19",
   "sinCommit": [],
   "estilosAusentes": [],
   "paquetesAusentes": [],
@@ -247,9 +247,9 @@
           "fuente": "components/docs/StatusBadge.tsx",
           "clases": [],
           "estado": "ok",
-          "huella": "2d8bc5c047a2b8f8",
-          "revisada": "2d8bc5c047a2b8f8",
-          "commitRevisado": "25b8a73",
+          "huella": "5c71214a0a994b3c",
+          "revisada": "5c71214a0a994b3c",
+          "commitRevisado": "0385c46",
           "cambioDesde": null
         },
         {
@@ -331,9 +331,9 @@
           "fuente": "components/docs/EntryCard.tsx",
           "clases": [],
           "estado": "ok",
-          "huella": "4f5e6c2da6d55b23",
-          "revisada": "4f5e6c2da6d55b23",
-          "commitRevisado": "25b8a73",
+          "huella": "764ca047f5936a17",
+          "revisada": "764ca047f5936a17",
+          "commitRevisado": "0385c46",
           "cambioDesde": null
         },
         {
@@ -384,6 +384,10 @@
       "sinDocumentar": []
     }
   },
+  "decisiones": {
+    "errores": [],
+    "avisos": []
+  },
   "hallazgos": {
     "superficies": {
       "web": {
@@ -394,12 +398,7 @@
     },
     "hojasSinCargar": [
       {
-        "archivo": "systems/ejemplo/experimental/boton.css",
-        "referencias": [],
-        "motivo": "Nada la importa."
-      },
-      {
-        "archivo": "systems/ejemplo/experimental/seccion.css",
+        "archivo": "systems/ejemplo/produccion/web/globals.css",
         "referencias": [],
         "motivo": "Nada la importa."
       }
