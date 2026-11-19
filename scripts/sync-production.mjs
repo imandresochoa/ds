@@ -27,8 +27,9 @@ const ACCEPT = acceptAt >= 0 ? args[acceptAt + 1] ?? 'all' : null;
 
 const sha = (text) => crypto.createHash('sha256').update(text).digest('hex').slice(0, 16);
 const git = (repo, ...cmd) => execFileSync('git', ['-C', repo, ...cmd], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-// Colores en hexadecimal, normalizados a #rrggbb en minúsculas.
-const hexes = (text) => [...new Set([...text.matchAll(/#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![\w-])/g)].map(([, h]) => '#' + (h.length === 3 ? [...h].map((c) => c + c).join('') : h.slice(0, 6)).toLowerCase()))];
+// Colores en hexadecimal, normalizados a #rrggbb en minúsculas. El # no puede ir pegado a una palabra, «/», «-» o «&»:
+// así repo#143, org/repo#143, /pagina#abc y &#123; no cuentan como colores.
+const hexes = (text) => [...new Set([...text.matchAll(/(?<![\w&/-])#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![\w-])/g)].map(([, h]) => '#' + (h.length === 3 ? [...h].map((c) => c + c).join('') : h.slice(0, 6)).toLowerCase()))];
 const classPattern = (name) => new RegExp(`\\.${name.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}(?![\\w-])`);
 
 let failed = false;
