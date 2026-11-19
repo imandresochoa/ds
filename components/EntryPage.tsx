@@ -1,7 +1,7 @@
 import { ArrowUpRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { documentedTokens, loadEntries, loadSyncReport, modeLabel, PLATFORM_SECTIONS, PLATFORMS, resolvedTokenValue, SECTIONS, STATUSES, SYNC_STATES, TOKEN_SECTION, tokenValue } from '@/lib/core.mjs';
+import { documentedTokens, loadEntries, loadSyncReport, modeLabel, PLATFORM_SECTIONS, PLATFORMS, resolvedTokenValue, DECISION_SECTION, isSettled, SECTIONS, STATUSES, SYNC_STATES, TOKEN_SECTION, tokenValue } from '@/lib/core.mjs';
 import { createSlugger, prepareMarkdown, splitSection, type TocItem } from '@/lib/markdown';
 import type { Entry, Nav, System } from '@/lib/nav';
 import { sitePath } from '@/lib/site';
@@ -13,6 +13,7 @@ import { DocsArticle } from './docs/DocsArticle';
 import { StatusBadge, StatusDot } from './docs/StatusBadge';
 import { isColor, loadTokenColumns, TokenTable, type TokenRow } from './docs/TokenTable';
 import { Markdown } from './Markdown';
+import { decisionRelations } from '@/lib/decisiones.mjs';
 
 type Source = { clave: string; plataforma: string; superficie: string; fuente: string; clases: string[]; estado: string; motivo?: string; huella?: string; commitRevisado?: string | null };
 
@@ -43,6 +44,13 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   // `usa`: las piezas que compone (el grafo del registry). `relacionados`: ver también.
   const uses = byIds(entry.data.usa as string[]);
   const related = byIds(entry.data.relacionados as string[]).filter((r) => !uses.includes(r));
+  // Decisiones: en una ficha, las que la afectan; en una decisión, a qué afecta y su cadena de sustituciones.
+  const relations = decisionRelations(all);
+  const isDecision = entry.section === DECISION_SECTION;
+  const asList = (value: unknown) => [value ?? []].flat().map(String);
+  const decisionLists: Array<[string, Entry[]]> = isDecision
+    ? [['Afecta a', byIds(asList(entry.data.afecta))], ['Sustituye a', byIds(asList(entry.data.sustituye))], ['Sustituida por', byIds(relations.sustituidaPor(entry.id))]]
+    : [['Decisiones', byIds(relations.para(entry.id))]];
   const item = nav.items.find((i) => i.href === entry.href)!;
   const sources = ((sync?.fuentes ?? []) as Source[]).filter((f) => f.superficie !== 'tokens');
   // Un bloque enseña sus ejemplos en el visor ancho (anchos de escritorio, tablet y móvil), no en la tarjeta compacta.
@@ -66,8 +74,9 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
   const productionHeading = sources.length > 0 ? extra('Enlace con producción') : null;
   const usesHeading = uses.length > 0 ? extra('Usa') : null;
   const relatedHeading = related.length > 0 ? extra('Relacionados') : null;
-  const pieceLists = [{ heading: usesHeading, list: uses }, { heading: relatedHeading, list: related }].filter((g): g is { heading: TocItem; list: Entry[] } => g.heading !== null);
-  const extras = [tokensHeading, productionHeading, usesHeading, relatedHeading].filter((t): t is TocItem => t !== null);
+  const decisionGroups = decisionLists.filter(([, list]) => list.length > 0).map(([title, list]) => ({ heading: extra(title), list }));
+  const pieceLists = [{ heading: usesHeading, list: uses }, { heading: relatedHeading, list: related }, ...decisionGroups].filter((g): g is { heading: TocItem; list: Entry[] } => g.heading !== null);
+  const extras = [tokensHeading, productionHeading, usesHeading, relatedHeading, ...decisionGroups.map((g) => g.heading)].filter((t): t is TocItem => t !== null);
   const toc = [...(platformMd?.toc ?? []), ...(commonMd?.toc ?? []), ...(tableHeading ? [tableHeading, ...(tableIntroMd?.toc ?? [])] : []), ...(afterMd?.toc ?? []), ...extras];
 
   const badgeLink = 'inline-flex items-center gap-1 transition-colors hover:text-foreground [&_svg]:size-3';
@@ -183,7 +192,7 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
                 <Link key={r.id} href={r.href} data-slot="card" title={r.resumen} className="flex min-w-0 flex-col rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-accent/50">
                   <span className="flex items-center gap-2">
                     <span className="truncate font-medium">{r.titulo}</span>
-                    {r.estado !== 'produccion' && <StatusDot item={{ estado: r.estado, sync: null }} className="size-1.5" />}
+                    {!isSettled(r.estado) && <StatusDot item={{ estado: r.estado, sync: null }} className="size-1.5" />}
                     <span className="ml-auto shrink-0 text-xs text-muted-foreground">{SECTIONS.find((x) => x.id === r.section)?.label}</span>
                   </span>
                   <span className="truncate text-[0.8rem] text-muted-foreground">{r.resumen}</span>
@@ -195,6 +204,8 @@ export function EntryPage({ system, entry, platform, nav }: { system: System; en
 
         <p className="mt-12 text-xs text-muted-foreground">
           <code>{entry.id}</code>
+          {isDecision && entry.data.fecha && <> · Propuesta el {String(entry.data.fecha instanceof Date ? entry.data.fecha.toISOString().slice(0, 10) : entry.data.fecha)}</>}
+          {isDecision && entry.data.decide && <> · Decide {String(entry.data.decide)}</>}
           {entry.data.actualizado && <> · Actualizado el {entry.data.actualizado}</>}
         </p>
       </div>

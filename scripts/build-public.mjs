@@ -15,7 +15,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
-import { CONTENT_SECTIONS, FUNCIONES, KIT_PAGES, PLATFORM_SECTIONS, PLATFORMS, ROOT, STATUSES, SYNC_STATES, documentedTokens, legacyTokenFiles, listSystems, loadDocs, loadExperimentalTokens, loadPages, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
+import { CONTENT_SECTIONS, FUNCIONES, KIT_PAGES, PLATFORM_SECTIONS, PLATFORMS, DECISION_SECTION, DECISION_STATUSES, ROOT, STATUSES, SYNC_STATES, statusInfo, documentedTokens, legacyTokenFiles, listSystems, loadDocs, loadExperimentalTokens, loadPages, loadSyncReport, modeLabel, publicationRoute, routeMarkdown, tokenModes, tokenValue, withRoute } from '../lib/core.mjs';
+import { decisionRelations } from '../lib/decisiones.mjs';
 import { categoria, loadDirectoryIndex, loadRegistry } from '../lib/registry.mjs';
 
 const PUBLIC = path.join(ROOT, 'public');
@@ -31,7 +32,7 @@ const write = (rel, content) => {
   fs.writeFileSync(file, content);
 };
 const copyDir = (from, to) => fs.existsSync(from) && fs.cpSync(from, path.join(PUBLIC, to), { recursive: true });
-const statusLabel = (s) => STATUSES[s]?.label ?? s;
+const statusLabel = (s) => statusInfo(s)?.label ?? s;
 
 /**
  * Los tokens que documenta un fundamento, en una tabla: nombre, rol y un valor por superficie y modo del último sync,
@@ -53,10 +54,15 @@ function tokenTableMarkdown(system, entry, tokens, report) {
   return `# Tokens\n\n${head}\n${body.join('\n')}`;
 }
 
-/** Una ficha completa en Markdown: frontmatter, cuerpo común, sus tokens (en un fundamento) y una sección por plataforma. */
-function entryMarkdown(system, entry, report, tokens) {
+/**
+ * Una ficha completa en Markdown: frontmatter, cuerpo común, sus tokens (en un fundamento), una sección por plataforma
+ * y las decisiones que la afectan. En una decisión, el frontmatter dice también qué decisiones la sustituyen.
+ */
+function entryMarkdown(system, entry, report, tokens, entries) {
   const sync = report?.entradas?.[entry.id];
-  const front = { ...entry.data, id: entry.id, url: at(entry.href), sync: sync?.estado ?? null };
+  const relations = decisionRelations(entries);
+  const isDecision = entry.section === DECISION_SECTION;
+  const front = { ...entry.data, id: entry.id, url: at(entry.href), ...(isDecision ? { sustituidaPor: relations.sustituidaPor(entry.id) } : { sync: sync?.estado ?? null }) };
   const parts = [`---\n${YAML.stringify(front).trim()}\n---`, `# ${entry.titulo}`, entry.resumen, md(entry.body.trim()), tokenTableMarkdown(system, entry, tokens, report)];
   for (const [platform, info] of Object.entries(entry.platforms)) {
     if (info.body.trim()) parts.push(`# ${PLATFORMS[platform]}\n\n${md(info.body.trim())}`);
@@ -65,6 +71,8 @@ function entryMarkdown(system, entry, report, tokens) {
   if (sync?.fuentes?.length) {
     parts.push('# Enlace con producción\n\n| Fuente | Estado | Huella |\n| --- | --- | --- |\n' + sync.fuentes.map((f) => `| \`${f.fuente}\` | ${SYNC_STATES[f.estado]?.label ?? f.estado} | ${f.huella ?? '—'} |`).join('\n'));
   }
+  const affecting = isDecision ? [] : relations.para(entry.id).map((id) => entries.find((e) => e.id === id)).filter(Boolean);
+  if (affecting.length) parts.push('# Decisiones\n\n' + affecting.map((d) => `- [${d.titulo}](${at(d.href)}.md): ${statusLabel(d.estado)}. ${d.resumen}`).join('\n'));
   return parts.filter(Boolean).join('\n\n') + '\n';
 }
 
@@ -86,10 +94,15 @@ const llms = [
   ...(directory?.descripcion ? [`> ${directory.descripcion}`, ''] : []),
   '> Sistemas de diseño agentic-first. Cada página tiene su versión Markdown en la misma ruta terminada en `.md`.',
   '> Empieza por el design.md del sistema. Usa solo fichas «En producción» salvo que te pidan lo contrario; las que están en exploración o desarrollo aún no existen en producción. Si algo no está documentado, dilo en lugar de inventarlo.',
+  '> Las decisiones aceptadas explican por qué el sistema es así y obligan: si un cambio las contradice, avisa antes de hacerlo.',
   '',
   '## Estados',
   '',
   ...Object.values(STATUSES).map((s) => `- ${s.label}: ${s.descripcion}`),
+  '',
+  '## Estados de una decisión',
+  '',
+  ...Object.values(DECISION_STATUSES).map((s) => `- ${s.label}: ${s.descripcion}`),
   '',
   ...(directory ? ['## Directorio', '', `- [directorio.json](${at('/directorio.json')}): un sistema por tarjeta, con su cobertura y el enlace a su registry`, ''] : []),
 ];
@@ -105,7 +118,7 @@ for (const system of listSystems()) {
   copyDir(path.join(system.dir, 'produccion'), `_ds/${system.id}/produccion`);
   copyDir(path.join(system.dir, 'experimental'), `_ds/${system.id}/experimental`);
 
-  for (const entry of entries) write(`${system.id}/${entry.section}/${entry.slug}.md`, entryMarkdown(system, entry, report, tokens));
+  for (const entry of entries) write(`${system.id}/${entry.section}/${entry.slug}.md`, entryMarkdown(system, entry, report, tokens, entries));
   // Las páginas propias de Docs; las del kit (Producción, Para agentes) se generan en la interfaz.
   const pages = loadPages(system).filter((p) => !KIT_PAGES.some((k) => k.slug === p.slug));
   for (const page of pages) write(page.slug ? `${system.id}/docs/${page.slug}.md` : `${system.id}/docs.md`, `# ${page.titulo}\n\n${page.resumen}\n\n${md(page.body.trim())}\n`);
@@ -144,6 +157,10 @@ for (const system of listSystems()) {
     '',
     ...Object.values(STATUSES).map((s) => `- **${s.label}:** ${s.descripcion}`),
     '',
+    '## Estados de una decisión',
+    '',
+    ...Object.values(DECISION_STATUSES).map((s) => `- **${s.label}:** ${s.descripcion}`),
+    '',
     '## API pública de clases (solo «En producción»)',
     '',
     'Usa exactamente estos nombres. No inventes sinónimos.',
@@ -160,7 +177,7 @@ for (const system of listSystems()) {
     '',
   ].join('\n');
   write(`${system.id}/design.md`, `${handwritten}\n\n${generated}`);
-  write(`${system.id}/llms-full.txt`, entries.map((e) => entryMarkdown(system, e, report, tokens)).join('\n\n---\n\n'));
+  write(`${system.id}/llms-full.txt`, entries.map((e) => entryMarkdown(system, e, report, tokens, entries)).join('\n\n---\n\n'));
 
   llms.push(`## ${system.nombre}`, '', `- [design.md](${at(`/${system.id}/design.md`)}): reglas, API de clases, tokens y estados`, `- [registry.json](${at(`/${system.id}/registry.json`)}): índice de piezas; cada una en \`${at(`/${system.id}/r/<sección>/<slug>.json`)}\` con su estado, lo que usa, sus fuentes y su sync`, `- [llms-full.txt](${at(`/${system.id}/llms-full.txt`)}): todas las fichas en un archivo`, '');
   llms.push('### Docs', '', ...pages.map((p) => `- [${p.titulo}](${at(`/${system.id}/${p.slug ? `docs/${p.slug}` : 'docs'}.md`)})${p.resumen ? `: ${p.resumen}` : ''}`), '');

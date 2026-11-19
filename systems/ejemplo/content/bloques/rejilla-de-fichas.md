@@ -62,7 +62,7 @@ La miniatura cambia según lo que enseña la sección (`CARD_KINDS`):
 | Regla | Cómo se comprueba |
 | --- | --- |
 | La tarjeta entera es el enlace. | Un solo `<a>` por tarjeta, con foco visible. |
-| El estado solo sale si no es «En producción». | Las fichas en producción no llevan punto. |
+| El estado solo sale si no es «En producción» (ni «Aceptada», en una decisión). | Las fichas en producción y las decisiones aceptadas no llevan punto. |
 | Sin ejemplo, el resumen. | Una ficha sin `html preview` enseña su `resumen`. |
 
 ## Antipatrones

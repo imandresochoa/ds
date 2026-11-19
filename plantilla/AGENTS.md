@@ -8,7 +8,7 @@ Repo del sistema de diseño de NOMBRE_DEL_SISTEMA. Aquí solo vive el **contenid
 | --- | --- |
 | `system.json` | Configuración: id, nombre, repo de producción, superficies y plataformas. |
 | `DESIGN.md` | Criterio para agentes, escrito a mano. Se publica como `/<id>/design.md` con un apéndice generado. |
-| `content/<sección>/` | Fichas en Markdown con frontmatter YAML: `fundamentos` (con la lista de sus tokens), `componentes`, `bloques`, `graficos`, `iniciativas`. Las páginas de Docs, en `content/docs/`. |
+| `content/<sección>/` | Fichas en Markdown con frontmatter YAML: `fundamentos` (con la lista de sus tokens), `componentes`, `bloques`, `graficos`, `iniciativas` y `decisiones` (el porqué, numeradas: `0001-…`). Las páginas de Docs, en `content/docs/`. |
 | `docs/INVENTARIO.md` | Plan de fichas por tandas: lo hecho, lo que falta y las dudas. Lo crea la skill `inventariar-produccion`. |
 | `experimental/` | CSS de piezas en exploración o desarrollo (aún no están en producción). |
 | `produccion/`, `tokens.produccion.json`, `sync-report.json` | Generados por `ds sync`. No se editan. |
@@ -25,6 +25,8 @@ Repo del sistema de diseño de NOMBRE_DEL_SISTEMA. Aquí solo vive el **contenid
 5. **Si falta algo, dilo.** Escribe «Pendiente» en lugar de rellenar con suposiciones.
 6. **No cambies la interfaz aquí.** Si algo del motor falla o falta, se arregla en el kit (skill `mejorar-kit`).
 7. Nombra el `id` de la ficha en los commits: `feat(ds): componentes/boton …`.
+8. **Respeta las decisiones.** Antes de cambiar una ficha, lee las decisiones que la afectan (al final de su página o con `npx ds ver <id>`). Si tu cambio contradice una aceptada, para y avisa. Si tu cambio toma una decisión (cambia cómo se trabaja, cuesta revertir o elige entre alternativas), escríbela en `content/decisiones/` en estado `propuesta`. Nunca la pases a `aceptada`: eso lo hace una persona.
+9. **Cuenta lo que has hecho.** Cada tarea acaba con un reporte a la persona: qué cambió (por `id`), por qué (las decisiones), cómo se comprobó (comandos y resultado), qué no se hizo y qué necesita de ella. Si una corrección se repite, propón convertirla en una comprobación. Formato: «Reporte al terminar», en la metodología.
 
 ## Comandos
 
@@ -48,11 +50,11 @@ npx ds feedback --texto "<sugerencias>"   # sugerencias anónimas para el kit: e
 
 Al crear una ficha nueva, reinicia `ds dev`: las rutas son estáticas.
 
-Antes de terminar una tarea: `npx ds sync` y `npx ds check`.
+Antes de terminar una tarea: `npx ds sync` y `npx ds check`, y el reporte (regla 9).
 
 ## Rutina diaria
 
-Una vez al día, un agente audita el sistema contra producción y arregla lo que no cuadra (skill `auditar-sistema`).
+Una vez al día, un agente audita el sistema contra producción, arregla lo que no cuadra y recoge las decisiones pendientes de aceptar (skill `auditar-sistema`). Acaba con un reporte, como cualquier tarea.
 
 - Programada: sin programar. <!-- Cámbialo por dónde y a qué hora, por ejemplo «tarea programada de Claude Code, 9:00». -->
 
@@ -61,7 +63,7 @@ Si pone «sin programar», prográmala siguiendo el apartado «Rutina diaria» d
 ## Skills
 
 - `montar-sistema`: monta el sistema desde el repo, la web o Figma del producto, o desde cero (superficies, tokens, primeras fichas), y aplica los presets del Lab de primitivos.
-- `nueva-ficha`: documenta un componente, bloque, gráfico, fundamento (con sus tokens), iniciativa o página de Docs.
+- `nueva-ficha`: documenta un componente, bloque, gráfico, fundamento (con sus tokens), iniciativa, decisión o página de Docs.
 - `auditar-sistema`: revisa que todo el sistema cuadre con producción y arregla lo que no. Antes de publicar y tras cada merge en producción.
 - `revisar-sync`: interpreta el informe de sync y propone qué actualizar o aceptar.
 - `inventariar-produccion`: lista priorizada de lo que falta documentar.

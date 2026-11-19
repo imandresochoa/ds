@@ -1,6 +1,6 @@
-# Decisiones
+# Decisiones (histórico)
 
-Registro de decisiones del método y del repositorio. No se reescriben: si algo cambia, se añade una entrada nueva que lo explica.
+Registro de decisiones del método y del repositorio hasta el 2026-11-19. **Ya no se amplía**: las decisiones nuevas van en [`decisiones/`](decisiones/), una por archivo (ver `metodologia/11-decisiones.md`). Estas entradas no se reescriben ni se convierten.
 
 ## 2026-10-11 · Repositorio propio para los sistemas de diseño
 

@@ -18,6 +18,7 @@ El kit contiene la interfaz (con la estructura de ui.shadcn.com), el CLI `ds`, l
 | `lib/hallazgos.mjs` | Lo que producción hace a mano (valores que ya son tokens, copias, tokens sin uso, hojas sin cargar). Lo usa el sync; lo lee la skill `recomendar-produccion`. |
 | `lib/patrones.mjs` | Agrupa clases de hojas y prefijos distintos con la misma forma (radio, sombra, fondo, borde, relleno y tokens), leídas de la instantánea de producción. Lo usa `ds patrones`. |
 | `lib/migrar.mjs` | Migraciones del contenido de un sistema entre versiones mayores (2.0: `content/tokens/` a sus fundamentos). Lo usa `ds migrar`. |
+| `lib/decisiones.mjs` | Decisiones (`content/decisiones/`): quién sustituye a quién, qué decisiones afectan a cada ficha y lo que comprueba `ds check`. Lo comparten el registry, la interfaz y el sync. |
 | `lib/registry.mjs` | El registry: índice (`registry.json`) y un JSON por pieza (`r/`). Lo comparten `ds build` y el CLI. |
 | `lib/feedback.mjs` | Informe de `ds feedback`: campos fijos, anonimización y validación. Lo comparten el CLI y `api/feedback.mjs`. |
 | `api/` | Funciones del proyecto de Vercel del kit: `feedback.mjs` abre un issue con cada informe. No va en npm. |
@@ -26,21 +27,22 @@ El kit contiene la interfaz (con la estructura de ui.shadcn.com), el CLI `ds`, l
 | `plantilla/` | Lo que `ds init` copia a un repo de sistema. Usa `NOMBRE_DEL_SISTEMA` e `ID_DEL_SISTEMA`. |
 | `skills/` | Skills que `ds init` y `ds skills` instalan en cada sistema (`.claude/skills/` y `.agents/skills/`). `montar-sistema` es la de entrada: `ds instalar` la deja en la carpeta de usuario. |
 | `systems/ejemplo/` | «ds», el sistema de diseño de la propia interfaz del kit: su producción es este repo (`app/globals.css`, `components/`). Sirve para desarrollar sin datos de ningún producto y es lo que se publica en `ds.aochoa.fyi/ejemplo`. Con dos carpetas o más en `systems/`, `npm run dev` enseña el Directorio. |
-| `docs/metodologia/` | La metodología. `docs/DECISIONES.md`, `docs/TAREAS.md`. |
+| `docs/metodologia/` | La metodología. `docs/decisiones/` (una por archivo), `docs/DECISIONES.md` (histórico, ya no se amplía) y `docs/TAREAS.md`. |
 
 ## Reglas
 
 1. **Ningún producto en el kit.** Ni nombres, ni textos, ni colores de un cliente. Los ejemplos usan contenido provisional.
 2. **Lo que cambia, cambia para todos.** Una función nueva funciona en cualquier sistema o se activa por configuración en `system.json`.
 3. **Compatibilidad.** No rompas fichas ni `system.json` existentes sin subir la versión mayor y escribir la migración en `CHANGELOG.md`.
-4. **Documenta el método.** Si cambia cómo se trabaja, actualiza `docs/metodologia/` y añade una entrada con fecha a `docs/DECISIONES.md` (no reescribas entradas antiguas).
+4. **Documenta el método.** Si cambia cómo se trabaja, actualiza `docs/metodologia/` y escribe una decisión en `docs/decisiones/` en estado `propuesta` (formato de `11-decisiones.md`). Solo Andrés la acepta. `docs/DECISIONES.md` es histórico: no lo amplíes ni lo reescribas.
 5. **Las skills y la plantilla siguen la metodología.** Si cambias una, revisa las otras.
 6. **Nada escribe en producción.** El sistema lee el repo de producción, pero ningún comando, skill ni pieza del kit lo modifica: no hay `ds add`, y el Lab y el registry son de solo lectura. Lo que entra en producción entra por un PR que aprueba una persona.
 
 ## Cómo trabajamos
 
 - **Primero la propuesta.** En un cambio grande (una fase, una sección nueva, un cambio de estructura): revisa lo que hay, propón con opciones y su porqué, haz preguntas concretas y construye solo después de las respuestas. Andrés decide y suele discutir las alternativas.
-- **Qué falta y por qué.** Lo pendiente, con lo acordado y lo que está por decidir de cada fase, está en `docs/TAREAS.md`; el porqué de lo hecho, en `docs/DECISIONES.md`. Léelos antes de proponer.
+- **Qué falta y por qué.** Lo pendiente, con lo acordado y lo que está por decidir de cada fase, está en `docs/TAREAS.md`; el porqué de lo hecho, en `docs/decisiones/` y, antes del 2026-11-19, en `docs/DECISIONES.md`. Léelos antes de proponer.
+- **El reporte al terminar.** Cada tarea acaba con los cinco apartados de `12-reporte.md`: qué cambió, por qué (las decisiones), cómo se comprobó (comandos y resultado), qué no se hizo y qué necesita de Andrés.
 - **Una rama y un PR por cambio**, desde `main`. No apiles PRs: fusionar el de abajo con `--delete-branch` cierra el de arriba.
 - **Commits con el correo noreply de GitHub** (`git config user.email 170357002+imandresochoa@users.noreply.github.com`), no con un correo personal.
 - **Credenciales.** Los inicios de sesión y la 2FA de npm y GitHub los hace Andrés. Ningún agente pide, guarda ni usa tokens.

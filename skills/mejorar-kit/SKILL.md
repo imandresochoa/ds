@@ -10,6 +10,6 @@ Los repos de sistema no cambian el motor. Toda mejora se hace en el kit y vale p
 1. **Localiza el kit en local.** `npx ds info --json`: si `kit.enlazado` es `true`, `kit.ruta` ya es el checkout del kit. Si no, clónalo al lado (`git clone https://github.com/imandresochoa/ds`), ejecuta `npm install` dentro y enlázalo desde aquí: `npx ds enlazar <ruta al kit>`.
 2. **Lee `AGENTS.md` del kit.** Regla principal: ningún producto en el kit. Si la mejora depende de un producto, hazla configurable en `system.json`.
 3. **Rama en el kit**, cambio y pruebas: `npm run typecheck`, `npm run build` y `npx ds dev` desde este sistema para verlo con datos reales.
-4. **Documenta**: si cambia el método, `docs/metodologia/` y una entrada en `docs/DECISIONES.md`. Si cambia el comportamiento, una línea en `CHANGELOG.md` y la versión en `package.json` (parche, menor o mayor).
-5. **PR en el kit** con qué cambia y cómo se ha probado.
+4. **Documenta**: si cambia el método, `docs/metodologia/` y una decisión en `docs/decisiones/` (formato de `11-decisiones.md`, estado `propuesta`). Si cambia el comportamiento, una línea en `CHANGELOG.md` y la versión en `package.json` (parche, menor o mayor).
+5. **PR en el kit** con qué cambia, por qué y cómo se ha probado, y el reporte a la persona (`12-reporte.md`).
 6. Cuando se fusione y se etiquete, actualiza este sistema (skill `actualizar-kit`).

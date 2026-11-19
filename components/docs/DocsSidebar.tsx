@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useLayoutEffect, useRef } from 'react';
 import type { Nav, NavItem } from '@/lib/nav';
 import { useSurfaceGroups } from '@/components/site/SurfaceFilter';
+import { isSettled } from '@/lib/meta.mjs';
 import { StatusDot } from './StatusBadge';
 
 // Densidad de Geist: título de grupo y elementos al mismo tamaño, el título con más peso y sin enlace.
@@ -63,7 +64,7 @@ export function DocsSidebar({ nav }: { nav: Nav }) {
 
 /** Una página. Punto azul si es nueva; punto de su color si no está en producción o el sync avisa. */
 function SidebarItem({ item, active }: { item: NavItem; active: boolean }) {
-  const flagged = item.estado !== 'produccion' || (item.sync !== null && item.sync !== 'ok');
+  const flagged = !isSettled(item.estado) || (item.sync !== null && item.sync !== 'ok');
   return (
     <li>
       <Link href={item.href} data-active={active} className={BUTTON}>

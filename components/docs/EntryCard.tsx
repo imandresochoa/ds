@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { PreviewSurface } from '@/components/Preview';
-import { STATUSES } from '@/lib/meta.mjs';
+import { isSettled, statusInfo } from '@/lib/meta.mjs';
 import { surfacesAttr } from '@/lib/nav';
 import { cn } from '@/lib/utils';
 import { PreviewThumb } from './PreviewThumb';
@@ -37,7 +37,7 @@ export type CardKind = keyof typeof CARD_KINDS;
 /** Tarjeta de una ficha en un índice: su primer ejemplo en vivo, reducido, con el nombre y el estado debajo. */
 export function EntryCard({ item, kind }: { item: CardItem; kind: CardKind }) {
   const { frame, thumb } = CARD_KINDS[kind];
-  const status = !item.sinEstado && item.estado !== 'produccion' ? STATUSES[item.estado as keyof typeof STATUSES]?.label ?? item.estado : null;
+  const status = !item.sinEstado && !isSettled(item.estado) ? statusInfo(item.estado)?.label ?? item.estado : null;
   return (
     <Link
       href={item.href}

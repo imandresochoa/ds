@@ -29,7 +29,7 @@ El flujo es GitHub Flow, igual en los tres repos:
 
 1. Partir de `main` actualizada y crear una rama con un nombre que diga qué se hace.
 2. Hacer commits pequeños. En un sistema, el mensaje nombra el `id` de la ficha (`feat(ds): componentes/boton …`).
-3. Subir la rama y abrir un PR. La descripción responde a tres preguntas: **qué cambia, por qué y cómo se ha probado** (con los comandos ejecutados y su resultado).
+3. Subir la rama y abrir un PR. La descripción responde a tres preguntas: **qué cambia, por qué y cómo se ha probado** (con los comandos ejecutados y su resultado). Es el mismo contenido que el reporte de un agente (ver «Reporte al terminar»).
 4. Esperar a la CI y a la revisión. Si algo falla, más commits en la misma rama.
 5. Hacer merge y borrar la rama.
 
@@ -64,6 +64,7 @@ El merge en producción es distinto porque, sin staging, **hacer merge es desple
 - Antes de abrir un PR en un sistema: `npx ds sync` y `npx ds check`. El resultado va en la descripción.
 - En producción, abrir el PR y parar. Si el checkout de producción tiene cambios sin commit de otra persona, no se tocan: se trabaja en una copia aparte del repo con `git worktree add`, que crea otra carpeta con su propia rama sobre el mismo historial.
 - Si una comprobación falla, se arregla en la rama; no se desactiva la comprobación.
+- Al terminar, el reporte a la persona (ver «Reporte al terminar»). Si hay PR, su descripción lo lleva.
 
 ## Entornos del producto y el sistema
 
@@ -114,4 +115,4 @@ Con rewrites, la ruta es la misma en los dos lados: el sistema se exporta con `/
 
 ## Decisiones escritas
 
-La forma de trabajar de cada equipo (flujo de ramas, entornos, quién promociona) se decide una vez y se escribe en un registro de decisión (ADR): un archivo corto con contexto, decisión y consecuencias. Las decisiones propias del sistema van en su `docs/DECISIONES.md`.
+La forma de trabajar de cada equipo (flujo de ramas, entornos, quién promociona) se decide una vez y se escribe en un registro de decisión (ADR): un archivo corto con contexto, decisión, consecuencias y alternativas. Las del sistema van en su sección Decisiones (`content/decisiones/`) y las del producto, en su repo; el formato, los estados y quién acepta están en «Decisiones».

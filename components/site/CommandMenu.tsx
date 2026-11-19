@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { agentContext } from '@/lib/agent';
-import { STATUSES } from '@/lib/meta.mjs';
+import { isSettled, statusInfo } from '@/lib/meta.mjs';
 import type { Nav } from '@/lib/nav';
 import { sitePath } from '@/lib/site';
 import { cn } from '@/lib/utils';
@@ -99,10 +99,10 @@ export function CommandMenu({ nav }: { nav: Nav }) {
                   <MenuItem key={item.href} value={`${g.label} ${item.titulo} ${item.resumen}`} onSelect={() => run(() => router.push(item.href))}>
                     <div className="aspect-square size-4 rounded-full border border-dashed border-muted-foreground" />
                     {item.titulo}
-                    {item.estado !== 'produccion' && (
+                    {!isSettled(item.estado) && (
                       <span className="ml-auto flex items-center gap-1.5 text-xs font-normal text-muted-foreground">
                         <StatusDot item={item} />
-                        {STATUSES[item.estado as keyof typeof STATUSES]?.label}
+                        {statusInfo(item.estado)?.label}
                       </span>
                     )}
                   </MenuItem>

@@ -6,7 +6,7 @@ funcion: feedback
 nivel: atomo
 destacado: true
 creado: 2026-11-05
-actualizado: 2026-11-05
+actualizado: 2026-11-19
 tokens: [estado-ok, estado-aviso, estado-error, estado-desarrollo, estado-exploracion, estado-obsoleto]
 relacionados: [fundamentos/estados]
 plataformas:
@@ -36,13 +36,16 @@ plataformas:
 | Sync `ausente` o `sin-repo` | `estado-error`. |
 | Sync `nuevo` o `desajuste` | `estado-aviso`. |
 | En producción y sincronizada | `estado-ok`. |
+| Decisión `aceptada` | `estado-ok`. |
+| Decisión `propuesta` | `estado-exploracion`: aún no obliga. |
+| Decisión `sustituida` o `rechazada` | `estado-obsoleto`. |
 
 ## Reglas
 
 | Regla | Cómo se comprueba |
 | --- | --- |
 | El punto es `aria-hidden`; el estado se lee en el texto. | En las tarjetas sin texto visible va un `sr-only`. |
-| Una ficha en producción y sincronizada no enseña punto en las tarjetas. | `EntryCard` solo lo pinta si `estado !== 'produccion'`. |
+| Una ficha en producción y sincronizada, o una decisión aceptada, no enseña punto en las tarjetas. | `EntryCard` solo lo pinta si `isSettled(estado)` es falso. |
 
 ## Antipatrones
 

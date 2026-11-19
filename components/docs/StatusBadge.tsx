@@ -1,6 +1,6 @@
 'use client';
 
-import { PLATFORMS, STATUSES, SYNC_STATES } from '@/lib/meta.mjs';
+import { PLATFORMS, STATUSES, SYNC_STATES, statusInfo } from '@/lib/meta.mjs';
 import type { NavItem } from '@/lib/nav';
 import { cn } from '@/lib/utils';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -12,6 +12,10 @@ type Toned = Pick<NavItem, 'estado' | 'sync'>;
  * revisarla; rojo, declara algo que ya no existe; azul, en desarrollo; violeta, exploración; gris, obsoleta.
  */
 export function tone(item: Toned): 'ok' | 'aviso' | 'error' | 'desarrollo' | 'exploracion' | 'obsoleto' {
+  // Decisiones: aceptada, verde; propuesta, violeta (aún no obliga); sustituida o rechazada, gris.
+  if (item.estado === 'aceptada') return 'ok';
+  if (item.estado === 'propuesta') return 'exploracion';
+  if (item.estado === 'sustituida' || item.estado === 'rechazada') return 'obsoleto';
   if (item.estado === 'desarrollo' || item.estado === 'exploracion') return item.estado;
   if (item.estado === 'sin-iniciar') return 'obsoleto';
   if (item.sync === 'ausente' || item.sync === 'sin-repo') return 'error';
@@ -39,7 +43,7 @@ const label = (map: Record<string, { label: string }>, key: string | null) => (k
  * foco, el detalle: estado, sync, plataformas y fuentes.
  */
 export function StatusBadge({ item }: { item: Pick<NavItem, 'estado' | 'sync' | 'plataformas' | 'fuentes'> }) {
-  const status = STATUSES[item.estado as keyof typeof STATUSES];
+  const status = statusInfo(item.estado);
   const sync = item.sync ? SYNC_STATES[item.sync as keyof typeof SYNC_STATES] : null;
   const platforms = Object.entries(item.plataformas).filter(([, s]) => s !== 'sin-iniciar');
   return (

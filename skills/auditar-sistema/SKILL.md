@@ -47,12 +47,19 @@ El check no ve lo visual. Con `npx ds dev`, abre las fichas que cambiaron y las 
 
 `hallazgos` lista lo que producción hace a mano (valores que ya son tokens, copias de tokens, hojas que no se cargan). Tampoco es un error del sistema. Si cambió desde la última auditoría, actualiza `docs/RECOMENDACIONES.md` con `recomendar-produccion`: quita lo que producción ya arregló y añade lo nuevo.
 
+## 4b. Decisiones
+
+`ds sync` comprueba las decisiones de `content/decisiones/` aunque no haya repo de producción. Los errores («error de decisiones») hacen fallar el check: arréglalos como cualquier otro (un id de `afecta` que ya no existe se corrige al nombre nuevo; si la ficha se eliminó, se quita de la lista). Los avisos no fallan, pero se recogen:
+
+- **Propuestas sin decidir** (más de 14 días): no las aceptes ni las rechaces. Ponlas en el reporte, en «Qué necesita de ti», con su enlace y una línea de qué deciden.
+- **Una ficha que contradice una decisión aceptada** (por ejemplo, producción cambió algo que una decisión fija): no cambies la decisión. Documenta la ficha como es producción y avisa: hace falta una decisión nueva que la sustituya, o un cambio en producción.
+
 ## 5. Cerrar
 
 1. `npx ds check` pasa.
 2. `npx ds build` pasa, sin avisos de `usa`.
 3. Commit en una rama y PR con el resumen.
-4. Resumen para la persona, sin jerga: qué no cuadraba, qué arreglaste, qué queda pendiente y por qué.
+4. El reporte para la persona, sin jerga y con los apartados de «Reporte al terminar» (metodología): qué no cuadraba y qué arreglaste, por qué (las decisiones), cómo lo comprobaste, qué queda pendiente y qué necesita de ella (incluidas las decisiones por aceptar).
 
 ## Rutina diaria
 
@@ -74,6 +81,6 @@ Repo del sistema: <ruta local>. Repo de producción: <ruta local>, solo lectura:
 3. Arregla en una rama fix/auditoria-<fecha>. Nunca inventes textos, nunca aceptes huellas sin revisar la ficha, nunca uses --accept all.
 4. Si AGENTS.md permite al agente mergear sus PRs, mergea tras verificar; si no, deja el PR abierto.
 5. Si AGENTS.md explica cómo se publica el sistema, publícalo y comprueba que responde.
-6. Resumen corto: qué no cuadraba, qué arreglaste (enlace al PR), qué queda y qué necesita una decisión.
+6. Reporte corto, con los apartados de «Reporte al terminar»: qué no cuadraba y qué arreglaste (enlace al PR), cómo lo comprobaste, qué queda y qué necesita una decisión (incluidas las propuestas sin aceptar).
 Si todo cuadra y producción no cambió, una línea: «Todo cuadra».
 ```

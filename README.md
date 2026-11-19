@@ -96,7 +96,7 @@ Para trabajar con datos reales, enlaza el kit desde un sistema (ver [`docs/metod
 | `skills/` | Skills para agentes que se instalan en cada sistema. |
 | `systems/ejemplo/` | «ds», el sistema de diseño de la interfaz del kit, enlazado con este repo. |
 | `docs/metodologia/` | La metodología. Va en el paquete; el sitio de cada sistema la muestra solo si la activa. |
-| `docs/DECISIONES.md`, `docs/TAREAS.md` | Decisiones con fecha y tareas del kit. |
+| `docs/decisiones/`, `docs/DECISIONES.md`, `docs/TAREAS.md` | Decisiones del kit (una por archivo; el histórico, hasta el 2026-11-19) y sus tareas. |
 
 ## Licencia
 

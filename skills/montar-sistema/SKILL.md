@@ -139,7 +139,8 @@ El Lab de primitivos (`/<id>/lab` con `npx ds dev`, o «Nuevo» → «Lab de pri
 ## 5. Cierra
 
 - Ejecuta `npx ds doctor` y, con repo, `npx ds sync` y `npx ds check`.
-- Resume qué está hecho, qué queda pendiente y qué decisiones necesitan a la persona. Para verlo, `npx ds dev`.
+- Las respuestas de la persona a las decisiones abiertas (paso 4 de «Desde un repo») que cambien cómo es el sistema (voz, tokens o valores fijos, qué superficies se documentan) van como decisiones en `content/decisiones/`, a continuación de la `0001` de la plantilla, en estado `propuesta` y con lo que dijo en Contexto (skill `nueva-ficha`, paso 3b). La persona las acepta al revisar.
+- Termina con el reporte de «Reporte al terminar» (metodología): qué está hecho, en qué decisiones se apoya y cuáles quedan por aceptar, cómo se comprobó (`doctor`, `sync`, `check`), qué queda pendiente y qué necesita la persona. Para verlo, `npx ds dev`.
 - **Feedback para el kit (opcional).** Ofrécelo una vez, al final:
   1. Redacta en texto libre qué te habría venido bien para montar este sistema: lo que faltó en el kit, en la skill o en lo que te dieron. Son sugerencias, no un informe de errores. Escríbelas ya en genérico, sin nombres del producto, rutas, URLs ni valores.
   2. Enséñalo sin enviar nada: `npx ds feedback --texto "<sugerencias>"` (o `--archivo <ruta>`, con el texto en un archivo temporal fuera de los repos). El comando anonimiza y saca el JSON exacto que se enviaría: enséñaselo a la persona y dile que acaba en un issue público de `imandresochoa/ds`.
